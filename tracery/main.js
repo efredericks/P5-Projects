@@ -20,6 +20,8 @@ var CANVAS_ROWS;
 
 var NUM_CHUNKS;
 var chunkIndex;
+var subChunkIndex;
+var currentLevelActive; // 0-overworld, 1-subworld
 
 /// sprites
 var spriteSheet;
@@ -47,6 +49,7 @@ var activeNPCStringTime
 var grammar;
 
 /// map
+var subMap;
 var gameMap;
 const TILES = {
   WALL    : 0,
@@ -55,6 +58,7 @@ const TILES = {
   WATER   : 3,
   TREE    : 4, //4-11 is trees
   BEACH   : 12,
+  BRICK   : 13,
 };
 //var tileIndices;
 var tilePositions;
@@ -152,7 +156,8 @@ function preload() {
     10: {'row':2,  'col':3},
     11: {'row':2,  'col':4},
     ///
-    12: {'row':6,  'col':47},
+    12: {'row':6,  'col':47}, // beach
+    13: {'row':15, 'col':7}, //brick
   };
   TREE_SPRITE_START = 4;
   TREE_SPRITE_END   = 11;
@@ -188,6 +193,8 @@ function setup() {
 
   NUM_CHUNKS      = 100;
   chunkIndex      = 1; // start in middle
+  currentLevelActive = 0; // overworld active
+  subChunkIndex   = 0;
 
   CHARACTER_INDEX = 99
   NPC_INDEX       = 98
@@ -299,6 +306,29 @@ function setup() {
       }
     }
   }
+
+  // underworld
+  subMap = new Array(NUM_CHUNKS);
+  for (let _chunk = 0; _chunk < 1; _chunk++) {
+    subMap[_chunk] = [];
+    let randomOffset = getRandomInteger(0,10000);
+    for (let _r = 0; _r < 10; _r++) {
+      subMap[_chunk][_r] = [];
+      for (let _c = 0; _c < 10; _c++) {
+        if (((_c == 0) || (_c == (10-1))) ||
+            ((_r == 0) || (_r == (10-1))))
+          subMap[_chunk][_r].push(TILES.BRICK);
+        else {
+          subMap[_chunk][_r].push(TILES.GROUND);
+        }
+      }
+    }
+  }
+
+
+
+
+
   // touch controls
   lbutton = createButton('<');
   lbutton.position(10, 90, 65);
@@ -352,6 +382,12 @@ function keyReleased() {
     shiftScreen("left");
   else if (key == "d")
     shiftScreen("right");
+  else if (key == "z") {
+    if (currentLevelActive == 0)
+      currentLevelActive = 1;
+    else 
+      currentLevelActive = 0;
+  }
 }
 
 function draw() {
@@ -360,13 +396,25 @@ function draw() {
   /// draw functions
   background(71, 45, 60);
 
-  for (let _r = 0; _r < MAP_ROWS; _r++) {
-    for (let _c = 0; _c < MAP_COLS; _c++) {
-      //https://github.com/processing/p5.js/issues/1567
-      //image(img,[sx=0],[sy=0],[sWidth=img.width],[sHeight=img.height],[dx=0],[dy=0],[dWidth],[dHeight])
-      let _tile = gameMap[chunkIndex][_r][_c];
-      let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
-      image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+  if (currentLevelActive == 0) {
+    for (let _r = 0; _r < MAP_ROWS; _r++) {
+      for (let _c = 0; _c < MAP_COLS; _c++) {
+        //https://github.com/processing/p5.js/issues/1567
+        //image(img,[sx=0],[sy=0],[sWidth=img.width],[sHeight=img.height],[dx=0],[dy=0],[dWidth],[dHeight])
+        let _tile = gameMap[chunkIndex][_r][_c];
+        let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
+        image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+      }
+    }
+  } else {
+    for (let _r = 0; _r < 10; _r++) {
+      for (let _c = 0; _c < 10; _c++) {
+        //https://github.com/processing/p5.js/issues/1567
+        //image(img,[sx=0],[sy=0],[sWidth=img.width],[sHeight=img.height],[dx=0],[dy=0],[dWidth],[dHeight])
+        let _tile = subMap[0][_r][_c];
+        let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
+        image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+      }
     }
   }
 
