@@ -5,6 +5,6 @@ Aggregation of various playthings in P5JS
 
 ## Tracery
 
-[Tracery + Tilemaps + Chunking Demo](/tracery/)
+[Tracery + Tilemaps + Chunking Demo](/tracery/index.html)
 
 ## Bullet Hell
