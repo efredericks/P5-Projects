@@ -30,6 +30,9 @@ var player;
 var playerImg;
 var npcImg;
 
+var TREE_SPRITE_START;
+var TREE_SPRITE_END;
+
 /// depths
 var CHARACTER_INDEX;
 var NPC_INDEX;
@@ -50,8 +53,9 @@ const TILES = {
   GROUND  : 1,
   FOLIAGE : 2,
   WATER   : 3,
+  TREE    : 4,
 };
-var tileIndices;
+//var tileIndices;
 var tilePositions;
 var noiseGen;
 
@@ -60,7 +64,7 @@ var keyPressDelay;
 
 /// helper functions
 function getRandomInteger(min, max) {
-  return Math.floor(random(min, max)) + min;
+  return Math.floor(Math.random() * (max - min) + min);
 }
 
 // get frame index into spritesheet for raw drawing
@@ -121,20 +125,33 @@ function preload() {
   grammar         = tracery.createGrammar(grammars["npcs"]);
 
   //used for p5play spritesheet - not working!
+  /*
   tileIndices = {
     0 : getFrameIndex(17,1), // wall
     1 : getFrameIndex(0,1),  // ground
     2 : getFrameIndex(0,6),  // foliage
     3 : getFrameIndex(5,8),  // water
-  };
+  };*/
 
   //used for p5 image offsetting
   tilePositions = {
-    0 : {'row':17, 'col':1},
-    1 : {'row':0,  'col':1},
-    2 : {'row':0,  'col':6},
-    3 : {'row':5,  'col':8},
-  }
+    0:  {'row':17, 'col':1}, // wall
+    1:  {'row':0,  'col':1}, // ground
+    2:  {'row':0,  'col':6}, // foliage
+    3:  {'row':5,  'col':8}, // water
+    /// trees
+    4:  {'row':1,  'col':0},
+    5:  {'row':1,  'col':1},
+    6:  {'row':1,  'col':2},
+    7:  {'row':1,  'col':3},
+    8:  {'row':1,  'col':4},
+    9:  {'row':1,  'col':5},
+    10: {'row':2,  'col':3},
+    11: {'row':2,  'col':4},
+    ///
+  };
+  TREE_SPRITE_START = 4;
+  TREE_SPRITE_END   = 11;
 
 
   // setup sprites
@@ -143,6 +160,9 @@ function preload() {
   spriteSheet    = loadImage(kenneyPath);
   playerImg      = loadImage("assets/separate/player.png");
   npcImg         = loadImage("assets/separate/npc.png");
+
+  //18,7 (blue crab?)
+  //20,7
 }
 
 function setup() {
@@ -256,7 +276,9 @@ function setup() {
             gameMap[_chunk][_r].push(TILES.GROUND);
           else if (_noise < 0.2)
             gameMap[_chunk][_r].push(TILES.WATER);
-          else if (_noise < 0.4)
+          else if (_noise < 0.4) 
+            gameMap[_chunk][_r].push(getRandomInteger(TREE_SPRITE_START,TREE_SPRITE_END+1));
+          else if (_noise < 0.5)
             gameMap[_chunk][_r].push(TILES.FOLIAGE);
           else
             gameMap[_chunk][_r].push(TILES.GROUND);
@@ -269,9 +291,38 @@ function setup() {
       }
     }
   }
-  // npcs
+  // touch controls
+  lbutton = createButton('<');
+  lbutton.position(10, 90, 65);
+  lbutton.mousePressed(tLeft);
+
+  rbutton = createButton('>');
+  rbutton.position(40, 90, 65);
+  rbutton.mousePressed(tRight);
+
+  ubutton = createButton('^');
+  ubutton.position(25, 80, 65);
+  ubutton.mousePressed(tUp);
+
+  dbutton = createButton('v');
+  dbutton.position(25, 100, 65);
+  dbutton.mousePressed(tDown);
 
   frameRate(20);
+}
+
+// abstract this!
+function tLeft() {
+  player.position.x -= TILE_WIDTH;
+}
+function tRight() {
+  player.position.x += TILE_WIDTH;
+}
+function tUp() {
+  player.position.y -= TILE_HEIGHT;
+}
+function tDown() {
+  player.position.y += TILE_HEIGHT;
 }
 
 function keyReleased() {
@@ -289,43 +340,11 @@ function draw() {
 
   for (let _r = 0; _r < MAP_ROWS; _r++) {
     for (let _c = 0; _c < MAP_COLS; _c++) {
-      //let _index;
-      let _tile = gameMap[chunkIndex][_r][_c];
-      if (_tile != TILES.GROUND) {
-        let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
-        image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
-      }
-
-
-
-      /*
-      switch (gameMap[chunkIndex][_r][_c]) {
-        case TILES.WALL:
-          offset = getSpriteOffset(tilePositions['0']['row'], tilePositions['0']['col']);
-          image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
-          break;
-        case TILES.FOLIAGE:
-          offset = getSpriteOffset(tilePositions['0']['row'], tilePositions['0']['col']);
-          image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
-          break;
-        case TILES.WALL:
-          break;
-        default:
-          break;
-      }*/
-
       //https://github.com/processing/p5.js/issues/1567
       //image(img,[sx=0],[sy=0],[sWidth=img.width],[sHeight=img.height],[dx=0],[dy=0],[dWidth],[dHeight])
-
-        //offset = getSpriteOffset(_r, _c);
-        //image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
-
-
-//      if (gameMap[_r][_c] == TILES.WALL)
-      //spriteSheet.drawFrame(tileIndices[gameMap[chunkIndex][_r][_c]], _c * TILE_WIDTH, _r * TILE_HEIGHT);
-
- //     else if (gameMap[_r][_c] == TILES.FOLIAGE)
-  //      spriteSheet.drawFrame(getFrameIndex(0,6), _c * TILE_WIDTH, _r * TILE_HEIGHT);
+      let _tile = gameMap[chunkIndex][_r][_c];
+      let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
+      image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
     }
   }
 
