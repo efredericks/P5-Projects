@@ -53,7 +53,8 @@ const TILES = {
   GROUND  : 1,
   FOLIAGE : 2,
   WATER   : 3,
-  TREE    : 4,
+  TREE    : 4, //4-11 is trees
+  BEACH   : 12,
 };
 //var tileIndices;
 var tilePositions;
@@ -149,6 +150,7 @@ function preload() {
     10: {'row':2,  'col':3},
     11: {'row':2,  'col':4},
     ///
+    12: {'row':6,  'col':47},
   };
   TREE_SPRITE_START = 4;
   TREE_SPRITE_END   = 11;
@@ -274,8 +276,12 @@ function setup() {
           let _noise = noiseGen.get2DNoise(_c+randomOffset, _r+randomOffset);
           if (_noise < 0)
             gameMap[_chunk][_r].push(TILES.GROUND);
+          else if (_noise < 0.1)
+            gameMap[_chunk][_r].push(TILES.BEACH);
           else if (_noise < 0.2)
             gameMap[_chunk][_r].push(TILES.WATER);
+          else if (_noise < 0.25)
+            gameMap[_chunk][_r].push(TILES.BEACH);
           else if (_noise < 0.4) 
             gameMap[_chunk][_r].push(getRandomInteger(TREE_SPRITE_START,TREE_SPRITE_END+1));
           else if (_noise < 0.5)
