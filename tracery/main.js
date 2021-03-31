@@ -52,6 +52,7 @@ const TILES = {
   WATER   : 3,
 };
 var tileIndices;
+var tilePositions;
 var noiseGen;
 
 var recentKeyPress;
@@ -65,6 +66,12 @@ function getRandomInteger(min, max) {
 // get frame index into spritesheet for raw drawing
 function getFrameIndex(row, col) {
   return row * NUM_SPRITE_COLS + col;
+}
+
+function getSpriteOffset(row, col) {
+  let dx = col * TILE_WIDTH;
+  let dy = row * TILE_HEIGHT;
+  return {'dx':dx, 'dy':dy};
 }
 
 // convert rows/cols into pixels
@@ -107,6 +114,37 @@ function drawUI() {
   //text("erik", ui_x + 5, ui_y + 24);
 }
 
+// load all image assets first!
+function preload() { 
+  // procgen stuff
+  noiseGen        = new FastSimplexNoise({frequency: 0.01, octaves: 4});
+  grammar         = tracery.createGrammar(grammars["npcs"]);
+
+  //used for p5play spritesheet - not working!
+  tileIndices = {
+    0 : getFrameIndex(17,1), // wall
+    1 : getFrameIndex(0,1),  // ground
+    2 : getFrameIndex(0,6),  // foliage
+    3 : getFrameIndex(5,8),  // water
+  };
+
+  //used for p5 image offsetting
+  tilePositions = {
+    0 : {'row':17, 'col':1},
+    1 : {'row':0,  'col':1},
+    2 : {'row':0,  'col':6},
+    3 : {'row':5,  'col':8},
+  }
+
+
+  // setup sprites
+  let kenneyPath = "assets/1bitpack_kenney_1.1/Tilesheet/colored_packed.png";
+  //spriteSheet    = loadSpriteSheet(kenneyPath, 16, 16, 1056);
+  spriteSheet    = loadImage(kenneyPath);
+  playerImg      = loadImage("assets/separate/player.png");
+  npcImg         = loadImage("assets/separate/npc.png");
+}
+
 function setup() {
   // set globals per https://github.com/processing/p5.js/wiki/p5.js-overview#why-cant-i-assign-variables-using-p5-functions-and-variables-before-setup
   TILE_WIDTH      = 16;
@@ -131,17 +169,6 @@ function setup() {
   NPC_INDEX       = 98
   ENV_INDEX       = 0
 
-  // procgen stuff
-  noiseGen        = new FastSimplexNoise({frequency: 0.01, octaves: 4});
-  grammar         = tracery.createGrammar(grammars["npcs"]);
-
-  tileIndices = {
-    0 : getFrameIndex(17,1), // wall
-    1 : getFrameIndex(0,1),  // ground
-    2 : getFrameIndex(0,6),  // foliage
-    3 : getFrameIndex(5,8),  // water
-  };
-
   // handle key repeating
   recentKeyPress = 0;
   keyPressDelay  = 5;
@@ -154,21 +181,15 @@ function setup() {
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
   background(71, 45, 60);
 
-  // setup sprites
-  let kenneyPath = "assets/1bitpack_kenney_1.1/Tilesheet/colored_packed.png";
-  spriteSheet = loadSpriteSheet(kenneyPath, 16, 16, 1056);
-
   envSprites = new Group();
   npcSprites = new Group();
 
   // player [col:35, row: 14]
-  playerImg    = loadImage("assets/separate/player.png");
   player       = createSprite((TILE_WIDTH*2)+(TILE_WIDTH/2),(TILE_HEIGHT*2)+(TILE_HEIGHT/2), TILE_WIDTH, TILE_HEIGHT);
   player.depth = CHARACTER_INDEX;
   player.addImage(playerImg);
 
   // npc
-  npcImg       = loadImage("assets/separate/npc.png");
   npc          = createSprite((TILE_WIDTH*4)+(TILE_WIDTH/2),(TILE_HEIGHT*4)+(TILE_HEIGHT/2), TILE_WIDTH, TILE_HEIGHT);
   /// generative:
   npc.name     = grammar.flatten("#name#");
@@ -268,9 +289,41 @@ function draw() {
 
   for (let _r = 0; _r < MAP_ROWS; _r++) {
     for (let _c = 0; _c < MAP_COLS; _c++) {
-      let _index;
+      //let _index;
+      let _tile = gameMap[chunkIndex][_r][_c];
+      if (_tile != TILES.GROUND) {
+        let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
+        image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+      }
+
+
+
+      /*
+      switch (gameMap[chunkIndex][_r][_c]) {
+        case TILES.WALL:
+          offset = getSpriteOffset(tilePositions['0']['row'], tilePositions['0']['col']);
+          image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+          break;
+        case TILES.FOLIAGE:
+          offset = getSpriteOffset(tilePositions['0']['row'], tilePositions['0']['col']);
+          image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+          break;
+        case TILES.WALL:
+          break;
+        default:
+          break;
+      }*/
+
+      //https://github.com/processing/p5.js/issues/1567
+      //image(img,[sx=0],[sy=0],[sWidth=img.width],[sHeight=img.height],[dx=0],[dy=0],[dWidth],[dHeight])
+
+        //offset = getSpriteOffset(_r, _c);
+        //image(spriteSheet, _c*TILE_WIDTH, _r*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+
+
 //      if (gameMap[_r][_c] == TILES.WALL)
-      spriteSheet.drawFrame(tileIndices[gameMap[chunkIndex][_r][_c]], _c * TILE_WIDTH, _r * TILE_HEIGHT);
+      //spriteSheet.drawFrame(tileIndices[gameMap[chunkIndex][_r][_c]], _c * TILE_WIDTH, _r * TILE_HEIGHT);
+
  //     else if (gameMap[_r][_c] == TILES.FOLIAGE)
   //      spriteSheet.drawFrame(getFrameIndex(0,6), _c * TILE_WIDTH, _r * TILE_HEIGHT);
     }
