@@ -91,6 +91,8 @@ function shiftScreen(dir) {
     if (chunkIndex >= (NUM_CHUNKS-1))
       chunkIndex = NUM_CHUNKS-1;
   }
+  activeNPCString = "Chunk: " + chunkIndex;
+  activeNPCStringTimer = activeNPCStringTime;
 }
 
 // collide with an entity
@@ -314,10 +316,24 @@ function setup() {
   dbutton.position(25, 100, 65);
   dbutton.mousePressed(tDown);
 
+  lcbutton = createButton('chunk <');
+  lcbutton.position(10, 120, 65);
+  lcbutton.mousePressed(sLeft);
+
+  rcbutton = createButton('chunk >');
+  rcbutton.position(10, 140, 65);
+  rcbutton.mousePressed(sRight);
+
   frameRate(20);
 }
 
 // abstract this!
+function sLeft() {
+  shiftScreen("left");
+}
+function sRight() {
+  shiftScreen("right");
+}
 function tLeft() {
   player.position.x -= TILE_WIDTH;
 }
