@@ -146,7 +146,7 @@ function setup() {
   background(150, 200, 250)
 
   groundSprites    = new Group()
-  spikeSprites     = new Group()
+  //spikeSprites     = new Group()
   obstacleSprites  = new Group()
   coinSprites      = new Group()
   powerupSprites   = new Group()
@@ -212,7 +212,7 @@ function setup() {
 }
 
 function resetGame() {
-  spikeSprites.removeSprite()
+  //spikeSprites.removeSprite()
   groundSprites.removeSprites()
   for (let n = -2; n < numGroundSprites; n++) {
     let gs = createSprite(
@@ -288,9 +288,9 @@ function draw() {
         //player.position.y = height - 50 - player.height / 2
       }
 
-      if (spikeSprites.overlap(player)) {
-        isGameOver = true;
-      }
+      //if (spikeSprites.overlap(player)) {
+       // isGameOver = true;
+//      }
 
       // collide with UI
       if (uiSprites.overlap(player)) {
@@ -325,7 +325,7 @@ function draw() {
         groundSprites.add(firstGroundSprite)
       }
 
-      var firstSpikeSprite = spikeSprites[0];
+//      var firstSpikeSprite = spikeSprites[0];
 
       // spawn random foliage
       if (random() > 0.98) {
