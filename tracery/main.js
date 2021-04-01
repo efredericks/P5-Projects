@@ -209,7 +209,7 @@ function setup() {
   activeNPCStringTimer = 0;
   activeNPCStringTime  = 200; // delay to show on ui
 
-  numGenericNPCs = 1000; // number of NPCs to generate randomly in the overworld (flavor NPCs)
+  numGenericNPCs = 10; // number of NPCs to generate randomly in the overworld (flavor NPCs)
 
   /// canvas setup
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -224,6 +224,7 @@ function setup() {
   player.addImage(playerImg);
 
   // npc
+  let questGiver = getRandomInteger(0,numGenericNPCs);
   for (let _n = 0; _n < numGenericNPCs; _n++) {
     npc          = createSprite((TILE_WIDTH*4)+(TILE_WIDTH/2),(TILE_HEIGHT*4)+(TILE_HEIGHT/2), TILE_WIDTH, TILE_HEIGHT);
     /// generative:
@@ -237,11 +238,17 @@ function setup() {
     npc.chunk    = getRandomInteger(0,NUM_CHUNKS); //1;
     npc.speed    = 2; // tbd
 
-    console.log(npc);
+    if (_n == questGiver)
+      npc.questGiver = true;
+    else
+      npc.questGiver = false;
 
     npc.draw     = function() {
-      if (chunkIndex == this.chunk)
+      if (chunkIndex == this.chunk) {
+        if (this.questGiver)
+          rect(this.deltaX*2, this.deltaY*2, this.width+5, this.height+5);
         image(npcImg, this.deltaX*2, this.deltaY*2);
+      }
     }
     npc.update   = function() {
       if (chunkIndex == this.chunk) { // only update on current chunk
