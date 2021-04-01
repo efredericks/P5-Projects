@@ -28,6 +28,7 @@ var spriteSheet;
 var envSprites;
 var npcSprites;
 var player;
+var numGenericNPCs;
 
 var playerImg;
 var npcImg;
@@ -191,7 +192,7 @@ function setup() {
   CANVAS_COLS     = (int)(CANVAS_WIDTH  / TILE_WIDTH);
   CANVAS_ROWS     = (int)(CANVAS_HEIGHT / TILE_HEIGHT);
 
-  NUM_CHUNKS      = 100;
+  NUM_CHUNKS      = 4;//100;
   chunkIndex      = 1; // start in middle
   currentLevelActive = 0; // overworld active
   subChunkIndex   = 0;
@@ -208,6 +209,8 @@ function setup() {
   activeNPCStringTimer = 0;
   activeNPCStringTime  = 200; // delay to show on ui
 
+  numGenericNPCs = 1000; // number of NPCs to generate randomly in the overworld (flavor NPCs)
+
   /// canvas setup
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
   background(71, 45, 60);
@@ -221,54 +224,60 @@ function setup() {
   player.addImage(playerImg);
 
   // npc
-  npc          = createSprite((TILE_WIDTH*4)+(TILE_WIDTH/2),(TILE_HEIGHT*4)+(TILE_HEIGHT/2), TILE_WIDTH, TILE_HEIGHT);
-  /// generative:
-  npc.name     = grammar.flatten("#name#");
-  npc.mood     = grammar.flatten("#mood#");
-  npc.vipTitle = grammar.flatten("#vipTitle#");
-  npc.occupation = grammar.flatten("#occupation#");
-  ///
-  npc.depth    = NPC_INDEX;
-  //npc.addImage = npcImg;
-  npc.chunk    = 1;
-  npc.speed    = 2;
-  npc.draw     = function() {
-    if (chunkIndex == this.chunk)
-      image(npcImg, this.deltaX*2, this.deltaY*2);
-  }
-  npc.update   = function() {
-    if (chunkIndex == this.chunk) { // only update on current chunk
-      // https://stackoverflow.com/questions/20044791/how-to-make-an-enemy-follow-the-player-in-pygame
-      if (random() > 0.9) { // move towards player
-        // direction vector
-        let dx   = player.position.x - this.position.x;
-        let dy   = player.position.y - this.position.y;
-        let dist = Math.hypot(dx, dy);
+  for (let _n = 0; _n < numGenericNPCs; _n++) {
+    npc          = createSprite((TILE_WIDTH*4)+(TILE_WIDTH/2),(TILE_HEIGHT*4)+(TILE_HEIGHT/2), TILE_WIDTH, TILE_HEIGHT);
+    /// generative:
+    npc.name     = grammar.flatten("#name#");
+    npc.mood     = grammar.flatten("#mood#");
+    npc.vipTitle = grammar.flatten("#vipTitle#");
+    npc.occupation = grammar.flatten("#occupation#");
+    ///
+    npc.depth    = NPC_INDEX;
+    //npc.addImage = npcImg;
+    npc.chunk    = getRandomInteger(0,NUM_CHUNKS); //1;
+    npc.speed    = 2; // tbd
 
-        // normalize
-        dx /= dist;
-        dy /= dist;
+    console.log(npc);
 
-        if (!(dist == 16)) {
-          if (random() > 0.5) { // move x
-            if (dx > 0)
-              this.position.x += TILE_WIDTH;
-            else if (dx < 0)
-              this.position.x -= TILE_WIDTH;
-          } else { // move y
-            if (dy > 0)
-              this.position.y += TILE_HEIGHT;
-            else if (dy < 0)
-              this.position.y -= TILE_HEIGHT;
+    npc.draw     = function() {
+      if (chunkIndex == this.chunk)
+        image(npcImg, this.deltaX*2, this.deltaY*2);
+    }
+    npc.update   = function() {
+      if (chunkIndex == this.chunk) { // only update on current chunk
+        npcSprites.add(this);
+        // https://stackoverflow.com/questions/20044791/how-to-make-an-enemy-follow-the-player-in-pygame
+        if (random() > 0.9) { // move towards player
+          // direction vector
+          let dx   = player.position.x - this.position.x;
+          let dy   = player.position.y - this.position.y;
+          let dist = Math.hypot(dx, dy);
+
+          // normalize
+          dx /= dist;
+          dy /= dist;
+
+          if (!(dist == 16)) {
+            if (random() > 0.5) { // move x
+              if (dx > 0)
+                this.position.x += TILE_WIDTH;
+              else if (dx < 0)
+                this.position.x -= TILE_WIDTH;
+            } else { // move y
+              if (dy > 0)
+                this.position.y += TILE_HEIGHT;
+              else if (dy < 0)
+                this.position.y -= TILE_HEIGHT;
+            }
           }
-        }
 
-        //this.position.x += dx * this.speed;
-        //this.position.y += dy * this.speed;
-      }
+          //this.position.x += dx * this.speed;
+          //this.position.y += dy * this.speed;
+        }
+      } else // remove from colliders
+        npcSprites.remove(this);
     }
   }
-  npcSprites.add(npc);
 
   // environment
   gameMap = new Array(NUM_CHUNKS);
