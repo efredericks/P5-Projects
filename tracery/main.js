@@ -27,11 +27,15 @@ var currentLevelActive; // 0-overworld, 1-subworld
 var spriteSheet;
 var envSprites;
 var npcSprites;
+var pickupSprites;
 var player;
 var numGenericNPCs;
 
 var playerImg;
 var npcImg;
+
+var blueCrabImg;
+var blueCrab;
 
 var TREE_SPRITE_START;
 var TREE_SPRITE_END;
@@ -100,11 +104,28 @@ function shiftScreen(dir) {
   activeNPCStringTimer = activeNPCStringTime;
 }
 
-// collide with an entity
-function collideEntity(e, p) {
+// collide with a pickup object
+function collidePickup(e, p) {
+  // only pickup is the blue crab
+  if (chunkIndex == e.chunk) {
+    pickupSprites.remove(e);
+    e.remove();
+  }
+}
+
+
+// collide with an NPC
+function collideNPC(e, p) {
   if (chunkIndex == e.chunk) {
     activeNPCString      = e.vipTitle + " " + e.name + ", " + e.occupation + " [" + e.mood + "]";
     activeNPCStringTimer = activeNPCStringTime;
+
+    if (e.questGiver) { // display message 
+      if (e.quest["done"])
+        activeNPCString += " : " + npc.quest["thanks"];
+      else
+        activeNPCString += " : " + npc.quest["quest"];
+    }
     //textSize(24);
     //fill(255);
     //text(e.name + ": how's it goin?", e.position.x + 10, e.position.y - 10);
@@ -165,11 +186,21 @@ function preload() {
 
 
   // setup sprites
+  pickupSprites = new Group();
+  envSprites    = new Group();
+  npcSprites    = new Group();
+
   let kenneyPath = "assets/1bitpack_kenney_1.1/Tilesheet/colored_packed.png";
   //spriteSheet    = loadSpriteSheet(kenneyPath, 16, 16, 1056);
   spriteSheet    = loadImage(kenneyPath);
   playerImg      = loadImage("assets/separate/player.png");
   npcImg         = loadImage("assets/separate/npc.png");
+
+  blueCrab = createSprite(100, 100, TILE_WIDTH, TILE_HEIGHT);
+  let blueCrabAnim = blueCrab.addAnimation("jaunting", "assets/separate/bcrab1.png", "assets/separate/bcrab2.png");
+  blueCrabAnim.frameDelay = 12;
+  blueCrab.chunk = 1;
+  pickupSprites.add(blueCrab);
 
   //18,7 (blue crab?)
   //20,7
@@ -215,8 +246,6 @@ function setup() {
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
   background(71, 45, 60);
 
-  envSprites = new Group();
-  npcSprites = new Group();
 
   // player [col:35, row: 14]
   player       = createSprite((TILE_WIDTH*2)+(TILE_WIDTH/2),(TILE_HEIGHT*2)+(TILE_HEIGHT/2), TILE_WIDTH, TILE_HEIGHT);
@@ -238,9 +267,12 @@ function setup() {
     npc.chunk    = getRandomInteger(0,NUM_CHUNKS); //1;
     npc.speed    = 2; // tbd
 
-    if (_n == questGiver)
+    if (_n == questGiver) {
       npc.questGiver = true;
-    else
+      npc.quest = {"quest" : "Have you seen my BLUE CRAB?", // make this a list?
+                   "thanks": "Thanks m8",
+                   "done"  : false};
+    } else
       npc.questGiver = false;
 
     npc.draw     = function() {
@@ -435,7 +467,8 @@ function draw() {
   }
 
   // interact
-  npcSprites.collide(player, collideEntity)
+  npcSprites.collide(player, collideNPC);
+  pickupSprites.overlap(player, collidePickup);
 
   // update entities
   npcSprites.forEach(elem => elem.update());
