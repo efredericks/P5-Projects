@@ -3,12 +3,23 @@
  */
 
 var grammars = {
-    npcs: {
+    npcs : {
 	  name: ["Arjun","Yuuma","Darcy","Mia","Chiaki","Izzi","Azra","Lina"],
   	  mood: ["vexed","indignant","impassioned","wistful","astute","courteous"],
       vipTitle : ["Dr.", "Professor", "Lord", "Sir", "Captain", "His Majesty"],
       occupationBase : ["firefighter", "scientist", "spy", "smuggler", "mechanic", "astronaut", "adventurer", "pirate", "cowboy", "vampire", "detective", "soldier", "marine", "doctor", "ninja"],
       occupation : ["space #occupationBase#", "manic #occupationBase#", "professional #occupationBase#", "gentleman #occupationBase#", "#occupationBase#"],
+    },
+    environments : {
+      foliage: ["foliage"],
+      ground: ["ground"],
+      beach: ["beach"],
+
+      trees: ["#treeDesc.capitalize# trees #treeAction#"],
+      treeDesc: ["gently swaying", "imposing", "scraggly"],
+      treeAction: ["dot the landscape", "surround you", ", while sparse, encircle you", "choke you", "tower over you"],
+
+      water: ["water"],
     },
     neverbar : {
         vipTitle : ["Dr.", "Professor", "Lord", "Sir", "Captain", "His Majesty"],
