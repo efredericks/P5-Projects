@@ -10,3 +10,7 @@ Aggregation of various playthings in P5JS
 [Tracery + Tilemaps + Chunking Demo](https://efredericks.github.io/P5-Projects/tracery/index.html)
 
 ## Bullet Hell
+
+## Maurer Rose
+
+[Maurer Rose](https://efredericks.github.io/P5-Projects/maurer-rose/index.html) - based on [CodingTrain Demo](https://thecodingtrain.com/challenges/coding-in-the-cabana/001-maurer-rose.html)
