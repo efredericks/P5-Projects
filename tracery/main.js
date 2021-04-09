@@ -122,7 +122,7 @@ function collidePickup(e, p) {
     pickupSprites.remove(e);
     e.remove();
 
-    console.log(npcSprites);
+    //console.log(npcSprites);
     for (let _i = 0; _i < npcSprites.length; _i++) {
       if (npcSprites[_i].questGiver)
         npcSprites[_i].quest["done"] = true;
