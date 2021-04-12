@@ -166,8 +166,8 @@ function drawUI() {
 
 
   // update info box
-  let _txt  = select("#info");
-  let _rc   = getRowCol(player.position.x, player.position.y);
+  let _txt = select("#info");
+  let _rc = getRowCol(player.position.x, player.position.y);
   let _tile = gameMap[chunkIndex][_rc['row']][_rc['col']];
   _txt.html(_tile.desc);
 }
@@ -623,7 +623,7 @@ function draw() {
         else //if (player.speedCtr < 7)
           player.speed = 2;
         //else
-         // player.speed = 3;
+        // player.speed = 3;
 
         player.speedCtr++;
       }
