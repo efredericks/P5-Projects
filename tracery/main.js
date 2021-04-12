@@ -163,12 +163,20 @@ function drawUI() {
     text(activeNPCString, ui_x + 5, ui_y + 24);
   }
   //text("erik", ui_x + 5, ui_y + 24);
+
+
+  // update info box
+  let _txt  = select("#info");
+  let _rc   = getRowCol(player.position.x, player.position.y);
+  let _tile = gameMap[chunkIndex][_rc['row']][_rc['col']];
+  _txt.html(_tile.desc);
 }
+
 
 // load all image assets first!
 function preload() {
   // procgen stuff
-  noiseGen    = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });
+  noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });
   npc_grammar = tracery.createGrammar(grammars["npcs"]);
   env_grammar = tracery.createGrammar(grammars["environments"]);
 
@@ -199,7 +207,7 @@ function preload() {
     ///
     12: { 'row': 6, 'col': 47 }, // beach
     13: { 'row': 15, 'col': 7 }, // brick
-    14: { 'row': 22, 'col': 0},  // water animation
+    14: { 'row': 22, 'col': 0 },  // water animation
   };
   TREE_SPRITE_START = 4;
   TREE_SPRITE_END = 11;
@@ -274,7 +282,7 @@ function setup() {
   // player [col:35, row: 14]
   player = createSprite((TILE_WIDTH * 2) + (TILE_WIDTH / 2), (TILE_HEIGHT * 2) + (TILE_HEIGHT / 2), TILE_WIDTH, TILE_HEIGHT);
   player.depth = CHARACTER_INDEX;
-  player.speed    = 1;  // # of tiles to speed through
+  player.speed = 1;  // # of tiles to speed through
   player.speedCtr = 0;  // ramp up speed
   player.addImage(playerImg);
 
@@ -359,27 +367,27 @@ function setup() {
 
         if (((_c == 0) || (_c == (MAP_COLS - 1))) ||
           ((_r == 0) || (_r == (MAP_ROWS - 1))))
-          _obj = {"type": TILES.WALL, "desc": "Impassable wall"};
+          _obj = { "type": TILES.WALL, "desc": "Impassable wall" };
         else {
           let _noise = noiseGen.get2DNoise(_c + randomOffset, _r + randomOffset);
           if (_noise < 0)
-            _obj = {"type": TILES.GROUND, "desc": env_grammar.flatten("#ground#")};
+            _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
           else if (_noise < 0.1)
-            _obj = {"type": TILES.BEACH, "desc": env_grammar.flatten("#beach#")};
+            _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
           else if (_noise < 0.2) {
             if (random() > 0.90)
-              _obj = {"type": TILES.WATER_ANIM, "desc": env_grammar.flatten("#water#")};
+              _obj = { "type": TILES.WATER_ANIM, "desc": env_grammar.flatten("#water#") };
             else
-              _obj = {"type": TILES.WATER, "desc": env_grammar.flatten("#water#")};
+              _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
 
           } else if (_noise < 0.25)
-            _obj = {"type": TILES.BEACH, "desc": env_grammar.flatten("#beach#")};
+            _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
           else if (_noise < 0.4)
-            _obj = {"type": getRandomInteger(TREE_SPRITE_START, TREE_SPRITE_END+1), "desc": env_grammar.flatten("#trees#")};
+            _obj = { "type": getRandomInteger(TREE_SPRITE_START, TREE_SPRITE_END + 1), "desc": env_grammar.flatten("#trees#") };
           else if (_noise < 0.5)
-            _obj = {"type": TILES.FOLIAGE, "desc": env_grammar.flatten("#foliage#")};
+            _obj = { "type": TILES.FOLIAGE, "desc": env_grammar.flatten("#foliage#") };
           else
-            _obj = {"type": TILES.GROUND, "desc": env_grammar.flatten("#ground#")};
+            _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
         }
         gameMap[_chunk][_r].push(_obj);
       }
@@ -479,11 +487,12 @@ function keyReleased() {
 }
 
 function draw() {
-  let _move = {'left':  false,
-               'right': false,
-               'up':    false,
-               'down':  false
-              };
+  let _move = {
+    'left': false,
+    'right': false,
+    'up': false,
+    'down': false
+  };
 
   /// draw functions
   background(71, 45, 60);
@@ -498,7 +507,7 @@ function draw() {
         // randomly animate water -- this probably would be better abstracted later on to encapsulate tile animations (otherwise we're going to get deep into if statements)
         let _tile = gameMap[chunkIndex][_r][_c]['type'];
         if ((_tile == TILES.WATER) || (_tile == TILES.WATER_ANIM)) {
-          if (random() > 0.99) { 
+          if (random() > 0.99) {
             if (_tile == TILES.WATER) {
               gameMap[chunkIndex][_r][_c]['type'] = TILES.WATER_ANIM;
               _tile = TILES.WATER_ANIM;
@@ -567,25 +576,25 @@ function draw() {
       _move['up'] = true;
     if (keyWentUp(UP_ARROW))
       _move['up'] = false;
-      //player.position.y -= TILE_HEIGHT;
+    //player.position.y -= TILE_HEIGHT;
 
-    if (keyDown(DOWN_ARROW)) 
+    if (keyDown(DOWN_ARROW))
       _move['down'] = true;
     if (keyWentUp(DOWN_ARROW))
       _move['down'] = false;
-      //player.position.y += TILE_HEIGHT;
+    //player.position.y += TILE_HEIGHT;
 
-    if (keyDown(LEFT_ARROW)) 
+    if (keyDown(LEFT_ARROW))
       _move['left'] = true;
     if (keyWentUp(LEFT_ARROW))
       _move['left'] = false;
-      //player.position.x -= TILE_WIDTH;
+    //player.position.x -= TILE_WIDTH;
 
-    if (keyDown(RIGHT_ARROW)) 
+    if (keyDown(RIGHT_ARROW))
       _move['right'] = true;
     if (keyWentUp(RIGHT_ARROW))
       _move['right'] = false;
-      //player.position.x += TILE_WIDTH;
+    //player.position.x += TILE_WIDTH;
 
     /*
   recentKeyPress = keyPressDelay;
@@ -605,16 +614,16 @@ function draw() {
       player.position.x -= TILE_WIDTH * player.speed;
     if (_move['right'])
       player.position.x += TILE_WIDTH * player.speed;
-    
+
     // increase velocity
     if (_move['down'] || _move['up'] || _move['left'] || _move['right']) {
       if (player.speedCtr < 10) {
-        if (player.speedCtr < 4)
+        if (player.speedCtr < 5)
           player.speed = 1;
-        else if (player.speedCtr < 7)
+        else //if (player.speedCtr < 7)
           player.speed = 2;
-        else
-          player.speed = 3;
+        //else
+         // player.speed = 3;
 
         player.speedCtr++;
       }
@@ -624,7 +633,7 @@ function draw() {
       player.speed = 1;
     }
 
-    
+
     // bounds
     if ((player.position.x - (TILE_WIDTH / 2)) <= TILE_WIDTH)
       player.position.x = TILE_WIDTH + (TILE_WIDTH / 2);
@@ -649,9 +658,9 @@ function draw() {
   } else {
     if (activeTile) { // show some info!
       // bg
-      fill(color(0,0,0,220));
-      let ui_x  = camera.position.x - CANVAS_WIDTH / 2;
-      let ui_y  = camera.position.y - CANVAS_HEIGHT / 2;
+      fill(color(0, 0, 0, 220));
+      let ui_x = camera.position.x - CANVAS_WIDTH / 2;
+      let ui_y = camera.position.y - CANVAS_HEIGHT / 2;
       //rect(ui_x + 50, ui_y + 50, CANVAS_WIDTH - 100, CANVAS_HEIGHT - 100);
       rect(player.position.x + 5, player.position.y - 55, 150, 50);
 
@@ -661,7 +670,7 @@ function draw() {
       textFont("New Tegomin");
       let _tile = gameMap[chunkIndex][activeTile['row']][activeTile['col']];
       let msg = _tile.desc;
-      text(msg, player.position.x + 8, player.position.y - 50, 150,45);
+      text(msg, player.position.x + 8, player.position.y - 50, 150, 45);
       //text(msg, ui_x + 50, ui_y + 50, CANVAS_WIDTH - 100, CANVAS_HEIGHT - 100);
     }
   }

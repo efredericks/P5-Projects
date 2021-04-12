@@ -1,3 +1,4 @@
+<!-- perhaps try this later? https://developer.mozilla.org/en-US/docs/Learn/CSS/CSS_layout/Responsive_Design -->
 <html>
 <head>
 <script type="text/javascript" src="jquery-3.6.0.min.js"></script>
@@ -92,6 +93,17 @@ canvas {
   width: 800px;
   box-shadow: 0 4px 8px 0 rgba(255, 255, 255, 0.2), 0 6px 20px 0 rgba(255, 255, 255, 0.19);
 }
+
+#info {
+  overflow: auto;
+  height: 400px;
+  width: 200px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  background:#ccc;
+}
+
 </style>
 </head>
 <body>
@@ -101,5 +113,6 @@ canvas {
       <a class="active" href="#home">Home</a>
     </div>
   </div> 
+  <div id="info"></div>
 </body>
 </html>
