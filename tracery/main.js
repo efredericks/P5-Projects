@@ -74,7 +74,7 @@ var tilePositions;
 var noiseGen;
 
 var recentKeyPress;
-var keyPressDelay;
+//var keyPressDelay;
 
 /// helper functions
 function getRandomInteger(min, max) {
@@ -254,7 +254,7 @@ function setup() {
 
   // handle key repeating
   recentKeyPress = 0;
-  keyPressDelay = 5;
+  //keyPressDelay = 5;
 
   paused = false; // game pause
 
@@ -274,6 +274,8 @@ function setup() {
   // player [col:35, row: 14]
   player = createSprite((TILE_WIDTH * 2) + (TILE_WIDTH / 2), (TILE_HEIGHT * 2) + (TILE_HEIGHT / 2), TILE_WIDTH, TILE_HEIGHT);
   player.depth = CHARACTER_INDEX;
+  player.speed    = 1;  // # of tiles to speed through
+  player.speedCtr = 0;  // ramp up speed
   player.addImage(playerImg);
 
   // npc
@@ -477,6 +479,11 @@ function keyReleased() {
 }
 
 function draw() {
+  let _move = {'left':  false,
+               'right': false,
+               'up':    false,
+               'down':  false
+              };
 
   /// draw functions
   background(71, 45, 60);
@@ -554,19 +561,31 @@ function draw() {
     }
 
 
+    // p5play keyboard functions
     //  if (recentKeyPress == 0) {
-    if (keyDown(UP_ARROW)) {
-      player.position.y -= TILE_HEIGHT;
-    }
-    if (keyDown(DOWN_ARROW)) {
-      player.position.y += TILE_HEIGHT;
-    }
-    if (keyDown(LEFT_ARROW)) {
-      player.position.x -= TILE_WIDTH;
-    }
-    if (keyDown(RIGHT_ARROW)) {
-      player.position.x += TILE_WIDTH;
-    }
+    if (keyDown(UP_ARROW))
+      _move['up'] = true;
+    if (keyWentUp(UP_ARROW))
+      _move['up'] = false;
+      //player.position.y -= TILE_HEIGHT;
+
+    if (keyDown(DOWN_ARROW)) 
+      _move['down'] = true;
+    if (keyWentUp(DOWN_ARROW))
+      _move['down'] = false;
+      //player.position.y += TILE_HEIGHT;
+
+    if (keyDown(LEFT_ARROW)) 
+      _move['left'] = true;
+    if (keyWentUp(LEFT_ARROW))
+      _move['left'] = false;
+      //player.position.x -= TILE_WIDTH;
+
+    if (keyDown(RIGHT_ARROW)) 
+      _move['right'] = true;
+    if (keyWentUp(RIGHT_ARROW))
+      _move['right'] = false;
+      //player.position.x += TILE_WIDTH;
 
     /*
   recentKeyPress = keyPressDelay;
@@ -577,6 +596,35 @@ function draw() {
 }*/
 
 
+    // position updates
+    if (_move['down'])
+      player.position.y += TILE_HEIGHT * player.speed;
+    if (_move['up'])
+      player.position.y -= TILE_HEIGHT * player.speed;
+    if (_move['left'])
+      player.position.x -= TILE_WIDTH * player.speed;
+    if (_move['right'])
+      player.position.x += TILE_WIDTH * player.speed;
+    
+    // increase velocity
+    if (_move['down'] || _move['up'] || _move['left'] || _move['right']) {
+      if (player.speedCtr < 10) {
+        if (player.speedCtr < 4)
+          player.speed = 1;
+        else if (player.speedCtr < 7)
+          player.speed = 2;
+        else
+          player.speed = 3;
+
+        player.speedCtr++;
+      }
+    }
+    if (!_move['down'] && !_move['up'] && !_move['left'] && !_move['right']) {
+      player.speedCtr = 0;
+      player.speed = 1;
+    }
+
+    
     // bounds
     if ((player.position.x - (TILE_WIDTH / 2)) <= TILE_WIDTH)
       player.position.x = TILE_WIDTH + (TILE_WIDTH / 2);
