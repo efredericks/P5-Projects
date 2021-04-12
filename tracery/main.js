@@ -67,6 +67,7 @@ const TILES = {
   TREE: 4, //4-11 is trees
   BEACH: 12,
   BRICK: 13,
+  WATER_ANIM: 14,
 };
 //var tileIndices;
 var tilePositions;
@@ -197,7 +198,8 @@ function preload() {
     11: { 'row': 2, 'col': 4 },
     ///
     12: { 'row': 6, 'col': 47 }, // beach
-    13: { 'row': 15, 'col': 7 }, //brick
+    13: { 'row': 15, 'col': 7 }, // brick
+    14: { 'row': 22, 'col': 0},  // water animation
   };
   TREE_SPRITE_START = 4;
   TREE_SPRITE_END = 11;
@@ -208,7 +210,7 @@ function preload() {
   envSprites = new Group();
   npcSprites = new Group();
 
-  let kenneyPath = "assets/1bitpack_kenney_1.1/Tilesheet/colored_packed.png";
+  let kenneyPath = "assets/1bitpack_kenney_1.1/Tilesheet/colored_packed_modified.png";
   //spriteSheet    = loadSpriteSheet(kenneyPath, 16, 16, 1056);
   spriteSheet = loadImage(kenneyPath);
   playerImg = loadImage("assets/separate/player.png");
@@ -362,9 +364,13 @@ function setup() {
             _obj = {"type": TILES.GROUND, "desc": env_grammar.flatten("#ground#")};
           else if (_noise < 0.1)
             _obj = {"type": TILES.BEACH, "desc": env_grammar.flatten("#beach#")};
-          else if (_noise < 0.2)
-            _obj = {"type": TILES.WATER, "desc": env_grammar.flatten("#water#")};
-          else if (_noise < 0.25)
+          else if (_noise < 0.2) {
+            if (random() > 0.90)
+              _obj = {"type": TILES.WATER_ANIM, "desc": env_grammar.flatten("#water#")};
+            else
+              _obj = {"type": TILES.WATER, "desc": env_grammar.flatten("#water#")};
+
+          } else if (_noise < 0.25)
             _obj = {"type": TILES.BEACH, "desc": env_grammar.flatten("#beach#")};
           else if (_noise < 0.4)
             _obj = {"type": getRandomInteger(TREE_SPRITE_START, TREE_SPRITE_END+1), "desc": env_grammar.flatten("#trees#")};
@@ -480,7 +486,28 @@ function draw() {
       for (let _c = 0; _c < MAP_COLS; _c++) {
         //https://github.com/processing/p5.js/issues/1567
         //image(img,[sx=0],[sy=0],[sWidth=img.width],[sHeight=img.height],[dx=0],[dy=0],[dWidth],[dHeight])
+
+
+        // randomly animate water -- this probably would be better abstracted later on to encapsulate tile animations (otherwise we're going to get deep into if statements)
         let _tile = gameMap[chunkIndex][_r][_c]['type'];
+        if ((_tile == TILES.WATER) || (_tile == TILES.WATER_ANIM)) {
+          if (random() > 0.99) { 
+            if (_tile == TILES.WATER) {
+              gameMap[chunkIndex][_r][_c]['type'] = TILES.WATER_ANIM;
+              _tile = TILES.WATER_ANIM;
+            } else {
+              gameMap[chunkIndex][_r][_c]['type'] = TILES.WATER;
+              _tile = TILES.WATER;
+
+            }
+          } else {
+            if ((random() > 0.85) && (_tile == TILES.WATER_ANIM)) {
+              gameMap[chunkIndex][_r][_c]['type'] = TILES.WATER;
+              _tile = TILES.WATER;
+            }
+
+          }
+        }
         let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
         image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
       }
@@ -577,15 +604,17 @@ function draw() {
       fill(color(0,0,0,220));
       let ui_x  = camera.position.x - CANVAS_WIDTH / 2;
       let ui_y  = camera.position.y - CANVAS_HEIGHT / 2;
-      rect(ui_x + 50, ui_y + 50, CANVAS_WIDTH - 100, CANVAS_HEIGHT - 100);
+      //rect(ui_x + 50, ui_y + 50, CANVAS_WIDTH - 100, CANVAS_HEIGHT - 100);
+      rect(player.position.x + 5, player.position.y - 55, 150, 50);
 
       // info
       fill(255);
-      textSize(24);
-
+      textSize(14);
+      textFont("New Tegomin");
       let _tile = gameMap[chunkIndex][activeTile['row']][activeTile['col']];
       let msg = _tile.desc;
-      text(msg, ui_x + 50, ui_y + 50, CANVAS_WIDTH - 100, CANVAS_HEIGHT - 100);
+      text(msg, player.position.x + 8, player.position.y - 50, 150,45);
+      //text(msg, ui_x + 50, ui_y + 50, CANVAS_WIDTH - 100, CANVAS_HEIGHT - 100);
     }
   }
 }
