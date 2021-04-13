@@ -23,6 +23,8 @@ var chunkIndex;
 var subChunkIndex;
 var currentLevelActive; // 0-overworld, 1-subworld
 
+var eventActive;
+
 /// sprites
 var spriteSheet;
 var envSprites;
@@ -59,6 +61,8 @@ var env_grammar;
 /// map
 var subMap;
 var gameMap;
+var treeMap; // lookup table for trees
+var burnMap; // lookup table for fires
 const TILES = {
   WALL: 0,
   GROUND: 1,
@@ -68,6 +72,7 @@ const TILES = {
   BEACH: 12,
   BRICK: 13,
   WATER_ANIM: 14,
+  BURN_ANIM: 15,
 };
 //var tileIndices;
 var tilePositions;
@@ -208,6 +213,7 @@ function preload() {
     12: { 'row': 6, 'col': 47 }, // beach
     13: { 'row': 15, 'col': 7 }, // brick
     14: { 'row': 22, 'col': 0 },  // water animation
+    15: { 'row': 22, 'col': 1 }, // burn animation
   };
   TREE_SPRITE_START = 4;
   TREE_SPRITE_END = 11;
@@ -246,8 +252,8 @@ function setup() {
   MAP_COLS = (int)(MAP_WIDTH / TILE_WIDTH);
   MAP_ROWS = (int)(MAP_HEIGHT / TILE_HEIGHT);
 
-  CANVAS_WIDTH = 800;
-  CANVAS_HEIGHT = 608;
+  CANVAS_WIDTH = 800;//windowWidth;
+  CANVAS_HEIGHT = 608;//windowHeight;
   CANVAS_COLS = (int)(CANVAS_WIDTH / TILE_WIDTH);
   CANVAS_ROWS = (int)(CANVAS_HEIGHT / TILE_HEIGHT);
 
@@ -263,6 +269,8 @@ function setup() {
   // handle key repeating
   recentKeyPress = 0;
   //keyPressDelay = 5;
+
+  eventActive = false;
 
   paused = false; // game pause
 
@@ -355,6 +363,8 @@ function setup() {
   }
 
   // environment
+  treeMap = [];
+  burnMap = [];
   gameMap = new Array(NUM_CHUNKS);
   for (let _chunk = 0; _chunk < NUM_CHUNKS; _chunk++) {
     gameMap[_chunk] = [];
@@ -382,9 +392,10 @@ function setup() {
 
           } else if (_noise < 0.25)
             _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
-          else if (_noise < 0.4)
+          else if (_noise < 0.4) {
             _obj = { "type": getRandomInteger(TREE_SPRITE_START, TREE_SPRITE_END + 1), "desc": env_grammar.flatten("#trees#") };
-          else if (_noise < 0.5)
+            treeMap.push({ 'chunk': _chunk, 'row': _r, 'col': _c }); // lookup table
+          } else if (_noise < 0.5)
             _obj = { "type": TILES.FOLIAGE, "desc": env_grammar.flatten("#foliage#") };
           else
             _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
@@ -475,6 +486,28 @@ function keyReleased() {
     else
       currentLevelActive = 0;
   }
+  else if (key == "p") {
+    eventActive = !eventActive;
+    // perhaps add a lookup table to just pick a random index?
+
+    let _cnt = 1;
+    while (_cnt > 0) {
+      let _ti = getRandomInteger(0, treeMap.length);
+      let _t = treeMap[_ti];
+      let _chunk = _t['chunk'];
+      let _row = _t['row'];
+      let _col = _t['col'];
+
+      gameMap[_chunk][_row][_col]['type'] = TILES.BURN_ANIM;
+      gameMap[_chunk][_row][_col]['desc'] = "The trees are afire";
+      burnMap.push({ 'chunk': _chunk, 'row': _row, 'col': _col }); // lookup table
+      _cnt--;
+
+      activeNPCString = "FIRE AT [" + _chunk + "][" + _row + "][" + _col + "]";
+      activeNPCStringTimer = activeNPCStringTime;
+
+    }
+  }
   else if (key == "q") { // query the local space
     paused = !paused;
 
@@ -514,16 +547,15 @@ function draw() {
             } else {
               gameMap[chunkIndex][_r][_c]['type'] = TILES.WATER;
               _tile = TILES.WATER;
-
             }
           } else {
             if ((random() > 0.85) && (_tile == TILES.WATER_ANIM)) {
               gameMap[chunkIndex][_r][_c]['type'] = TILES.WATER;
               _tile = TILES.WATER;
             }
-
           }
         }
+
         let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
         image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
       }
@@ -561,6 +593,46 @@ function draw() {
 
   /// handle updates
   if (!paused) {
+    // Event
+    if (eventActive) {
+      //console.log(burnMap);
+      //      if (random() > 0.9) {
+      let _bi = getRandomInteger(0, burnMap.length);
+      let _burn = burnMap[_bi];
+      let _burn_chunk = _burn['chunk'];
+      let _burn_row = _burn['row'];
+      let _burn_col = _burn['col'];
+
+      //console.log(_burn);
+      let _random_row = getRandomInteger(max(0, _burn_row - 1), min(_burn_row + 1, NUM_SPRITE_ROWS));
+      let _random_col = getRandomInteger(max(0, _burn_col - 1), min(_burn_col + 1, NUM_SPRITE_COLS));
+
+      if ((_burn_row != _random_row) && (_burn_col != _random_col)) { // not the same
+        if (((gameMap[_burn_chunk][_random_row][_random_col]['type'] >= TREE_SPRITE_START) && (gameMap[_burn_chunk][_random_row][_random_col]['type'] <= TREE_SPRITE_END)) || (gameMap[_burn_chunk][_random_row][_random_col]['type'] == TILES.FOLIAGE)) {
+          gameMap[_burn_chunk][_random_row][_random_col]['type'] = TILES.BURN_ANIM;
+          gameMap[_burn_chunk][_random_row][_random_col]['desc'] = "The trees are afire";
+          burnMap.push({ 'chunk': _burn_chunk, 'row': _random_row, 'col': _random_col }); // lookup table
+        }
+      }
+
+      // spread in a direction
+      /*
+      for (let _brow = max(_burn_row - 1, 0); _brow <= min(_burn_row + 1, NUM_SPRITE_ROWS-1); _brow++) {
+        for (let _bcol = max(_burn_col - 1, 0); _bcol <= min(_burn_col + 1, NUM_SPRITE_COLS-1); _bcol++) {
+          if ((_brow != _burn_row) || (_bcol != _burn_col)) { // not the same
+            //if ((random() > 0.99) && ((gameMap[_burn_chunk][_brow][_bcol]['type'] >= TREE_SPRITE_START) && (gameMap[_burn_chunk][_brow][_bcol]['type'] <= TREE_SPRITE_END)))
+            if (((gameMap[_burn_chunk][_brow][_bcol]['type'] >= TREE_SPRITE_START) && (gameMap[_burn_chunk][_brow][_bcol]['type'] <= TREE_SPRITE_END))) {
+              gameMap[_burn_chunk][_brow][_bcol]['type'] = TILES.BURN_ANIM;
+              burnMap.push({ 'chunk': _burn_chunk, 'row': _brow, 'col': _bcol }); // lookup table
+            }
+          }
+        }
+      }
+//     }
+*/
+    }
+
+    // NPC
     if (activeNPCStringTimer > 0) {
       activeNPCStringTimer--;
       if (activeNPCStringTimer <= 0) {

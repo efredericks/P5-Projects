@@ -4,7 +4,7 @@
 
 var grammars = {
     npcs : {
-	  name: ["Arjun","Yuuma","Darcy","Mia","Chiaki","Izzi","Azra","Lina"],
+	  name: ["Arjun","Yuuma","Darcy","Mia","Chiaki","Izzi","Azra","Lina", "Murph", "Anne", "Jefferson", "Dag", "Yaz"],
   	  mood: ["vexed","indignant","impassioned","wistful","astute","courteous"],
       vipTitle : ["Dr.", "Professor", "Lord", "Sir", "Captain", "His Majesty"],
       occupationBase : ["firefighter", "scientist", "spy", "smuggler", "mechanic", "astronaut", "adventurer", "pirate", "cowboy", "vampire", "detective", "soldier", "marine", "doctor", "ninja"],
@@ -14,6 +14,7 @@ var grammars = {
       foliage: ["foliage"],
       ground: ["ground"],
       beach: ["beach"],
+      
 
       trees: ["#treeDesc.capitalize# trees #treeAction#"],
       treeDesc: ["gently swaying", "imposing", "scraggly"],
