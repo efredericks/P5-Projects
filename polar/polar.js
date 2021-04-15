@@ -19,6 +19,7 @@ let r;
 
 let restart;
 let pause;
+let useBezier;
 let random_colors = false;
 
 function keyPressed() {
@@ -53,10 +54,15 @@ function restartDrawing() {
 
   restart = false;
   pause = false;
+  useBezier = false;
 }
 
 function randomizeColors() {
   random_colors = !random_colors;
+}
+
+function toggleBezier() {
+  useBezier = !useBezier;
 }
 
 function setup() {
@@ -66,8 +72,12 @@ function setup() {
   let _chkbox = createCheckbox("Randomize Colors?", random_colors);
   _chkbox.changed(randomizeColors);
 
+  let _chkbox2 = createCheckbox("Bezier Curves?", useBezier);
+  _chkbox2.changed(toggleBezier);
+
   pause = false;
   restart = false;
+  useBezier = false;
   r = height * 0.45;
   restartDrawing();
 }
@@ -91,10 +101,18 @@ function draw() {
       console.log(random_colors);
 
       strokeWeight(getRandomInt(1, 4));
-      line(points[current_index]['x1'],
-        points[current_index]['y1'],
-        points[current_index]['x2'],
-        points[current_index]['y2']);
+
+      if (!useBezier)
+        line(points[current_index]['x1'],
+          points[current_index]['y1'],
+          points[current_index]['x2'],
+          points[current_index]['y2']);
+      else
+        bezier(
+          points[current_index]['x1'], points[current_index]['y1'],
+          points[current_index]['x1'] + getRandomInt(0, 50), points[current_index]['y1'] - getRandomInt(0, 50),
+          points[current_index]['x2'] - getRandomInt(0, 50), points[current_index]['y2'] + getRandomInt(0, 50),
+          points[current_index]['x2'], points[current_index]['y2']);
 
       current_index++;
       if (current_index >= points.length) {
