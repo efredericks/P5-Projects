@@ -1,7 +1,5 @@
 // Just a whole buncha lines drawn around a circle
 
-// Just a whole buncha lines drawn around a circle
-
 // thanks mozilla i always forget this one:
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 function getRandomInt(min, max) {
@@ -19,8 +17,9 @@ let r;
 
 let restart;
 let pause;
-let useBezier;
-let random_colors = false;
+
+let col_chkbox;
+let bezier_chkbox;
 
 function keyPressed() {
   if (key == "r")
@@ -46,38 +45,20 @@ function restartDrawing() {
     let _y2 = r * sin(_theta2);
 
     points.push({ 'x1': _x1, 'y1': _y1, 'x2': _x2, 'y2': _y2 });
-
-    // Test without animation
-    //stroke(155);
-    //line(_x1, _y1, _x2, _y2);
   }
 
   restart = false;
   pause = false;
-  useBezier = false;
-}
-
-function randomizeColors() {
-  random_colors = !random_colors;
-}
-
-function toggleBezier() {
-  useBezier = !useBezier;
 }
 
 function setup() {
   createCanvas(640, 480);
 
-  random_colors = false;
-  let _chkbox = createCheckbox("Randomize Colors?", random_colors);
-  _chkbox.changed(randomizeColors);
-
-  let _chkbox2 = createCheckbox("Bezier Curves?", useBezier);
-  _chkbox2.changed(toggleBezier);
+  col_chkbox = createCheckbox("Randomize Colors?", false);
+  bezier_chkbox = createCheckbox("Bezier Curves?", false);
 
   pause = false;
   restart = false;
-  useBezier = false;
   r = height * 0.45;
   restartDrawing();
 }
@@ -95,14 +76,13 @@ function draw() {
 
     if (!restart) {
       let _col = color(128, 128, 128);
-      if (random_colors)
+
+      if (col_chkbox.checked())
         _col = color(getRandomInt(0, 256), getRandomInt(0, 256), getRandomInt(0, 256));
       stroke(_col);
-      console.log(random_colors);
-
       strokeWeight(getRandomInt(1, 4));
 
-      if (!useBezier)
+      if (!bezier_chkbox.checked())
         line(points[current_index]['x1'],
           points[current_index]['y1'],
           points[current_index]['x2'],
