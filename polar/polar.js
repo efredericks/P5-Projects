@@ -17,9 +17,11 @@ let theta_vel;
 let current_index = 0;
 let r;
 let restart;
+let random_colors = false;
 
-function mousePressed() {
-  restart = true;
+function keyPressed() {
+  if (key == "r")
+    restart = true;
 }
 
 function restartDrawing() {
@@ -48,8 +50,17 @@ function restartDrawing() {
   restart = false;
 }
 
+function randomizeColors() {
+  random_colors = !random_colors;
+}
+
 function setup() {
   createCanvas(640, 480);
+
+  random_colors = false;
+  let _chkbox = createCheckbox("Randomize Colors?", random_colors);
+  _chkbox.changed(randomizeColors);
+
   restart = false;
   r = height * 0.45;
   restartDrawing();
@@ -61,12 +72,17 @@ function draw() {
   rect(0,0,150,40);
   fill(255);
   textSize(14);
-  text(current_index + "/" + points.length, 10, 20);
+  text("[r to restart] - " + current_index + "/" + points.length, 10, 20);
 
   translate(width / 2, height / 2);
   
   if (!restart) {
-    stroke(155);
+    let _col = color(128, 128, 128);
+    if (random_colors) 
+      _col = color(getRandomInt(0,256), getRandomInt(0,256), getRandomInt(0,256));
+    stroke(_col);
+    console.log(random_colors);
+
     strokeWeight(getRandomInt(1,4));
     line(points[current_index]['x1'],
          points[current_index]['y1'],
