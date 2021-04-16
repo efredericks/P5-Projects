@@ -157,6 +157,7 @@ function collideNPC(e, p) {
 }
 
 function drawUI() {
+  // top bar
   let ui_x = camera.position.x - CANVAS_WIDTH / 2;
   let ui_y = camera.position.y - CANVAS_HEIGHT / 2;
   fill(color(0, 0, 0, 127));
@@ -169,12 +170,26 @@ function drawUI() {
   }
   //text("erik", ui_x + 5, ui_y + 24);
 
+  // bottom bar
+  let ui_y2 = camera.position.y + CANVAS_HEIGHT / 2 - 30; 
+  fill(color(0, 0, 0, 127));
+  rect(ui_x, ui_y2, CANVAS_WIDTH, 30);
+
+  let _rc = getRowCol(player.position.x, player.position.y);
+  let _tile = gameMap[chunkIndex][_rc['row']][_rc['col']];
+  fill(255);
+  textSize(24);
+  text(_tile.desc, ui_x + 5, ui_y2+24);
+
+
 
   // update info box
+  /*
   let _txt = select("#info");
   let _rc = getRowCol(player.position.x, player.position.y);
   let _tile = gameMap[chunkIndex][_rc['row']][_rc['col']];
   _txt.html(_tile.desc);
+  */
 }
 
 
@@ -252,10 +267,15 @@ function setup() {
   MAP_COLS = (int)(MAP_WIDTH / TILE_WIDTH);
   MAP_ROWS = (int)(MAP_HEIGHT / TILE_HEIGHT);
 
-  CANVAS_WIDTH = 800;//windowWidth;
-  CANVAS_HEIGHT = 608;//windowHeight;
+  //CANVAS_WIDTH = 800;
+  //CANVAS_HEIGHT = 608;
+  CANVAS_WIDTH = windowWidth;
+  CANVAS_HEIGHT = windowHeight;
   CANVAS_COLS = (int)(CANVAS_WIDTH / TILE_WIDTH);
   CANVAS_ROWS = (int)(CANVAS_HEIGHT / TILE_HEIGHT);
+
+  CANVAS_UI_WIDTH = 200;
+  CANVAS_UI_HEIGHT = CANVAS_HEIGHT;
 
   NUM_CHUNKS = 4;//100;
   chunkIndex = 1; // start in middle
@@ -428,6 +448,7 @@ function setup() {
 
 
   // touch controls
+  /*
   lbutton = createButton('<');
   lbutton.position(10, 90, 65);
   lbutton.mousePressed(tLeft);
@@ -451,6 +472,7 @@ function setup() {
   rcbutton = createButton('chunk >');
   rcbutton.position(10, 140, 65);
   rcbutton.mousePressed(sRight);
+  */
 
   frameRate(20);
 }
