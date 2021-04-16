@@ -638,10 +638,11 @@ function keyReleased() {
     } else
       activeTile = null;
   }
+  /*
   else {
     if 
 
-  }
+  }*/
 }
 
 function draw() {
