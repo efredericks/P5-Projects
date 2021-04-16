@@ -28,7 +28,12 @@ var eventActive;
 /// sprites
 var spriteSheet;
 var envSprites;
+
+// npcSprites is the group for ALL sprites
+// chunkNPCSprites gets dynamically added/removed from for collisions and updates
 var npcSprites;
+var chunkNPCSprites;
+
 var pickupSprites;
 var player;
 var numGenericNPCs;
@@ -81,7 +86,32 @@ var noiseGen;
 var recentKeyPress;
 //var keyPressDelay;
 
+// keyboard config
+var KEYBOARD_CONFIG = {
+  // movement
+  "up": [UP_ARROW, "k"],
+  "down": [DOWN_ARROW, "j"],
+  "left": [LEFT_ARROW, "h"],
+  "right": [RIGHT_ARROW, "l"],
+  "up-right": ["u"],
+  "up-left": ["y"],
+  "down-right": ["n"],
+  "down-left": ["b"],
+};
+
 /// helper functions
+
+// via https://stackoverflow.com/questions/59919642/p5-js-how-can-i-make-text-appear-when-my-mouse-hovers-over-a-different-text-ele
+/*function textExpand(textMain, textAdd, textX, textY, textH) {
+      textSize(textH);
+      text(textMain, textX, textY);
+      textW = textWidth(textMain)
+      if (mouseX > textX && mouseX < textX+textW && mouseY < textY && mouseY > textY-textH) {
+          text(textAdd, textX, textY+5+textH);
+      }
+}*/
+
+
 function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
@@ -94,6 +124,50 @@ function getFrameIndex(row, col) {
 function getSpriteOffset(row, col) {
   let dx = col * TILE_WIDTH;
   let dy = row * TILE_HEIGHT;
+  return { 'dx': dx, 'dy': dy };
+}
+
+function checkMove(curr_pos, curr_chunk, dir) {
+  let _rc = getRowCol(curr_pos.x, curr_pos.y);
+  let _r = _rc['row'];
+  let _c = _rc['col'];
+
+  if (dir == 'left')
+    _c--;
+  else if (dir == 'right')
+    _c++;
+  else if (dir == 'up')
+    _r--
+  else if (dir == 'down')
+    _r++;
+  else
+    console.log("checkMove: something went wrong here");
+
+  if ((_c > 0) && (_c < (MAP_COLS - 1)) && (_r > 0) && (_r < (MAP_ROWS - 1))) {
+    let _tile = gameMap[curr_chunk][_r][_c]['type'];
+
+    //if ((_tile == TILES.WATER) || (_tile == TILES.WATER_ANIM)) // unwalkable
+    //  return { 'state': false, 'pos': null };
+
+    return { 'state': true, 'pos': getSpritePosition(_r, _c) };
+  } else {
+    return { 'state': false, 'pos': null };
+  }
+
+  /*
+if ((_c == 0) || (_c >= (MAP_COLS-1)) || (_r == 0) || (_r >= (MAP_ROWS-1))) // out of bounds
+  return {'state':false, 'pos':null};
+else if (gameMap[curr_chunk][_r][_c]['type'] == 'wall') // cannot enter this spot
+  return {'state':false, 'pos':null};
+else {
+  let pos = getSpriteOffset(_r, _c);
+  return {'state':true, 'pos': pos};
+}
+*/
+}
+function getSpritePosition(row, col) {
+  let dx = (int)(col * TILE_WIDTH + TILE_WIDTH / 2);
+  let dy = (int)(row * TILE_HEIGHT + TILE_HEIGHT / 2);
   return { 'dx': dx, 'dy': dy };
 }
 
@@ -129,6 +203,7 @@ function collidePickup(e, p) {
     e.remove();
 
     //console.log(npcSprites);
+    // this doesn't work on all chunks!
     for (let _i = 0; _i < npcSprites.length; _i++) {
       if (npcSprites[_i].questGiver)
         npcSprites[_i].quest["done"] = true;
@@ -171,7 +246,7 @@ function drawUI() {
   //text("erik", ui_x + 5, ui_y + 24);
 
   // bottom bar
-  let ui_y2 = camera.position.y + CANVAS_HEIGHT / 2 - 30; 
+  let ui_y2 = camera.position.y + CANVAS_HEIGHT / 2 - 30;
   fill(color(0, 0, 0, 127));
   rect(ui_x, ui_y2, CANVAS_WIDTH, 30);
 
@@ -179,7 +254,7 @@ function drawUI() {
   let _tile = gameMap[chunkIndex][_rc['row']][_rc['col']];
   fill(255);
   textSize(24);
-  text(_tile.desc, ui_x + 5, ui_y2+24);
+  text(_tile.desc, ui_x + 5, ui_y2 + 24);
 
 
 
@@ -238,6 +313,7 @@ function preload() {
   pickupSprites = new Group();
   envSprites = new Group();
   npcSprites = new Group();
+  chunkNPCSprites = new Group();
 
   let kenneyPath = "assets/1bitpack_kenney_1.1/Tilesheet/colored_packed_modified.png";
   //spriteSheet    = loadSpriteSheet(kenneyPath, 16, 16, 1056);
@@ -316,8 +392,11 @@ function setup() {
 
   // npc
   let questGiver = getRandomInteger(0, numGenericNPCs);
+
   for (let _n = 0; _n < numGenericNPCs; _n++) {
-    npc = createSprite((TILE_WIDTH * 4) + (TILE_WIDTH / 2), (TILE_HEIGHT * 4) + (TILE_HEIGHT / 2), TILE_WIDTH, TILE_HEIGHT);
+    let _c = getRandomInteger(1, MAP_COLS - 1);
+    let _r = getRandomInteger(1, MAP_ROWS - 1);
+    npc = createSprite((TILE_WIDTH * _c) + (TILE_WIDTH / 2), (TILE_HEIGHT * _r) + (TILE_HEIGHT / 2), TILE_WIDTH, TILE_HEIGHT);
     /// generative:
     npc.name = npc_grammar.flatten("#name#");
     npc.mood = npc_grammar.flatten("#mood#");
@@ -331,13 +410,17 @@ function setup() {
 
     if (_n == questGiver) {
       npc.questGiver = true;
+      npc.ai = "follow";
+      console.log("Questy McQuesterson on: " + npc.chunk);
       npc.quest = {
         "quest": "Have you seen my BLUE CRAB?", // make this a list?
         "thanks": "Thanks m8",
         "done": false
       };
-    } else
+    } else {
       npc.questGiver = false;
+      npc.ai = "wander";
+    }
 
     npc.draw = function () {
       if (chunkIndex == this.chunk) {
@@ -348,38 +431,54 @@ function setup() {
     }
     npc.update = function () {
       if ((chunkIndex == this.chunk) && (!paused)) { // only update on current chunk / not paused
-        npcSprites.add(this);
-        // https://stackoverflow.com/questions/20044791/how-to-make-an-enemy-follow-the-player-in-pygame
-        if (random() > 0.9) { // move towards player
-          // direction vector
-          let dx = player.position.x - this.position.x;
-          let dy = player.position.y - this.position.y;
-          let dist = Math.hypot(dx, dy);
+        chunkNPCSprites.add(this);
 
-          // normalize
-          dx /= dist;
-          dy /= dist;
+        // update based on AI type
+        if (this.ai == "wander") {
+          if (random() > 0.9) { // decide to move
 
-          if (!(dist == 16)) {
-            if (random() > 0.5) { // move x
-              if (dx > 0)
-                this.position.x += TILE_WIDTH;
-              else if (dx < 0)
-                this.position.x -= TILE_WIDTH;
-            } else { // move y
-              if (dy > 0)
-                this.position.y += TILE_HEIGHT;
-              else if (dy < 0)
-                this.position.y -= TILE_HEIGHT;
+            // pick a direction
+            let _dirs = ["up", "down", "left", "right"];
+            let _retval = checkMove(this.position, chunkIndex, _dirs[Math.floor(Math.random() * _dirs.length)])
+            if (_retval['state']) { // true -- move
+              this.position.x = _retval['pos']['dx'];
+              this.position.y = _retval['pos']['dy'];
             }
           }
+        } else if (this.ai == "follow") {
+          // https://stackoverflow.com/questions/20044791/how-to-make-an-enemy-follow-the-player-in-pygame
+          if (random() > 0.8) { // move towards player
+            // direction vector
+            let dx = player.position.x - this.position.x;
+            let dy = player.position.y - this.position.y;
+            let dist = Math.hypot(dx, dy);
 
-          //this.position.x += dx * this.speed;
-          //this.position.y += dy * this.speed;
+            // normalize
+            dx /= dist;
+            dy /= dist;
+
+            if (!(dist == 16)) {
+              if (random() > 0.5) { // move x
+                if (dx > 0)
+                  this.position.x += TILE_WIDTH;
+                else if (dx < 0)
+                  this.position.x -= TILE_WIDTH;
+              } else { // move y
+                if (dy > 0)
+                  this.position.y += TILE_HEIGHT;
+                else if (dy < 0)
+                  this.position.y -= TILE_HEIGHT;
+              }
+            }
+
+            //this.position.x += dx * this.speed;
+            //this.position.y += dy * this.speed;
+          }
         }
       } else // remove from colliders
-        npcSprites.remove(this);
+        chunkNPCSprites.remove(this);
     }
+    npcSprites.add(npc);
   }
 
   // environment
@@ -452,23 +551,23 @@ function setup() {
   lbutton = createButton('<');
   lbutton.position(10, 90, 65);
   lbutton.mousePressed(tLeft);
-
+  
   rbutton = createButton('>');
   rbutton.position(40, 90, 65);
   rbutton.mousePressed(tRight);
-
+  
   ubutton = createButton('^');
   ubutton.position(25, 80, 65);
   ubutton.mousePressed(tUp);
-
+  
   dbutton = createButton('v');
   dbutton.position(25, 100, 65);
   dbutton.mousePressed(tDown);
-
+  
   lcbutton = createButton('chunk <');
   lcbutton.position(10, 120, 65);
   lcbutton.mousePressed(sLeft);
-
+  
   rcbutton = createButton('chunk >');
   rcbutton.position(10, 140, 65);
   rcbutton.mousePressed(sRight);
@@ -539,6 +638,10 @@ function keyReleased() {
     } else
       activeTile = null;
   }
+  else {
+    if 
+
+  }
 }
 
 function draw() {
@@ -596,7 +699,7 @@ function draw() {
 
   if (!paused) {
     // interact
-    npcSprites.collide(player, collideNPC);
+    chunkNPCSprites.collide(player, collideNPC);
     pickupSprites.overlap(player, collidePickup);
 
     // update entities -- not needed?
@@ -666,28 +769,46 @@ function draw() {
 
     // p5play keyboard functions
     //  if (recentKeyPress == 0) {
-    if (keyDown(UP_ARROW))
+      // this probably needs to be abstracted to its own thing
+    let _moveDir = null;
+    if (keyDown(UP_ARROW)) {
       _move['up'] = true;
-    if (keyWentUp(UP_ARROW))
+      _moveDir = "up";
+    }
+    if (keyWentUp(UP_ARROW)) {
       _move['up'] = false;
+      _moveDir = null;
+    }
     //player.position.y -= TILE_HEIGHT;
 
-    if (keyDown(DOWN_ARROW))
+    if (keyDown(DOWN_ARROW)) {
       _move['down'] = true;
-    if (keyWentUp(DOWN_ARROW))
+      _moveDir = "down";
+    }
+    if (keyWentUp(DOWN_ARROW)) {
       _move['down'] = false;
+      _moveDir = null;
+    }
     //player.position.y += TILE_HEIGHT;
 
-    if (keyDown(LEFT_ARROW))
+    if (keyDown(LEFT_ARROW)) {
       _move['left'] = true;
-    if (keyWentUp(LEFT_ARROW))
+      _moveDir = "left";
+    }
+    if (keyWentUp(LEFT_ARROW)) {
       _move['left'] = false;
+      _moveDir = null;
+    }
     //player.position.x -= TILE_WIDTH;
 
-    if (keyDown(RIGHT_ARROW))
+    if (keyDown(RIGHT_ARROW)) {
       _move['right'] = true;
-    if (keyWentUp(RIGHT_ARROW))
+      _moveDir = "right";
+    }
+    if (keyWentUp(RIGHT_ARROW)) {
       _move['right'] = false;
+      _moveDir = null;
+    }
     //player.position.x += TILE_WIDTH;
 
     /*
@@ -700,14 +821,31 @@ function draw() {
 
 
     // position updates
-    if (_move['down'])
-      player.position.y += TILE_HEIGHT * player.speed;
+    if (_moveDir != null) {
+
+      //      let _newpos = player.position;
+      //     if (_move['left']) _newpos.x -= TILE_WIDTH * player.speed;
+      //    if (_move['right']) _newpos.x += TILE_WIDTH * player.speed;
+      //   if (_move['up']) _newpos.y -= TILE_HEIGHT * player.speed;
+      //  if (_move['down']) _newpos.y += TILE_HEIGHT * player.speed;
+
+      for (let _i = 0; _i < player.speed; _i++) {
+        let _retval = checkMove(player.position, chunkIndex, _moveDir);
+        if (_retval['state']) { // true -- move
+          player.position.x = _retval['pos']['dx'];
+          player.position.y = _retval['pos']['dy'];
+        }
+      }
+      //player.position.y += TILE_HEIGHT * player.speed;
+    }
+    /*
     if (_move['up'])
-      player.position.y -= TILE_HEIGHT * player.speed;
+      //player.position.y -= TILE_HEIGHT * player.speed;
     if (_move['left'])
-      player.position.x -= TILE_WIDTH * player.speed;
+      //player.position.x -= TILE_WIDTH * player.speed;
     if (_move['right'])
-      player.position.x += TILE_WIDTH * player.speed;
+      //player.position.x += TILE_WIDTH * player.speed;
+      */
 
     // increase velocity
     if (_move['down'] || _move['up'] || _move['left'] || _move['right']) {
@@ -729,6 +867,7 @@ function draw() {
 
 
     // bounds
+    /*
     if ((player.position.x - (TILE_WIDTH / 2)) <= TILE_WIDTH)
       player.position.x = TILE_WIDTH + (TILE_WIDTH / 2);
     else if ((player.position.x - (TILE_WIDTH / 2)) >= MAP_WIDTH - (TILE_WIDTH * 2))
@@ -738,6 +877,7 @@ function draw() {
       player.position.y = TILE_HEIGHT + (TILE_HEIGHT / 2);
     else if ((player.position.y - (TILE_HEIGHT / 2)) >= MAP_HEIGHT - (TILE_HEIGHT * 2))
       player.position.y = MAP_HEIGHT - (TILE_HEIGHT * 2) + (TILE_HEIGHT / 2);
+      */
 
     //camera.position.x = player.position.x + CANVAS_WIDTH / 4;
     //camera.position.y = player.position.y + CANVAS_HEIGHT / 4;
@@ -759,6 +899,7 @@ function draw() {
       rect(player.position.x + 5, player.position.y - 55, 150, 50);
 
       // info
+      /*
       fill(255);
       textSize(14);
       textFont("New Tegomin");
@@ -766,6 +907,7 @@ function draw() {
       let msg = _tile.desc;
       text(msg, player.position.x + 8, player.position.y - 50, 150, 45);
       //text(msg, ui_x + 50, ui_y + 50, CANVAS_WIDTH - 100, CANVAS_HEIGHT - 100);
+      */
     }
   }
 }
