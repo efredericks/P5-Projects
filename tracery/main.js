@@ -709,19 +709,21 @@ function draw() {
 
 
   // set camera and draw player 
+  /*
   if (player.position.x <= (48*TILE_WIDTH))
     camera.position.x = 48 * TILE_WIDTH;
   else if (player.position.x >= ((MAP_COLS-48)*TILE_WIDTH))
     camera.position.x = (MAP_COLS-48) * TILE_WIDTH;
   else
     camera.position.x = player.position.x;
-  if (player.position.y <= (24*TILE_HEIGHT))
-    camera.position.y = 24 * TILE_HEIGHT;
-  else if (player.position.y >= ((MAP_ROWS-24)*TILE_HEIGHT))
-    camera.position.y = (MAP_ROWS-24) * TILE_HEIGHT;
+  if (player.position.y <= (24*TILE_WIDTH))
+    camera.position.y = 24 * TILE_WIDTH;
+  else if (player.position.y >= ((MAP_ROWS-48)*TILE_WIDTH))
+    camera.position.y = (MAP_ROWS-24) * TILE_WIDTH;
   else
     camera.position.y = player.position.y;
-  //camera.position = player.position;
+    */
+  camera.position = player.position;
   //if (camera.position.x <= CANVAS_WIDTH/2)
   // camera.position.x = CANVAS_WIDTH/2;
 
