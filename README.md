@@ -18,3 +18,7 @@ Aggregation of various playthings in P5JS
 ## Polar Things
 
 [Polar Lines](https://efredericks.github.io/P5-Projects/polar)
+
+## Truchet Halftones
+
+[Truchet Halftones](https://efredericks.github.io/P5-Projects/truchet)
