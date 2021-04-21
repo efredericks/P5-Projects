@@ -84,6 +84,7 @@ var tilePositions;
 var noiseGen;
 
 var recentKeyPress;
+
 //var keyPressDelay;
 
 // keyboard config
@@ -111,6 +112,10 @@ var KEYBOARD_CONFIG = {
       }
 }*/
 
+// https://www.webtips.dev/webtips/javascript/how-to-clamp-numbers-in-javascript
+function clamp(num, min, max) {
+  return Math.min(Math.max(num, min), max);
+}
 
 function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
@@ -707,25 +712,9 @@ function draw() {
     //npcSprites.forEach(elem => elem.update());
   }
 
-
-  // set camera and draw player 
-  /*
-  if (player.position.x <= (48*TILE_WIDTH))
-    camera.position.x = 48 * TILE_WIDTH;
-  else if (player.position.x >= ((MAP_COLS-48)*TILE_WIDTH))
-    camera.position.x = (MAP_COLS-48) * TILE_WIDTH;
-  else
-    camera.position.x = player.position.x;
-  if (player.position.y <= (24*TILE_WIDTH))
-    camera.position.y = 24 * TILE_WIDTH;
-  else if (player.position.y >= ((MAP_ROWS-48)*TILE_WIDTH))
-    camera.position.y = (MAP_ROWS-24) * TILE_WIDTH;
-  else
-    camera.position.y = player.position.y;
-    */
-  camera.position = player.position;
-  //if (camera.position.x <= CANVAS_WIDTH/2)
-  // camera.position.x = CANVAS_WIDTH/2;
+  // clamp camera and draw player 
+  camera.position.x = clamp(player.position.x, CANVAS_WIDTH*0.5, MAP_WIDTH - CANVAS_WIDTH * 0.5);
+  camera.position.y = clamp(player.position.y, CANVAS_HEIGHT*0.5, MAP_HEIGHT - CANVAS_HEIGHT * 0.5);
 
   //  spriteSheet.drawFrame(getFrameIndex(14, 35), player.position.x, player.position.y);
   drawSprites();

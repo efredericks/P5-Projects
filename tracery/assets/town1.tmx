@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.5" tiledversion="1.5.0" orientation="orthogonal" renderorder="right-down" width="40" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="1">
+ <tileset firstgid="1" source="kenney.tsx"/>
+ <layer id="2" name="ground" width="40" height="40">
+  <data encoding="base64" compression="zstd">
+   KLUv/WAAGF0AACABAAAAAQD5eO+I
+  </data>
+ </layer>
+ <layer id="6" name="water" width="40" height="40">
+  <data encoding="base64" compression="zstd">
+   KLUv/WAAGN0AAFgA+gAAAPn6AADAAAQAKTgyPUDgqN4ZCk7HBg==
+  </data>
+ </layer>
+ <layer id="7" name="fg" width="40" height="40">
+  <data encoding="base64" compression="zstd">
+   KLUv/WAAGCUEAHQDABMAAAAUAAAAFQBDAAAARAAAAEUAcwAAAHQAAAB1AAIAAAADAgIDAAEAgAABAAD4AAMAAgICAiOgQFNJzQFQg0q1Af2qIJ1LpSHpHlGTo+SLIcbJyzNOZ5Ip2gQ6xFBIB0/0M+SeA8fRhHTEFNDhOVUdqSKH+s06oTJJZTIVgfwxBg==
+  </data>
+ </layer>
+</map>
