@@ -18,6 +18,9 @@ var CANVAS_HEIGHT;
 var CANVAS_COLS;
 var CANVAS_ROWS;
 
+var ui_x;
+var ui_y;
+
 var NUM_CHUNKS;
 var chunkIndex;
 var subChunkIndex;
@@ -88,6 +91,7 @@ var recentKeyPress;
 //var keyPressDelay;
 
 // keyboard config
+/*
 var KEYBOARD_CONFIG = {
   // movement
   "up": [UP_ARROW, "k"],
@@ -99,6 +103,7 @@ var KEYBOARD_CONFIG = {
   "down-right": ["n"],
   "down-left": ["b"],
 };
+*/
 
 /// helper functions
 
@@ -712,10 +717,6 @@ function draw() {
     //npcSprites.forEach(elem => elem.update());
   }
 
-  // clamp camera and draw player 
-  camera.position.x = clamp(player.position.x, CANVAS_WIDTH*0.5, MAP_WIDTH - CANVAS_WIDTH * 0.5);
-  camera.position.y = clamp(player.position.y, CANVAS_HEIGHT*0.5, MAP_HEIGHT - CANVAS_HEIGHT * 0.5);
-
   //  spriteSheet.drawFrame(getFrameIndex(14, 35), player.position.x, player.position.y);
   drawSprites();
   drawUI();
@@ -773,7 +774,7 @@ function draw() {
 
     // p5play keyboard functions
     //  if (recentKeyPress == 0) {
-      // this probably needs to be abstracted to its own thing
+    // this probably needs to be abstracted to its own thing
     let _moveDir = null;
     if (keyDown(UP_ARROW)) {
       _move['up'] = true;
@@ -869,6 +870,14 @@ function draw() {
       player.speed = 1;
     }
 
+    // clamp camera and draw player 
+    camera.position.x = clamp(player.position.x, CANVAS_WIDTH * 0.5, MAP_WIDTH - CANVAS_WIDTH * 0.5);
+    camera.position.y = clamp(player.position.y, CANVAS_HEIGHT * 0.5, MAP_HEIGHT - CANVAS_HEIGHT * 0.5);
+
+    ui_x = camera.position.x - CANVAS_WIDTH / 2;
+    ui_y = camera.position.y - CANVAS_HEIGHT / 2;
+
+
 
     // bounds
     /*
@@ -897,8 +906,8 @@ function draw() {
     if (activeTile) { // show some info!
       // bg
       fill(color(0, 0, 0, 220));
-      let ui_x = camera.position.x - CANVAS_WIDTH / 2;
-      let ui_y = camera.position.y - CANVAS_HEIGHT / 2;
+      //let ui_x = camera.position.x - CANVAS_WIDTH / 2;
+      //let ui_y = camera.position.y - CANVAS_HEIGHT / 2;
       //rect(ui_x + 50, ui_y + 50, CANVAS_WIDTH - 100, CANVAS_HEIGHT - 100);
       rect(player.position.x + 5, player.position.y - 55, 150, 50);
 
