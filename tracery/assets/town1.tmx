@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.5" tiledversion="1.5.0" orientation="orthogonal" renderorder="right-down" width="40" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="8" nextobjectid="1">
+<map version="1.5" tiledversion="1.5.0" orientation="orthogonal" renderorder="right-down" width="60" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="11" nextobjectid="1">
  <tileset firstgid="1" source="kenney.tsx"/>
- <layer id="2" name="ground" width="40" height="40">
+ <layer id="2" name="ground" width="60" height="40">
   <data encoding="base64" compression="zstd">
-   KLUv/WAAGF0AACABAAAAAQD5eO+I
+   KLUv/WCAJKUAADABAAAAUgEDAL3AD34ECdeBeUcE
   </data>
  </layer>
- <layer id="6" name="water" width="40" height="40">
+ <layer id="6" name="water" width="60" height="40">
   <data encoding="base64" compression="zstd">
-   KLUv/WAAGN0AAFgA+gAAAPn6AADAAAQAKTgyPUDgqN4ZCk7HBg==
+   KLUv/WCAJN0AAFgA+gAAAPn6AADAAAQAWWRueIDFUb0zFJyODQ==
   </data>
  </layer>
- <layer id="7" name="fg" width="40" height="40">
+ <layer id="7" name="fg" width="60" height="40">
   <data encoding="base64" compression="zstd">
-   KLUv/WAAGCUEAHQDABMAAAAUAAAAFQBDAAAARAAAAEUAcwAAAHQAAAB1AAIAAAADAgIDAAEAgAABAAD4AAMAAgICAiOgQFNJzQFQg0q1Af2qIJ1LpSHpHlGTo+SLIcbJyzNOZ5Ip2gQ6xFBIB0/0M+SeA8fRhHTEFNDhOVUdqSKH+s06oTJJZTIVgfwxBg==
+   KLUv/WCAJNUJABJHFyKQKen/mdi2g7z71T+/N0URkdUnVWqa6c8UFkyNlkco2XKnLQYeAY9Ma/lWvhTJ4heqI6g+pVbx5W/I9+AXtH0m+HyJ1loH8/E7/gZiiD/Dfyj8K5ORTmuaSxixA1+g8Ngk0wHAAhsRsUkHNbASc9FVKVeLQrFzRqH0OXdRMlBCExlQw0/heDMxP0k89Ss7sBxbCgZLttOPyDUdCizqSdioPv8TiqOjZhGlL4ySaDJplNNjF9Qnt64Ri8TBdA+LzuRNW2KY56JgjyI97qzwHCVbqLxh7IYsZWFUcsULqXPwCALqHESZo9roHCS1HcP856sJgToHoR0at4lhdA5CwbiNzG0fi5TuuKV4fJpsm1nq/FQzmYPQvKee8A03XbM0o54QrnnnUJlutqbAl/cWoI5w3B0Oqi4C
+  </data>
+ </layer>
+ <layer id="8" name="colliders" width="60" height="40">
+  <data encoding="base64" compression="zstd">
+   KLUv/WCAJBUGAEJFEBqwJ60BDawAFlwLOqnwCX/AYRhmIyBhdkuZAolQlCwQYBlQchFcAozFpTjGfOZj1ajD6vCwm/gW4vaLfJDvZxkGM6AArxZWhgOQAkQjoSgdfVDpzadCTCUobI0hBkbnMJbQOeqIGZyLGyJiktFDU7sP5oMjdAKi90ZBqXNEj7qzGHSJ1fHSLhuvIcT9BUrjhu0jC3SuFOed2fFSWOS5Xk2RDoNjHBSkNpWuhCJFHlkxa8Mc9LXA+Qd4eBs//ncC
   </data>
  </layer>
 </map>

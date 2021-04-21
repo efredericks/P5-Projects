@@ -81,6 +81,8 @@ const TILES = {
   BRICK: 13,
   WATER_ANIM: 14,
   BURN_ANIM: 15,
+  TOWN: 16,
+  GROUND_SPECIAL: 17,
 };
 //var tileIndices;
 var tilePositions;
@@ -126,6 +128,10 @@ function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
+function getTile(_chunk, _row, _col) {
+  return gameMap[_chunk][_row][_col]['type'];
+}
+
 // get frame index into spritesheet for raw drawing
 function getFrameIndex(row, col) {
   return row * NUM_SPRITE_COLS + col;
@@ -154,7 +160,7 @@ function checkMove(curr_pos, curr_chunk, dir) {
     console.log("checkMove: something went wrong here");
 
   if ((_c > 0) && (_c < (MAP_COLS - 1)) && (_r > 0) && (_r < (MAP_ROWS - 1))) {
-    let _tile = gameMap[curr_chunk][_r][_c]['type'];
+    let _tile = getTile(curr_chunk, _r, _c);//gameMap[curr_chunk][_r][_c]['type'];
 
     //if ((_tile == TILES.WATER) || (_tile == TILES.WATER_ANIM)) // unwalkable
     //  return { 'state': false, 'pos': null };
@@ -314,6 +320,8 @@ function preload() {
     13: { 'row': 15, 'col': 7 }, // brick
     14: { 'row': 22, 'col': 0 },  // water animation
     15: { 'row': 22, 'col': 1 }, // burn animation
+    16: { 'row': 19, 'col': 0 }, // town sprite (make them special for each town so player knows)
+    17: { 'row': 0, 'col': 4 }, // dirt surrounding town
   };
   TREE_SPRITE_START = 4;
   TREE_SPRITE_END = 11;
@@ -534,6 +542,32 @@ function setup() {
     }
   }
 
+  // place towns -- these should be sprites?
+  let _townChunk = getRandomInteger(0, NUM_CHUNKS);
+  let _t_col = getRandomInteger(2, MAP_COLS - 2);
+  let _t_row = getRandomInteger(2, MAP_ROWS - 2);
+  let _t_tile = getTile(_townChunk, _t_row, _t_col);// gameMap[_townChunk][_t_row][_t_col]['type'];
+  while ((_t_tile == TILES.WATER) || (_t_tile == TILES.WATER_ANIM)) {
+    _townChunk = getRandomInteger(0, NUM_CHUNKS);
+    _t_col = getRandomInteger(2, MAP_COLS - 2);
+    _t_row = getRandomInteger(2, MAP_ROWS - 2);
+    _t_tile = getTile(_townChunk, _t_row, _t_col);// gameMap[_townChunk][_t_row][_t_col]['type'];
+  }
+  console.log(_townChunk, _t_row, _t_col);
+  gameMap[_townChunk][_t_row][_t_col]['type'] = TILES.TOWN;
+
+  // left col
+  gameMap[_townChunk][_t_row - 1][_t_col - 1]['type'] = TILES.GROUND_SPECIAL;
+  gameMap[_townChunk][_t_row][_t_col - 1]['type'] = TILES.GROUND_SPECIAL;
+  gameMap[_townChunk][_t_row + 1][_t_col - 1]['type'] = TILES.GROUND_SPECIAL;
+  // right col
+  gameMap[_townChunk][_t_row - 1][_t_col + 1]['type'] = TILES.GROUND_SPECIAL;
+  gameMap[_townChunk][_t_row][_t_col + 1]['type'] = TILES.GROUND_SPECIAL;
+  gameMap[_townChunk][_t_row + 1][_t_col + 1]['type'] = TILES.GROUND_SPECIAL;
+  // top/bottom
+  gameMap[_townChunk][_t_row - 1][_t_col]['type'] = TILES.GROUND_SPECIAL;
+  gameMap[_townChunk][_t_row + 1][_t_col]['type'] = TILES.GROUND_SPECIAL;
+
   // underworld
   subMap = new Array(NUM_CHUNKS);
   for (let _chunk = 0; _chunk < 1; _chunk++) {
@@ -551,7 +585,6 @@ function setup() {
       }
     }
   }
-
 
 
 
@@ -674,7 +707,7 @@ function draw() {
 
 
         // randomly animate water -- this probably would be better abstracted later on to encapsulate tile animations (otherwise we're going to get deep into if statements)
-        let _tile = gameMap[chunkIndex][_r][_c]['type'];
+        let _tile = getTile(chunkIndex, _r, _c); // gameMap[chunkIndex][_r][_c]['type'];
         if ((_tile == TILES.WATER) || (_tile == TILES.WATER_ANIM)) {
           if (random() > 0.99) {
             if (_tile == TILES.WATER) {
@@ -738,7 +771,8 @@ function draw() {
       let _random_col = getRandomInteger(max(0, _burn_col - 1), min(_burn_col + 1, NUM_SPRITE_COLS));
 
       if ((_burn_row != _random_row) && (_burn_col != _random_col)) { // not the same
-        if (((gameMap[_burn_chunk][_random_row][_random_col]['type'] >= TREE_SPRITE_START) && (gameMap[_burn_chunk][_random_row][_random_col]['type'] <= TREE_SPRITE_END)) || (gameMap[_burn_chunk][_random_row][_random_col]['type'] == TILES.FOLIAGE)) {
+        let _tile = getTile(_burn_chunk, _random_row, _random_col);
+        if (((_tile >= TREE_SPRITE_START) && (_tile <= TREE_SPRITE_END)) || (_tile == TILES.FOLIAGE)) {
           gameMap[_burn_chunk][_random_row][_random_col]['type'] = TILES.BURN_ANIM;
           gameMap[_burn_chunk][_random_row][_random_col]['desc'] = "The trees are afire";
           burnMap.push({ 'chunk': _burn_chunk, 'row': _random_row, 'col': _random_col }); // lookup table
@@ -839,6 +873,13 @@ function draw() {
         if (_retval['state']) { // true -- move
           player.position.x = _retval['pos']['dx'];
           player.position.y = _retval['pos']['dy'];
+
+          // special check for non-sprite interactions
+          let _rc = getRowCol(player.position.x, player.position.y);
+          let _tile = getTile(chunkIndex, _rc['row'], _rc['col']); //gameMap[chunkIndex][_rc['row']][_rc['col']]['type'];
+          if (_tile == TILES.TOWN)
+            currentLevelActive = 1;
+          
         }
       }
       //player.position.y += TILE_HEIGHT * player.speed;

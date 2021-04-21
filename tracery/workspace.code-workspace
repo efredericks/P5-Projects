@@ -16,5 +16,7 @@
 			"path": "..\\P5-Projects\\truchet"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"activestate.promptRuntimeCreation": false
+	}
 }
