@@ -91,6 +91,10 @@ const TILES = {
   BURN_ANIM: 15,
   TOWN: 16,
   GROUND_SPECIAL: 17,
+  CAMPFIRE: 18,
+  CAMPFIRE_ANIM: 19,
+  CAMPFIRE_SURROUND: 20,
+  BURN_ANIM2: 21,
 };
 //var tileIndices;
 var tilePositions;
@@ -335,6 +339,10 @@ function preload() {
     15: { 'row': 22, 'col': 1 }, // burn animation
     16: { 'row': 19, 'col': 0 }, // town sprite (make them special for each town so player knows)
     17: { 'row': 0, 'col': 4 }, // dirt surrounding town
+    18: { 'row': 10, 'col': 14 }, // campfire
+    19: { 'row': 22, 'col': 3 }, // campfire anim
+    20: { 'row': 22, 'col': 4 }, // campfire dirt
+    21: { 'row': 22, 'col': 2 }, // burn animation 2
   };
   TREE_SPRITE_START = 4;
   TREE_SPRITE_END = 11;
@@ -358,7 +366,7 @@ function preload() {
   let blueCrabAnim = blueCrab.addAnimation("jaunting", "assets/separate/bcrab1.png", "assets/separate/bcrab2.png");
   blueCrabAnim.frameDelay = 12;
   blueCrab.chunk = 1;
-  blueCrab.setCollider('rectangle', 3,3,TILE_WIDTH-3,TILE_HEIGHT-3); // avoid 'next cell' collision
+  blueCrab.setCollider('rectangle', 3, 3, TILE_WIDTH - 3, TILE_HEIGHT - 3); // avoid 'next cell' collision
   pickupSprites.add(blueCrab);
 
   //18,7 (blue crab?)
@@ -453,8 +461,8 @@ function setup() {
   // place crab
   let _bc_c = 5;
   let _bc_r = 5;
-  blueCrab.position.x = _bc_c * TILE_WIDTH + (TILE_WIDTH/2);
-  blueCrab.position.y = _bc_r * TILE_HEIGHT + (TILE_HEIGHT/2);
+  blueCrab.position.x = _bc_c * TILE_WIDTH + (TILE_WIDTH / 2);
+  blueCrab.position.y = _bc_r * TILE_HEIGHT + (TILE_HEIGHT / 2);
 
   // npc
   let questGiver = getRandomInteger(0, numGenericNPCs);
@@ -600,7 +608,7 @@ function setup() {
     _t_row = getRandomInteger(2, MAP_ROWS - 2);
     _t_tile = getTile(_townChunk, _t_row, _t_col);// gameMap[_townChunk][_t_row][_t_col]['type'];
   }
-  console.log(_townChunk, _t_row, _t_col);
+  console.log("Town: ", _townChunk, _t_row, _t_col);
   gameMap[_townChunk][_t_row][_t_col]['type'] = TILES.TOWN;
 
   // left col
@@ -614,6 +622,41 @@ function setup() {
   // top/bottom
   gameMap[_townChunk][_t_row - 1][_t_col]['type'] = TILES.GROUND_SPECIAL;
   gameMap[_townChunk][_t_row + 1][_t_col]['type'] = TILES.GROUND_SPECIAL;
+
+  // place a campfire
+  let _campfireChunk = getRandomInteger(0, NUM_CHUNKS);
+  let _cf_col = getRandomInteger(2, MAP_COLS - 2);
+  let _cf_row = getRandomInteger(2, MAP_ROWS - 2);
+  _t_tile = getTile(_campfireChunk, _cf_row, _cf_col);// gameMap[_campfireChunk][_cf_row][_cf_col]['type'];
+  while ((_t_tile == TILES.WATER) || (_t_tile == TILES.WATER_ANIM)) {
+    _campfireChunk = getRandomInteger(0, NUM_CHUNKS);
+    _cf_col = getRandomInteger(2, MAP_COLS - 2);
+    _cf_row = getRandomInteger(2, MAP_ROWS - 2);
+    _t_tile = getTile(_campfireChunk, _cf_row, _cf_col);// gameMap[_campfireChunk][_cf_row][_cf_col]['type'];
+  }
+  console.log("Campfire: ", _campfireChunk, _cf_row, _cf_col);
+  gameMap[_campfireChunk][_cf_row][_cf_col]['type'] = TILES.CAMPFIRE;
+
+  // left col
+  gameMap[_campfireChunk][_cf_row - 1][_cf_col - 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row][_cf_col - 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row + 1][_cf_col - 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  // right col
+  gameMap[_campfireChunk][_cf_row - 1][_cf_col + 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row][_cf_col + 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row + 1][_cf_col + 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  // top/bottom
+  gameMap[_campfireChunk][_cf_row - 1][_cf_col]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row + 1][_cf_col]['type'] = TILES.CAMPFIRE_SURROUND;
+  //CAMPFIRE: 18,
+  //CAMPFIRE_ANIM: 19,
+  //CAMPFIRE_SURROUND: 20,
+
+
+
+
+
+
 
   // underworld
   subMap = new Array(NUM_CHUNKS);
@@ -786,6 +829,19 @@ function mainGame() {
             if ((random() > 0.85) && (_tile == TILES.WATER_ANIM)) {
               gameMap[chunkIndex][_r][_c]['type'] = TILES.WATER;
               _tile = TILES.WATER;
+            }
+          }
+        }
+
+        // randomly animate fire
+        if ((_tile == TILES.CAMPFIRE) || (_tile == TILES.CAMPFIRE_ANIM)) {
+          if ((frameCount % 10) == 0) {
+            if (_tile == TILES.CAMPFIRE) {
+              gameMap[chunkIndex][_r][_c]['type'] = TILES.CAMPFIRE_ANIM;
+              _tile = TILES.CAMPFIRE_ANIM;
+            } else {
+              gameMap[chunkIndex][_r][_c]['type'] = TILES.CAMPFIRE;
+              _tile = TILES.CAMPFIRE;
             }
           }
         }
@@ -1042,9 +1098,9 @@ function requireClick() {
   background(0);
   textSize(18);
 
-  fill(color(255,255,255,INTRO_CTR));
+  fill(color(255, 255, 255, INTRO_CTR));
   textAlign(CENTER);
-  text("Click mouse to focus", 0, CANVAS_HEIGHT/2, CANVAS_WIDTH);
+  text("Click mouse to focus", 0, CANVAS_HEIGHT / 2, CANVAS_WIDTH);
 
   if (mouseIsPressed) {
     INTRO_SFX.play();
@@ -1056,12 +1112,12 @@ function intro() {
   background(0);
   textSize(24);
 
-  fill(color(255,255,255,INTRO_CTR));
+  fill(color(255, 255, 255, INTRO_CTR));
   textAlign(CENTER);
-  text("WELCOME TO COZYRL GAME OF THE YEAR 20k21", 0, CANVAS_HEIGHT/2, CANVAS_WIDTH);
+  text("WELCOME TO COZYRL GAME OF THE YEAR 20k21", 0, CANVAS_HEIGHT / 2, CANVAS_WIDTH);
 
   if (frameCount > 25) {
-    INTRO_CTR-=5;
+    INTRO_CTR -= 5;
     if (INTRO_CTR <= 0) {
       CURRENT_SCENE = SCENES.GAME;
       INTRO_SFX.setVolume(0, 5);
