@@ -2,13 +2,14 @@
 // Tracery: http://tracery.io/
 // Kenney 1-bit asset pack: https://www.kenney.nl/assets/bit-pack
 
+// Intro music: Joel Steudler; www.patreon.com/joelsteudler; joel@joelsteudlermusic.com (Menu - Bringer of Doom)
+
 /// globals
 var SCENES;
 var CURRENT_SCENE;
 
 var INTRO_CTR;
-
-
+var INTRO_SFX;
 
 var TILE_WIDTH;
 var TILE_HEIGHT;
@@ -300,6 +301,9 @@ function preload() {
   npc_grammar = tracery.createGrammar(grammars["npcs"]);
   env_grammar = tracery.createGrammar(grammars["environments"]);
 
+  // sounds
+  INTRO_SFX = loadSound("assets/sfx/Menu_-_Bringer_Of_Doom.ogg");
+
   //used for p5play spritesheet - not working!
   /*
   tileIndices = {
@@ -376,13 +380,14 @@ function loadGameState() {
 function setup() {
   // set globals per https://github.com/processing/p5.js/wiki/p5.js-overview#why-cant-i-assign-variables-using-p5-functions-and-variables-before-setup
   SCENES = {
-    INTRO: 0,
-    MAIN_MENU: 1,
-    GAME: 2,
-    PAUSED: 3,
-    GAME_OVER: 4
+    PRELOAD: 0,
+    INTRO: 1,
+    MAIN_MENU: 2,
+    GAME: 3,
+    PAUSED: 4,
+    GAME_OVER: 5
   };
-  CURRENT_SCENE = SCENES.INTRO;
+  CURRENT_SCENE = SCENES.PRELOAD;
   INTRO_CTR = 255;
 
   TILE_WIDTH = 16;
@@ -724,6 +729,9 @@ function keyReleased() {
 
 function draw() {
   switch (CURRENT_SCENE) {
+    case SCENES.PRELOAD:
+      requireClick();
+      break;
     case SCENES.INTRO:
       intro();
       break;
@@ -1015,6 +1023,20 @@ function mainGame() {
   }
 }
 
+function requireClick() {
+  background(0);
+  textSize(18);
+
+  fill(color(255,255,255,INTRO_CTR));
+  textAlign(CENTER);
+  text("Click mouse to focus", 0, CANVAS_HEIGHT/2, CANVAS_WIDTH);
+
+  if (mouseIsPressed) {
+    INTRO_SFX.play();
+    CURRENT_SCENE = SCENES.INTRO;
+  }
+}
+
 function intro() {
   background(0);
   textSize(24);
@@ -1025,7 +1047,9 @@ function intro() {
 
   if (frameCount > 25) {
     INTRO_CTR-=5;
-    if (INTRO_CTR <= 0)
+    if (INTRO_CTR <= 0) {
       CURRENT_SCENE = SCENES.GAME;
+      INTRO_SFX.setVolume(0, 5);
+    }
   }
 }
