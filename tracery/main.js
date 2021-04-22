@@ -352,10 +352,13 @@ function preload() {
   playerImg = loadImage("assets/separate/player.png");
   npcImg = loadImage("assets/separate/npc.png");
 
+
+  // crab
   blueCrab = createSprite(100, 100, TILE_WIDTH, TILE_HEIGHT);
   let blueCrabAnim = blueCrab.addAnimation("jaunting", "assets/separate/bcrab1.png", "assets/separate/bcrab2.png");
   blueCrabAnim.frameDelay = 12;
   blueCrab.chunk = 1;
+  blueCrab.setCollider('rectangle', 3,3,TILE_WIDTH-3,TILE_HEIGHT-3); // avoid 'next cell' collision
   pickupSprites.add(blueCrab);
 
   //18,7 (blue crab?)
@@ -387,7 +390,7 @@ function setup() {
     PAUSED: 4,
     GAME_OVER: 5
   };
-  CURRENT_SCENE = SCENES.PRELOAD;
+  CURRENT_SCENE = SCENES.INTRO;//PRELOAD;
   INTRO_CTR = 255;
 
   TILE_WIDTH = 16;
@@ -447,9 +450,14 @@ function setup() {
   player.speedCtr = 0;  // ramp up speed
   player.addImage(playerImg);
 
+  // place crab
+  let _bc_c = 5;
+  let _bc_r = 5;
+  blueCrab.position.x = _bc_c * TILE_WIDTH + (TILE_WIDTH/2);
+  blueCrab.position.y = _bc_r * TILE_HEIGHT + (TILE_HEIGHT/2);
+
   // npc
   let questGiver = getRandomInteger(0, numGenericNPCs);
-
   for (let _n = 0; _n < numGenericNPCs; _n++) {
     let _c = getRandomInteger(1, MAP_COLS - 1);
     let _r = getRandomInteger(1, MAP_ROWS - 1);
@@ -808,7 +816,14 @@ function mainGame() {
   }
 
   //  spriteSheet.drawFrame(getFrameIndex(14, 35), player.position.x, player.position.y);
-  drawSprites();
+  //drawSprites();
+
+  if (chunkIndex == blueCrab.chunk)
+    drawSprites(pickupSprites);
+  drawSprites(npcSprites);
+  drawSprite(player);
+
+
   drawUI();
 
   /// handle updates
