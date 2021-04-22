@@ -636,18 +636,28 @@ function setup() {
   }
   console.log("Campfire: ", _campfireChunk, _cf_row, _cf_col);
   gameMap[_campfireChunk][_cf_row][_cf_col]['type'] = TILES.CAMPFIRE;
+  gameMap[_campfireChunk][_cf_row][_cf_col]['desc'] = "That's a bit warm, don't you think?";
 
   // left col
+  let _ms = "Rocks separate the cheerily glowing campfire from anything that can catch fire"
   gameMap[_campfireChunk][_cf_row - 1][_cf_col - 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row - 1][_cf_col - 1]['desc'] = _ms;
   gameMap[_campfireChunk][_cf_row][_cf_col - 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row][_cf_col - 1]['desc'] = _ms;
   gameMap[_campfireChunk][_cf_row + 1][_cf_col - 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row + 1][_cf_col - 1]['desc'] = _ms;
   // right col
   gameMap[_campfireChunk][_cf_row - 1][_cf_col + 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row - 1][_cf_col + 1]['desc'] = _ms;
   gameMap[_campfireChunk][_cf_row][_cf_col + 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row][_cf_col + 1]['desc'] = _ms;
   gameMap[_campfireChunk][_cf_row + 1][_cf_col + 1]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row + 1][_cf_col + 1]['desc'] = _ms;
   // top/bottom
   gameMap[_campfireChunk][_cf_row - 1][_cf_col]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row - 1][_cf_col]['desc'] = _ms;
   gameMap[_campfireChunk][_cf_row + 1][_cf_col]['type'] = TILES.CAMPFIRE_SURROUND;
+  gameMap[_campfireChunk][_cf_row + 1][_cf_col]['desc'] = _ms;
   //CAMPFIRE: 18,
   //CAMPFIRE_ANIM: 19,
   //CAMPFIRE_SURROUND: 20,
