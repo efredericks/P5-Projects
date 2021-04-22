@@ -95,6 +95,8 @@ const TILES = {
   CAMPFIRE_ANIM: 19,
   CAMPFIRE_SURROUND: 20,
   BURN_ANIM2: 21,
+  SHIFT_SCREEN_LEFT: 22,
+  SHIFT_SCREEN_RIGHT: 23,
 };
 //var tileIndices;
 var tilePositions;
@@ -171,8 +173,13 @@ function checkMove(curr_pos, curr_chunk, dir) {
   else
     console.log("checkMove: something went wrong here");
 
-  if ((_c > 0) && (_c < (MAP_COLS - 1)) && (_r > 0) && (_r < (MAP_ROWS - 1))) {
+  if ((_c >= 0) && (_c <= (MAP_COLS - 1)) && (_r >= 0) && (_r <= (MAP_ROWS - 1))) {
     let _tile = getTile(curr_chunk, _r, _c);//gameMap[curr_chunk][_r][_c]['type'];
+
+    // non-walkable
+    if (_tile == TILES.WALL)
+      return { 'state': false, 'pos': null };
+
 
     //if ((_tile == TILES.WATER) || (_tile == TILES.WATER_ANIM)) // unwalkable
     //  return { 'state': false, 'pos': null };
@@ -343,6 +350,8 @@ function preload() {
     19: { 'row': 22, 'col': 3 }, // campfire anim
     20: { 'row': 22, 'col': 4 }, // campfire dirt
     21: { 'row': 22, 'col': 2 }, // burn animation 2
+    22: { 'row': 20, 'col': 26 }, // shift screen left tile
+    23: { 'row': 20, 'col': 24 }, // shift screen right tile
   };
   TREE_SPRITE_START = 4;
   TREE_SPRITE_END = 11;
@@ -662,11 +671,30 @@ function setup() {
   //CAMPFIRE_ANIM: 19,
   //CAMPFIRE_SURROUND: 20,
 
+  // place portals to next chunk
+  let _mid_row = (int)(MAP_ROWS / 2);
+  for (let _i = 0; _i < NUM_CHUNKS; _i++) {
+    if (_i > 0) {
+      gameMap[_i][_mid_row][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
+      gameMap[_i][_mid_row - 1][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
+      gameMap[_i][_mid_row + 1][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
+
+      gameMap[_i][_mid_row][0]['desc'] = "";
+      gameMap[_i][_mid_row - 1][0]['desc'] = "";
+      gameMap[_i][_mid_row + 1][0]['desc'] = "";
+    }
+
+    if (_i < (NUM_CHUNKS - 1)) {
+      gameMap[_i][_mid_row][MAP_COLS - 1]['type'] = TILES.SHIFT_SCREEN_RIGHT;
+      gameMap[_i][_mid_row - 1][MAP_COLS - 1]['type'] = TILES.SHIFT_SCREEN_RIGHT;
+      gameMap[_i][_mid_row + 1][MAP_COLS - 1]['type'] = TILES.SHIFT_SCREEN_RIGHT;
 
 
-
-
-
+      gameMap[_i][_mid_row][MAP_COLS - 1]['desc'] = "";
+      gameMap[_i][_mid_row - 1][MAP_COLS - 1]['desc'] = "";
+      gameMap[_i][_mid_row + 1][MAP_COLS - 1]['desc'] = "";
+    }
+  }
 
   // underworld
   subMap = new Array(NUM_CHUNKS);
@@ -1018,6 +1046,34 @@ function mainGame() {
           if (_tile == TILES.TOWN)
             currentLevelActive = 1;
 
+          // tbd: abstract these a bit!
+          if ((_tile == TILES.SHIFT_SCREEN_LEFT) && (chunkIndex > 0)) {
+            chunkIndex--;
+
+            let _p_rc = getRowCol(player.position.x, player.position.y);
+            let _new_col = MAP_COLS - 2;
+
+            let _new_pos = getSpritePosition(_p_rc['row'], _new_col);
+            player.position.x = _new_pos['dx'];
+            player.position.y = _new_pos['dy'];
+
+            activeNPCString = "Chunk: " + chunkIndex;
+            activeNPCStringTimer = activeNPCStringTime;
+          }
+
+          if ((_tile == TILES.SHIFT_SCREEN_RIGHT) && (chunkIndex < (NUM_CHUNKS - 1))) {
+            chunkIndex++;
+
+            let _p_rc = getRowCol(player.position.x, player.position.y);
+            let _new_col = 1;
+
+            let _new_pos = getSpritePosition(_p_rc['row'], _new_col);
+            player.position.x = _new_pos['dx'];
+            player.position.y = _new_pos['dy'];
+
+            activeNPCString = "Chunk: " + chunkIndex;
+            activeNPCStringTimer = activeNPCStringTime;
+          }
         }
       }
       //player.position.y += TILE_HEIGHT * player.speed;
