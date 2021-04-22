@@ -14,13 +14,15 @@ var grammars = {
       foliage: ["foliage"],
       ground: ["ground"],
       beach: ["beach"],
-      
 
       trees: ["#treeDesc.capitalize# trees #treeAction#"],
       treeDesc: ["gently swaying", "imposing", "scraggly"],
       treeAction: ["dot the landscape", "surround you", ", while sparse, encircle you", "choke you", "tower over you"],
 
       water: ["water"],
+    },
+    event_dialogue : {
+        campfire: ['Sure is warm'],
     },
     neverbar : {
         vipTitle : ["Dr.", "Professor", "Lord", "Sir", "Captain", "His Majesty"],

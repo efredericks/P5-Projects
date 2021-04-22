@@ -3,6 +3,13 @@
 // Kenney 1-bit asset pack: https://www.kenney.nl/assets/bit-pack
 
 /// globals
+var SCENES;
+var CURRENT_SCENE;
+
+var INTRO_CTR;
+
+
+
 var TILE_WIDTH;
 var TILE_HEIGHT;
 var NUM_SPRITE_ROWS;
@@ -221,8 +228,10 @@ function collidePickup(e, p) {
     //console.log(npcSprites);
     // this doesn't work on all chunks!
     for (let _i = 0; _i < npcSprites.length; _i++) {
-      if (npcSprites[_i].questGiver)
+      if (npcSprites[_i].questGiver) {
         npcSprites[_i].quest["done"] = true;
+        npcSprites[_i].ai = "wander";
+      }
     }
   }
 }
@@ -349,8 +358,33 @@ function preload() {
   //20,7
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
+// things to save:
+// random seed
+//   quest states 
+//   npcs
+//   town locations
+//   pickup locations
+//   player
+function saveGameState() {
+  ;
+}
+function loadGameState() {
+  ;
+}
+
 function setup() {
   // set globals per https://github.com/processing/p5.js/wiki/p5.js-overview#why-cant-i-assign-variables-using-p5-functions-and-variables-before-setup
+  SCENES = {
+    INTRO: 0,
+    MAIN_MENU: 1,
+    GAME: 2,
+    PAUSED: 3,
+    GAME_OVER: 4
+  };
+  CURRENT_SCENE = SCENES.INTRO;
+  INTRO_CTR = 255;
+
   TILE_WIDTH = 16;
   TILE_HEIGHT = 16;
   NUM_SPRITE_ROWS = 22;
@@ -689,6 +723,21 @@ function keyReleased() {
 }
 
 function draw() {
+  switch (CURRENT_SCENE) {
+    case SCENES.INTRO:
+      intro();
+      break;
+    case SCENES.MAIN_MENU:
+    case SCENES.GAME:
+    case SCENES.PAUSED:
+    case SCENES.GAME_OVER:
+    default:
+      mainGame();
+      break;
+  }
+}
+
+function mainGame() {
   let _move = {
     'left': false,
     'right': false,
@@ -879,7 +928,7 @@ function draw() {
           let _tile = getTile(chunkIndex, _rc['row'], _rc['col']); //gameMap[chunkIndex][_rc['row']][_rc['col']]['type'];
           if (_tile == TILES.TOWN)
             currentLevelActive = 1;
-          
+
         }
       }
       //player.position.y += TILE_HEIGHT * player.speed;
@@ -963,5 +1012,20 @@ function draw() {
       //text(msg, ui_x + 50, ui_y + 50, CANVAS_WIDTH - 100, CANVAS_HEIGHT - 100);
       */
     }
+  }
+}
+
+function intro() {
+  background(0);
+  textSize(24);
+
+  fill(color(255,255,255,INTRO_CTR));
+  textAlign(CENTER);
+  text("WELCOME TO COZYRL GAME OF THE YEAR 20k21", 0, CANVAS_HEIGHT/2, CANVAS_WIDTH);
+
+  if (frameCount > 25) {
+    INTRO_CTR-=5;
+    if (INTRO_CTR <= 0)
+      CURRENT_SCENE = SCENES.GAME;
   }
 }
