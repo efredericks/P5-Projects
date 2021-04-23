@@ -22,7 +22,13 @@ var grammars = {
       water: ["water"],
     },
     event_dialogue : {
-        campfire: ['Sure is warm'],
+        campfire1: ["Sure is warm!"], 
+        campfire2: ["Pull up a stump and set a spell!"], 
+        campfire3: ["Hey you look like an able-bodied adventurer, mind taking a peek in that lake over there?"], 
+        campfire4: ["I lost something in it the other day!"], 
+        campfire5: ["Not as much something as somebody."],
+        campfire6: ["It's a dead body."], 
+        campfire7: ["Jerk swiped my wedding ring, I want it back."],
     },
     neverbar : {
         vipTitle : ["Dr.", "Professor", "Lord", "Sir", "Captain", "His Majesty"],

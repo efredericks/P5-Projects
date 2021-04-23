@@ -73,6 +73,7 @@ var activeNPCStringTime;
 /// tracery
 var npc_grammar;
 var env_grammar;
+var event_grammar;
 
 /// map
 var subMap;
@@ -255,11 +256,18 @@ function collideNPC(e, p) {
     activeNPCString = e.vipTitle + " " + e.name + ", " + e.occupation + " [" + e.mood + "]";
     activeNPCStringTimer = activeNPCStringTime;
 
+    console.log(e);
+
     if (e.questGiver) { // display message 
       if (e.quest["done"])
         activeNPCString += " : " + e.quest["thanks"];
       else
         activeNPCString += " : " + e.quest["quest"];
+    } else if (e.quest["quest"] == "body") {
+      activeNPCString += npc.quest["questDialogue"][npc.dialogue_index];
+      npc.dialogue_index++;
+      if (npc.dialogue_index >= npc.quest["questDialogue"].length)
+        npc.dialogue_index = 0;
     }
     //textSize(24);
     //fill(255);
@@ -311,6 +319,7 @@ function preload() {
   noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });
   npc_grammar = tracery.createGrammar(grammars["npcs"]);
   env_grammar = tracery.createGrammar(grammars["environments"]);
+  event_grammar = tracery.createGrammar(grammars["event_dialogue"]);
 
   // sounds
   INTRO_SFX = loadSound("assets/sfx/Menu_-_Bringer_Of_Doom.ogg");
@@ -473,95 +482,6 @@ function setup() {
   blueCrab.position.x = _bc_c * TILE_WIDTH + (TILE_WIDTH / 2);
   blueCrab.position.y = _bc_r * TILE_HEIGHT + (TILE_HEIGHT / 2);
 
-  // npc
-  let questGiver = getRandomInteger(0, numGenericNPCs);
-  for (let _n = 0; _n < numGenericNPCs; _n++) {
-    let _c = getRandomInteger(1, MAP_COLS - 1);
-    let _r = getRandomInteger(1, MAP_ROWS - 1);
-    npc = createSprite((TILE_WIDTH * _c) + (TILE_WIDTH / 2), (TILE_HEIGHT * _r) + (TILE_HEIGHT / 2), TILE_WIDTH, TILE_HEIGHT);
-    /// generative:
-    npc.name = npc_grammar.flatten("#name#");
-    npc.mood = npc_grammar.flatten("#mood#");
-    npc.vipTitle = npc_grammar.flatten("#vipTitle#");
-    npc.occupation = npc_grammar.flatten("#occupation#");
-    ///
-    npc.depth = NPC_INDEX;
-    //npc.addImage = npcImg;
-    npc.chunk = getRandomInteger(0, NUM_CHUNKS); //1;
-    npc.speed = 2; // tbd
-
-    if (_n == questGiver) {
-      npc.questGiver = true;
-      npc.ai = "follow";
-      console.log("Questy McQuesterson on: " + npc.chunk);
-      npc.quest = {
-        "quest": "Have you seen my BLUE CRAB?", // make this a list?
-        "thanks": "Thanks m8",
-        "done": false
-      };
-    } else {
-      npc.questGiver = false;
-      npc.ai = "wander";
-    }
-
-    npc.draw = function () {
-      if (chunkIndex == this.chunk) {
-        if (this.questGiver)
-          rect(this.deltaX * 2, this.deltaY * 2, this.width + 5, this.height + 5);
-        image(npcImg, this.deltaX * 2, this.deltaY * 2);
-      }
-    }
-    npc.update = function () {
-      if ((chunkIndex == this.chunk) && (!paused)) { // only update on current chunk / not paused
-        chunkNPCSprites.add(this);
-
-        // update based on AI type
-        if (this.ai == "wander") {
-          if (random() > 0.9) { // decide to move
-
-            // pick a direction
-            let _dirs = ["up", "down", "left", "right"];
-            let _retval = checkMove(this.position, chunkIndex, _dirs[Math.floor(Math.random() * _dirs.length)])
-            if (_retval['state']) { // true -- move
-              this.position.x = _retval['pos']['dx'];
-              this.position.y = _retval['pos']['dy'];
-            }
-          }
-        } else if (this.ai == "follow") {
-          // https://stackoverflow.com/questions/20044791/how-to-make-an-enemy-follow-the-player-in-pygame
-          if (random() > 0.8) { // move towards player
-            // direction vector
-            let dx = player.position.x - this.position.x;
-            let dy = player.position.y - this.position.y;
-            let dist = Math.hypot(dx, dy);
-
-            // normalize
-            dx /= dist;
-            dy /= dist;
-
-            if (!(dist == 16)) {
-              if (random() > 0.5) { // move x
-                if (dx > 0)
-                  this.position.x += TILE_WIDTH;
-                else if (dx < 0)
-                  this.position.x -= TILE_WIDTH;
-              } else { // move y
-                if (dy > 0)
-                  this.position.y += TILE_HEIGHT;
-                else if (dy < 0)
-                  this.position.y -= TILE_HEIGHT;
-              }
-            }
-
-            //this.position.x += dx * this.speed;
-            //this.position.y += dy * this.speed;
-          }
-        }
-      } else // remove from colliders
-        chunkNPCSprites.remove(this);
-    }
-    npcSprites.add(npc);
-  }
 
   // environment
   treeMap = [];
@@ -712,6 +632,126 @@ function setup() {
         }
       }
     }
+  }
+
+  // npc
+  let questGiver = getRandomInteger(0, numGenericNPCs);
+  for (let _n = 0; _n < numGenericNPCs + 1; _n++) {
+    let _c = getRandomInteger(1, MAP_COLS - 1);
+    let _r = getRandomInteger(1, MAP_ROWS - 1);
+
+    if (_n == numGenericNPCs) { // campfire friend
+      _r = _cf_row;
+      _c = _cf_col;
+    }
+
+    npc = createSprite((TILE_WIDTH * _c) + (TILE_WIDTH / 2), (TILE_HEIGHT * _r) + (TILE_HEIGHT / 2), TILE_WIDTH, TILE_HEIGHT);
+    /// generative:
+    npc.name = npc_grammar.flatten("#name#");
+    npc.mood = npc_grammar.flatten("#mood#");
+    npc.vipTitle = npc_grammar.flatten("#vipTitle#");
+    npc.occupation = npc_grammar.flatten("#occupation#");
+    ///
+    npc.depth = NPC_INDEX;
+    //npc.addImage = npcImg;
+    npc.chunk = getRandomInteger(0, NUM_CHUNKS); //1;
+    npc.speed = 2; // tbd
+    npc.dialogue_index = 0;
+
+    if (_n == questGiver) {
+      npc.questGiver = true;
+      npc.ai = "follow";
+      console.log("Questy McQuesterson on: " + npc.chunk);
+      npc.quest = {
+        "quest": "Have you seen my BLUE CRAB?", // make this a list?
+        "thanks": "Thanks m8",
+        "done": false
+      };
+    } else if (_n == numGenericNPCs) { // last one hangs by the campfire
+      npc.questGiver = false;
+      npc.ai = "loiter";
+      npc.chunk = _campfireChunk;
+      npc.quest = {
+        "quest": "body", // make this a list?
+        "questDialogue": [
+          event_grammar.flatten("#campfire1#"), 
+          event_grammar.flatten("#campfire2#"), 
+          event_grammar.flatten("#campfire3#"), 
+          event_grammar.flatten("#campfire4#"), 
+          event_grammar.flatten("#campfire5#"), 
+          event_grammar.flatten("#campfire6#"), 
+          event_grammar.flatten("#campfire7#"), 
+        ],
+        "thanks": "Thanks m8",
+        "done": false
+      };
+      console.log(npc.quest["questDialogue"]);
+
+    } else {
+      npc.questGiver = false;
+      npc.ai = "wander";
+    }
+
+    npc.draw = function () {
+      if (chunkIndex == this.chunk) {
+        if (this.questGiver)
+          rect(this.deltaX * 2, this.deltaY * 2, this.width + 5, this.height + 5);
+        image(npcImg, this.deltaX * 2, this.deltaY * 2);
+      }
+    }
+    npc.update = function () {
+      if ((chunkIndex == this.chunk) && (!paused)) { // only update on current chunk / not paused
+        chunkNPCSprites.add(this);
+
+        // update based on AI type
+        if (this.ai == "wander") {
+          if (random() > 0.9) { // decide to move
+
+            // pick a direction
+            let _dirs = ["up", "down", "left", "right"];
+            let _retval = checkMove(this.position, chunkIndex, _dirs[Math.floor(Math.random() * _dirs.length)])
+            if (_retval['state']) { // true -- move
+              this.position.x = _retval['pos']['dx'];
+              this.position.y = _retval['pos']['dy'];
+            }
+          }
+        } else if (this.ai == "loiter") {
+          ;
+
+        } else if (this.ai == "follow") {
+          // https://stackoverflow.com/questions/20044791/how-to-make-an-enemy-follow-the-player-in-pygame
+          if (random() > 0.8) { // move towards player
+            // direction vector
+            let dx = player.position.x - this.position.x;
+            let dy = player.position.y - this.position.y;
+            let dist = Math.hypot(dx, dy);
+
+            // normalize
+            dx /= dist;
+            dy /= dist;
+
+            if (!(dist == 16)) {
+              if (random() > 0.5) { // move x
+                if (dx > 0)
+                  this.position.x += TILE_WIDTH;
+                else if (dx < 0)
+                  this.position.x -= TILE_WIDTH;
+              } else { // move y
+                if (dy > 0)
+                  this.position.y += TILE_HEIGHT;
+                else if (dy < 0)
+                  this.position.y -= TILE_HEIGHT;
+              }
+            }
+
+            //this.position.x += dx * this.speed;
+            //this.position.y += dy * this.speed;
+          }
+        }
+      } else // remove from colliders
+        chunkNPCSprites.remove(this);
+    }
+    npcSprites.add(npc);
   }
 
 
