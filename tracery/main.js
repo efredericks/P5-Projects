@@ -262,12 +262,13 @@ function collideNPC(e, p) {
       if (e.quest["done"])
         activeNPCString += " : " + e.quest["thanks"];
       else
-        activeNPCString += " : " + e.quest["quest"];
-    } else if (e.quest["quest"] == "body") {
-      activeNPCString += npc.quest["questDialogue"][npc.dialogue_index];
-      npc.dialogue_index++;
-      if (npc.dialogue_index >= npc.quest["questDialogue"].length)
-        npc.dialogue_index = 0;
+        if (e.quest["quest"] == "body") {
+          activeNPCString += ": " + npc.quest["questDialogue"][npc.dialogue_index];
+          npc.dialogue_index++;
+          if (npc.dialogue_index >= npc.quest["questDialogue"].length)
+            npc.dialogue_index = 0;
+        } else
+          activeNPCString += " : " + e.quest["quest"];
     }
     //textSize(24);
     //fill(255);
@@ -668,19 +669,19 @@ function setup() {
         "done": false
       };
     } else if (_n == numGenericNPCs) { // last one hangs by the campfire
-      npc.questGiver = false;
+      npc.questGiver = true;
       npc.ai = "loiter";
       npc.chunk = _campfireChunk;
       npc.quest = {
         "quest": "body", // make this a list?
         "questDialogue": [
-          event_grammar.flatten("#campfire1#"), 
-          event_grammar.flatten("#campfire2#"), 
-          event_grammar.flatten("#campfire3#"), 
-          event_grammar.flatten("#campfire4#"), 
-          event_grammar.flatten("#campfire5#"), 
-          event_grammar.flatten("#campfire6#"), 
-          event_grammar.flatten("#campfire7#"), 
+          event_grammar.flatten("#campfire1#"),
+          event_grammar.flatten("#campfire2#"),
+          event_grammar.flatten("#campfire3#"),
+          event_grammar.flatten("#campfire4#"),
+          event_grammar.flatten("#campfire5#"),
+          event_grammar.flatten("#campfire6#"),
+          event_grammar.flatten("#campfire7#"),
         ],
         "thanks": "Thanks m8",
         "done": false
@@ -1016,43 +1017,43 @@ function mainGame() {
     //  if (recentKeyPress == 0) {
     // this probably needs to be abstracted to its own thing
     let _moveDir = null;
-    if (keyDown(UP_ARROW)) {
+    if (keyIsDown(UP_ARROW)) {
       _move['up'] = true;
       _moveDir = "up";
-    }
-    if (keyWentUp(UP_ARROW)) {
+    } else {
+      //if (keyWentUp(UP_ARROW)) {
       _move['up'] = false;
-      _moveDir = null;
+      //      _moveDir = null;
     }
     //player.position.y -= TILE_HEIGHT;
 
-    if (keyDown(DOWN_ARROW)) {
+    if (keyIsDown(DOWN_ARROW)) {
       _move['down'] = true;
       _moveDir = "down";
-    }
-    if (keyWentUp(DOWN_ARROW)) {
+    } else {
+      //if (keyWentUp(DOWN_ARROW)) {
       _move['down'] = false;
-      _moveDir = null;
+      //     _moveDir = null;
     }
     //player.position.y += TILE_HEIGHT;
 
-    if (keyDown(LEFT_ARROW)) {
+    if (keyIsDown(LEFT_ARROW)) {
       _move['left'] = true;
       _moveDir = "left";
-    }
-    if (keyWentUp(LEFT_ARROW)) {
+    } else {
+      //if (keyWentUp(LEFT_ARROW)) {
       _move['left'] = false;
-      _moveDir = null;
+      //    _moveDir = null;
     }
     //player.position.x -= TILE_WIDTH;
 
-    if (keyDown(RIGHT_ARROW)) {
+    if (keyIsDown(RIGHT_ARROW)) {
       _move['right'] = true;
       _moveDir = "right";
-    }
-    if (keyWentUp(RIGHT_ARROW)) {
+    } else {
+      //if (keyWentUp(RIGHT_ARROW)) {
       _move['right'] = false;
-      _moveDir = null;
+      //   _moveDir = null;
     }
     //player.position.x += TILE_WIDTH;
 
