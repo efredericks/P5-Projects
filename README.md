@@ -7,22 +7,22 @@ Aggregation of various playthings in P5JS
 
 ## Tracery
 
-[Tracery + Tilemaps + Chunking Demo](https://efredericks.github.io/P5-Projects/tracery)
+[Tracery + Tilemaps + Chunking Demo](tracery)
 
 ## Bullet Hell
 
 ## Maurer Rose
 
-[Maurer Rose](https://efredericks.github.io/P5-Projects/maurer-rose) - based on [CodingTrain Demo](https://thecodingtrain.com/challenges/coding-in-the-cabana/001-maurer-rose.html)
+[Maurer Rose](maurer-rose) - based on [CodingTrain Demo](https://thecodingtrain.com/challenges/coding-in-the-cabana/001-maurer-rose.html)
 
 ## Polar Things
 
-[Polar Lines](https://efredericks.github.io/P5-Projects/polar)
+[Polar Lines](polar)
 
 ## Truchet Halftones
 
-[Truchet Halftones](https://efredericks.github.io/P5-Projects/truchet)
+[Truchet Halftones](truchet)
 
 ## Sine
 
-[Sine](https://efredericks.github.io/P5-Projects/sine)
+[Sine](sine)
