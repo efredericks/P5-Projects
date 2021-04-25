@@ -22,3 +22,10 @@ Aggregation of various playthings in P5JS
 ## Truchet Halftones
 
 [Truchet Halftones](https://efredericks.github.io/P5-Projects/truchet)
+
+## Sine
+
+[Sine](https://efredericks.github.io/P5-Projects/sine)
+
+
+[Truchet Halftones](https://efredericks.github.io/P5-Projects/truchet)
