@@ -22,8 +22,8 @@ var grammars = {
         beach: ["beach"],
 
         trees: ["#treeDesc.capitalize# trees #treeAction#"],
-        treeDesc: ["gently swaying", "imposing", "scraggly"],
-        treeAction: ["dot the landscape", "surround you", ", while sparse, encircle you", "choke you", "tower over you"],
+        treeDesc: ["gently swaying", "imposing", "scraggly", "sparse"],
+        treeAction: ["dot the landscape", "surround you", "encircle you", "choke you", "tower over you"],
 
         water: ["water"],
     },

@@ -33,11 +33,21 @@ function getSpriteOffset(row, col) {
   return { 'dx': dx, 'dy': dy };
 }
 
-function checkMove(curr_pos, curr_chunk, dir) {
+function checkMove(curr_pos, curr_chunk, dirs) {
   let _rc = getRowCol(curr_pos.x, curr_pos.y);
   let _r = _rc['row'];
   let _c = _rc['col'];
 
+  if (dirs['left'])
+    _c--;
+  if (dirs['right'])
+    _c++;
+  if (dirs['up'])
+    _r--
+  if (dirs['down'])
+    _r++;
+
+  /*
   if (dir == 'left')
     _c--;
   else if (dir == 'right')
@@ -48,6 +58,7 @@ function checkMove(curr_pos, curr_chunk, dir) {
     _r++;
   else
     console.log("checkMove: something went wrong here");
+    */
 
   if ((_c >= 0) && (_c <= (MAP_COLS - 1)) && (_r >= 0) && (_r <= (MAP_ROWS - 1))) {
     let _tile = getTile(curr_chunk, _r, _c);//gameMap[curr_chunk][_r][_c]['type'];
@@ -493,7 +504,10 @@ function setup() {
 
             // pick a direction
             let _dirs = ["up", "down", "left", "right"];
-            let _retval = checkMove(this.position, chunkIndex, _dirs[Math.floor(Math.random() * _dirs.length)])
+            let _move = {};
+            _move[_dirs[Math.floor(Math.random() * _dirs.length)]] = true;
+            let _retval = checkMove(this.position, chunkIndex, _move);
+            //_dirs[Math.floor(Math.random() * _dirs.length)]);
             if (_retval['state']) { // true -- move
               this.position.x = _retval['pos']['dx'];
               this.position.y = _retval['pos']['dy'];
@@ -833,7 +847,7 @@ function mainGame() {
     // position updates
     if (_moveDir != null) {
       for (let _i = 0; _i < player.speed; _i++) {
-        let _retval = checkMove(player.position, chunkIndex, _moveDir); ///// TBD: THIS NEEDS TO BE THE ARRAY!
+        let _retval = checkMove(player.position, chunkIndex, _move);//_moveDir); ///// TBD: THIS NEEDS TO BE THE ARRAY!
         if (_retval['state']) { // true -- move
           player.position.x = _retval['pos']['dx'];
           player.position.y = _retval['pos']['dy'];
