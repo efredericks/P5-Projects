@@ -4,123 +4,6 @@
 
 // Intro music: Joel Steudler; www.patreon.com/joelsteudler; joel@joelsteudlermusic.com (Menu - Bringer of Doom)
 
-/// globals
-var SCENES;
-var CURRENT_SCENE;
-
-var INTRO_CTR;
-var INTRO_SFX;
-
-var TILE_WIDTH;
-var TILE_HEIGHT;
-var NUM_SPRITE_ROWS;
-var NUM_SPRITE_COLS;
-
-var MAP_WIDTH;
-var MAP_HEIGHT;
-var MAP_COLS;
-var MAP_ROWS;
-
-var CANVAS_WIDTH;
-var CANVAS_HEIGHT;
-var CANVAS_COLS;
-var CANVAS_ROWS;
-
-var ui_x;
-var ui_y;
-
-var NUM_CHUNKS;
-var chunkIndex;
-var subChunkIndex;
-var currentLevelActive; // 0-overworld, 1-subworld
-
-var eventActive;
-
-/// sprites
-var spriteSheet;
-var envSprites;
-
-// npcSprites is the group for ALL sprites
-// chunkNPCSprites gets dynamically added/removed from for collisions and updates
-var npcSprites;
-var chunkNPCSprites;
-
-var pickupSprites;
-var player;
-var numGenericNPCs;
-
-var playerImg;
-var npcImg;
-
-var blueCrabImg;
-var blueCrab;
-
-var TREE_SPRITE_START;
-var TREE_SPRITE_END;
-
-/// sprite depths
-var CHARACTER_INDEX;
-var NPC_INDEX;
-var ENV_INDEX;
-
-/// ui
-var paused;
-var activeTile;
-var activeNPCStringTime;
-var activeNPCStringTimer;
-var activeNPCStringTime;
-
-/// tracery
-var npc_grammar;
-var env_grammar;
-var event_grammar;
-
-/// map
-var subMap;
-var gameMap;
-var treeMap; // lookup table for trees
-var burnMap; // lookup table for fires
-const TILES = {
-  WALL: 0,
-  GROUND: 1,
-  FOLIAGE: 2,
-  WATER: 3,
-  TREE: 4, //4-11 is trees
-  BEACH: 12,
-  BRICK: 13,
-  WATER_ANIM: 14,
-  BURN_ANIM: 15,
-  TOWN: 16,
-  GROUND_SPECIAL: 17,
-  CAMPFIRE: 18,
-  CAMPFIRE_ANIM: 19,
-  CAMPFIRE_SURROUND: 20,
-  BURN_ANIM2: 21,
-  SHIFT_SCREEN_LEFT: 22,
-  SHIFT_SCREEN_RIGHT: 23,
-};
-//var tileIndices;
-var tilePositions;
-var noiseGen;
-
-var recentKeyPress;
-
-//var keyPressDelay;
-
-// keyboard config
-/*
-var KEYBOARD_CONFIG = {
-  // movement
-  "up": [UP_ARROW, "k"],
-  "down": [DOWN_ARROW, "j"],
-  "left": [LEFT_ARROW, "h"],
-  "right": [RIGHT_ARROW, "l"],
-  "up-right": ["u"],
-  "up-left": ["y"],
-  "down-right": ["n"],
-  "down-left": ["b"],
-};
-*/
 
 /// helper functions
 
@@ -134,14 +17,6 @@ var KEYBOARD_CONFIG = {
       }
 }*/
 
-// https://www.webtips.dev/webtips/javascript/how-to-clamp-numbers-in-javascript
-function clamp(num, min, max) {
-  return Math.min(Math.max(num, min), max);
-}
-
-function getRandomInteger(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-}
 
 function getTile(_chunk, _row, _col) {
   return gameMap[_chunk][_row][_col]['type'];
@@ -231,52 +106,6 @@ function shiftScreen(dir) {
   activeNPCStringTimer = activeNPCStringTime;
 }
 
-// collide with a pickup object
-function collidePickup(e, p) {
-  // only pickup is the blue crab
-  if (chunkIndex == e.chunk) {
-    pickupSprites.remove(e);
-    e.remove();
-
-    //console.log(npcSprites);
-    // this doesn't work on all chunks!
-    for (let _i = 0; _i < npcSprites.length; _i++) {
-      if (npcSprites[_i].questGiver) {
-        npcSprites[_i].quest["done"] = true;
-        npcSprites[_i].ai = "wander";
-      }
-    }
-  }
-}
-
-
-// collide with an NPC
-function collideNPC(e, p) {
-  if (chunkIndex == e.chunk) {
-    activeNPCString = e.vipTitle + " " + e.name + ", " + e.occupation + " [" + e.mood + "]";
-    activeNPCStringTimer = activeNPCStringTime;
-
-    console.log(e);
-
-    if (e.questGiver) { // display message 
-      if (e.quest["done"])
-        activeNPCString += " : " + e.quest["thanks"];
-      else
-        if (e.quest["quest"] == "body") {
-          activeNPCString += ": " + npc.quest["questDialogue"][npc.dialogue_index];
-          npc.dialogue_index++;
-          if (npc.dialogue_index >= npc.quest["questDialogue"].length)
-            npc.dialogue_index = 0;
-        } else
-          activeNPCString += " : " + e.quest["quest"];
-    }
-    //textSize(24);
-    //fill(255);
-    //text(e.name + ": how's it goin?", e.position.x + 10, e.position.y - 10);
-    //console.log(npc.name + '\n' + npc.mood + '\n' + npc.vipTitle + '\n' + npc.occupation);
-  }
-}
-
 function drawUI() {
   // top bar
   let ui_x = camera.position.x - CANVAS_WIDTH / 2;
@@ -321,51 +150,10 @@ function preload() {
   npc_grammar = tracery.createGrammar(grammars["npcs"]);
   env_grammar = tracery.createGrammar(grammars["environments"]);
   event_grammar = tracery.createGrammar(grammars["event_dialogue"]);
+  splash_grammar = tracery.createGrammar(grammars["splash"]);
 
   // sounds
   INTRO_SFX = loadSound("assets/sfx/Menu_-_Bringer_Of_Doom.ogg");
-
-  //used for p5play spritesheet - not working!
-  /*
-  tileIndices = {
-    0 : getFrameIndex(17,1), // wall
-    1 : getFrameIndex(0,1),  // ground
-    2 : getFrameIndex(0,6),  // foliage
-    3 : getFrameIndex(5,8),  // water
-  };*/
-
-  //used for p5 image offsetting
-  tilePositions = {
-    0: { 'row': 17, 'col': 1 }, // wall
-    1: { 'row': 0, 'col': 1 }, // ground
-    2: { 'row': 0, 'col': 6 }, // foliage
-    3: { 'row': 5, 'col': 8 }, // water
-    /// trees
-    4: { 'row': 1, 'col': 0 },
-    5: { 'row': 1, 'col': 1 },
-    6: { 'row': 1, 'col': 2 },
-    7: { 'row': 1, 'col': 3 },
-    8: { 'row': 1, 'col': 4 },
-    9: { 'row': 1, 'col': 5 },
-    10: { 'row': 2, 'col': 3 },
-    11: { 'row': 2, 'col': 4 },
-    ///
-    12: { 'row': 6, 'col': 47 }, // beach
-    13: { 'row': 15, 'col': 7 }, // brick
-    14: { 'row': 22, 'col': 0 },  // water animation
-    15: { 'row': 22, 'col': 1 }, // burn animation
-    16: { 'row': 19, 'col': 0 }, // town sprite (make them special for each town so player knows)
-    17: { 'row': 0, 'col': 4 }, // dirt surrounding town
-    18: { 'row': 10, 'col': 14 }, // campfire
-    19: { 'row': 22, 'col': 3 }, // campfire anim
-    20: { 'row': 22, 'col': 4 }, // campfire dirt
-    21: { 'row': 22, 'col': 2 }, // burn animation 2
-    22: { 'row': 20, 'col': 26 }, // shift screen left tile
-    23: { 'row': 20, 'col': 24 }, // shift screen right tile
-  };
-  TREE_SPRITE_START = 4;
-  TREE_SPRITE_END = 11;
-
 
   // setup sprites
   pickupSprites = new Group();
@@ -374,7 +162,6 @@ function preload() {
   chunkNPCSprites = new Group();
 
   let kenneyPath = "assets/1bitpack_kenney_1.1/Tilesheet/colored_packed_modified.png";
-  //spriteSheet    = loadSpriteSheet(kenneyPath, 16, 16, 1056);
   spriteSheet = loadImage(kenneyPath);
   playerImg = loadImage("assets/separate/player.png");
   npcImg = loadImage("assets/separate/npc.png");
@@ -387,9 +174,6 @@ function preload() {
   blueCrab.chunk = 1;
   blueCrab.setCollider('rectangle', 3, 3, TILE_WIDTH - 3, TILE_HEIGHT - 3); // avoid 'next cell' collision
   pickupSprites.add(blueCrab);
-
-  //18,7 (blue crab?)
-  //20,7
 }
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
@@ -450,8 +234,6 @@ function setup() {
   ENV_INDEX = 0
 
   // handle key repeating
-  recentKeyPress = 0;
-  //keyPressDelay = 5;
 
   eventActive = false;
 
@@ -468,6 +250,8 @@ function setup() {
   /// canvas setup
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
   background(71, 45, 60);
+
+  startupMsg = splash_grammar.flatten("#origin#");
 
 
   // player [col:35, row: 14]
@@ -1014,67 +798,40 @@ function mainGame() {
 
 
     // p5play keyboard functions
-    //  if (recentKeyPress == 0) {
     // this probably needs to be abstracted to its own thing
     let _moveDir = null;
     if (keyIsDown(UP_ARROW)) {
       _move['up'] = true;
       _moveDir = "up";
     } else {
-      //if (keyWentUp(UP_ARROW)) {
       _move['up'] = false;
-      //      _moveDir = null;
     }
-    //player.position.y -= TILE_HEIGHT;
 
     if (keyIsDown(DOWN_ARROW)) {
       _move['down'] = true;
       _moveDir = "down";
     } else {
-      //if (keyWentUp(DOWN_ARROW)) {
       _move['down'] = false;
-      //     _moveDir = null;
     }
-    //player.position.y += TILE_HEIGHT;
 
     if (keyIsDown(LEFT_ARROW)) {
       _move['left'] = true;
       _moveDir = "left";
     } else {
-      //if (keyWentUp(LEFT_ARROW)) {
       _move['left'] = false;
-      //    _moveDir = null;
     }
-    //player.position.x -= TILE_WIDTH;
 
     if (keyIsDown(RIGHT_ARROW)) {
       _move['right'] = true;
       _moveDir = "right";
     } else {
-      //if (keyWentUp(RIGHT_ARROW)) {
       _move['right'] = false;
-      //   _moveDir = null;
     }
-    //player.position.x += TILE_WIDTH;
 
-    /*
-  recentKeyPress = keyPressDelay;
-} else { // debounce a bit
-  recentKeyPress--;
-  if (recentKeyPress <= 0)
-    recentKeyPress = 0;
-}*/
 
 
     // position updates
     if (_moveDir != null) {
-
-      //      let _newpos = player.position;
-      //     if (_move['left']) _newpos.x -= TILE_WIDTH * player.speed;
-      //    if (_move['right']) _newpos.x += TILE_WIDTH * player.speed;
-      //   if (_move['up']) _newpos.y -= TILE_HEIGHT * player.speed;
-      //  if (_move['down']) _newpos.y += TILE_HEIGHT * player.speed;
-
       for (let _i = 0; _i < player.speed; _i++) {
         let _retval = checkMove(player.position, chunkIndex, _moveDir);
         if (_retval['state']) { // true -- move
@@ -1083,7 +840,7 @@ function mainGame() {
 
           // special check for non-sprite interactions
           let _rc = getRowCol(player.position.x, player.position.y);
-          let _tile = getTile(chunkIndex, _rc['row'], _rc['col']); //gameMap[chunkIndex][_rc['row']][_rc['col']]['type'];
+          let _tile = getTile(chunkIndex, _rc['row'], _rc['col']); 
           if (_tile == TILES.TOWN)
             currentLevelActive = 1;
 
@@ -1117,26 +874,15 @@ function mainGame() {
           }
         }
       }
-      //player.position.y += TILE_HEIGHT * player.speed;
     }
-    /*
-    if (_move['up'])
-      //player.position.y -= TILE_HEIGHT * player.speed;
-    if (_move['left'])
-      //player.position.x -= TILE_WIDTH * player.speed;
-    if (_move['right'])
-      //player.position.x += TILE_WIDTH * player.speed;
-      */
 
     // increase velocity
     if (_move['down'] || _move['up'] || _move['left'] || _move['right']) {
       if (player.speedCtr < 10) {
         if (player.speedCtr < 5)
           player.speed = 1;
-        else //if (player.speedCtr < 7)
+        else 
           player.speed = 2;
-        //else
-        // player.speed = 3;
 
         player.speedCtr++;
       }
@@ -1153,50 +899,11 @@ function mainGame() {
     ui_x = camera.position.x - CANVAS_WIDTH / 2;
     ui_y = camera.position.y - CANVAS_HEIGHT / 2;
 
-
-
-    // bounds
-    /*
-    if ((player.position.x - (TILE_WIDTH / 2)) <= TILE_WIDTH)
-      player.position.x = TILE_WIDTH + (TILE_WIDTH / 2);
-    else if ((player.position.x - (TILE_WIDTH / 2)) >= MAP_WIDTH - (TILE_WIDTH * 2))
-      player.position.x = MAP_WIDTH - (TILE_WIDTH * 2) + (TILE_WIDTH / 2);
-
-    if ((player.position.y - (TILE_HEIGHT / 2)) <= TILE_HEIGHT)
-      player.position.y = TILE_HEIGHT + (TILE_HEIGHT / 2);
-    else if ((player.position.y - (TILE_HEIGHT / 2)) >= MAP_HEIGHT - (TILE_HEIGHT * 2))
-      player.position.y = MAP_HEIGHT - (TILE_HEIGHT * 2) + (TILE_HEIGHT / 2);
-      */
-
-    //camera.position.x = player.position.x + CANVAS_WIDTH / 4;
-    //camera.position.y = player.position.y + CANVAS_HEIGHT / 4;
-
-    // debug
-    /*
-    textSize(16);
-    fill(255)
-    text('camera [' + camera.position.x + '] [' + camera.position.y + ']', player.position.x, player.position.y - 24)
-    text('chunk [' + chunkIndex + ']', player.position.x, player.position.y - 12)
-    */
   } else {
     if (activeTile) { // show some info!
       // bg
       fill(color(0, 0, 0, 220));
-      //let ui_x = camera.position.x - CANVAS_WIDTH / 2;
-      //let ui_y = camera.position.y - CANVAS_HEIGHT / 2;
-      //rect(ui_x + 50, ui_y + 50, CANVAS_WIDTH - 100, CANVAS_HEIGHT - 100);
       rect(player.position.x + 5, player.position.y - 55, 150, 50);
-
-      // info
-      /*
-      fill(255);
-      textSize(14);
-      textFont("New Tegomin");
-      let _tile = gameMap[chunkIndex][activeTile['row']][activeTile['col']];
-      let msg = _tile.desc;
-      text(msg, player.position.x + 8, player.position.y - 50, 150, 45);
-      //text(msg, ui_x + 50, ui_y + 50, CANVAS_WIDTH - 100, CANVAS_HEIGHT - 100);
-      */
     }
   }
 }
@@ -1221,7 +928,7 @@ function intro() {
 
   fill(color(255, 255, 255, INTRO_CTR));
   textAlign(CENTER);
-  text("WELCOME TO COZYRL GAME OF THE YEAR 20k21", 0, CANVAS_HEIGHT / 2, CANVAS_WIDTH);
+  text(startupMsg, 0, CANVAS_HEIGHT / 2, CANVAS_WIDTH);
 
   if (frameCount > 25) {
     INTRO_CTR -= 5;

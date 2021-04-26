@@ -1,0 +1,1 @@
+// quests lookup table (link up NPC to dict?)
