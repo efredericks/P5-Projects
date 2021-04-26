@@ -55,9 +55,8 @@ function checkMove(curr_pos, curr_chunk, dir) {
     // non-walkable
     if (_tile == TILES.WALL)
       return { 'state': false, 'pos': null };
-
-
-    //if ((_tile == TILES.WATER) || (_tile == TILES.WATER_ANIM)) // unwalkable
+    if ((_tile == TILES.WATER) || (_tile == TILES.WATER_ANIM)) // slow
+      return { 'state': true, 'pos': getSpritePosition(_r, _c), 'speed': 1 };
     //  return { 'state': false, 'pos': null };
 
     return { 'state': true, 'pos': getSpritePosition(_r, _c) };
@@ -249,7 +248,7 @@ function setup() {
 
   /// canvas setup
   createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
-  background(71, 45, 60);
+  background(0);
 
   startupMsg = splash_grammar.flatten("#origin#");
 
@@ -654,6 +653,7 @@ function draw() {
     case SCENES.PAUSED:
     case SCENES.GAME_OVER:
     default:
+      background(71, 45, 60);
       mainGame();
       break;
   }
@@ -833,10 +833,15 @@ function mainGame() {
     // position updates
     if (_moveDir != null) {
       for (let _i = 0; _i < player.speed; _i++) {
-        let _retval = checkMove(player.position, chunkIndex, _moveDir);
+        let _retval = checkMove(player.position, chunkIndex, _moveDir); ///// TBD: THIS NEEDS TO BE THE ARRAY!
         if (_retval['state']) { // true -- move
           player.position.x = _retval['pos']['dx'];
           player.position.y = _retval['pos']['dy'];
+
+          if (_retval['speed']) { // walking through something that modifies your speed
+            player.speed = _retval['speed'];
+            player.speedCtr = 0;
+          }
 
           // special check for non-sprite interactions
           let _rc = getRowCol(player.position.x, player.position.y);
