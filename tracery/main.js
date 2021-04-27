@@ -47,6 +47,8 @@ function checkMove(curr_pos, curr_chunk, dirs) {
   if (dirs['down'])
     _r++;
 
+  // add sliding!
+  // fix if NPC is next to you - stop motion otherwise you pass through
   /*
   if (dir == 'left')
     _c--;
@@ -203,15 +205,8 @@ function loadGameState() {
 
 function setup() {
   // set globals per https://github.com/processing/p5.js/wiki/p5.js-overview#why-cant-i-assign-variables-using-p5-functions-and-variables-before-setup
-  SCENES = {
-    PRELOAD: 0,
-    INTRO: 1,
-    MAIN_MENU: 2,
-    GAME: 3,
-    PAUSED: 4,
-    GAME_OVER: 5
-  };
   CURRENT_SCENE = SCENES.INTRO;//PRELOAD;
+  PRIOR_SCENE = SCENES.GAME; // only used during gameplay
   INTRO_CTR = 255;
 
   TILE_WIDTH = 16;
@@ -270,6 +265,7 @@ function setup() {
   player.speed = 1;  // # of tiles to speed through
   player.speedCtr = 0;  // ramp up speed
   player.addImage(playerImg);
+  player.inventory = [];
 
   // place crab
   let _bc_c = 5;
@@ -616,7 +612,24 @@ function keyReleased() {
     else
       currentLevelActive = 0;
   }
+  else if (key == "i") {
+    if (CURRENT_SCENE === SCENES.GAME) {
+      PRIOR_SCENE = CURRENT_SCENE;
+      CURRENT_SCENE = SCENES.INVENTORY;
+    } else {
+      if (CURRENT_SCENE === SCENES.INVENTORY) // lock to only P
+        CURRENT_SCENE = PRIOR_SCENE;
+    }
+  }
   else if (key == "p") {
+    if (CURRENT_SCENE === SCENES.GAME) {
+      PRIOR_SCENE = CURRENT_SCENE;
+      CURRENT_SCENE = SCENES.PAUSED;
+    } else {
+      if (CURRENT_SCENE === SCENES.PAUSED) // lock to only P
+        CURRENT_SCENE = PRIOR_SCENE;
+    }
+    /*
     eventActive = !eventActive;
     // perhaps add a lookup table to just pick a random index?
 
@@ -637,6 +650,7 @@ function keyReleased() {
       activeNPCStringTimer = activeNPCStringTime;
 
     }
+    */
   }
   else if (key == "q") { // query the local space
     paused = !paused;
@@ -662,25 +676,69 @@ function draw() {
     case SCENES.INTRO:
       intro();
       break;
+    case SCENES.PAUSED:
+      frameRate(2);
+      drawBackground();
+      drawPause();
+      break;
+    case SCENES.INVENTORY:
+      frameRate(2);
+      drawBackground();
+      drawInventory();
+      break;
     case SCENES.MAIN_MENU:
     case SCENES.GAME:
-    case SCENES.PAUSED:
     case SCENES.GAME_OVER:
     default:
-      background(71, 45, 60);
+      frameRate(20);
+      drawBackground();
       mainGame();
       break;
   }
 }
 
-function mainGame() {
-  let _move = {
-    'left': false,
-    'right': false,
-    'up': false,
-    'down': false
-  };
+// show your inventory
+function drawInventory() {
+  push();
+  translate(width / 2, height / 2);
+  textSize(48);
+  fill(color(0, 0, 0, 200));
+  //rect(-_txt_width/2,0,_txt_width,60);
+  rect(-width / 2, -height / 2, width, height)
 
+  fill(255);
+  textAlign(CENTER);
+
+  let _msg = "You have:";
+  if (player.inventory.length === 0)
+    _msg += " nothing";
+  else {
+    for (let _i = 0; _i < player.inventory.length; _i++)
+      _msg += " [" + player.inventory[_i] + "]";
+  }
+  text(_msg, 0, 36);
+
+  pop();
+}
+
+// show the pause menu
+function drawPause() {
+  push();
+  translate(width / 2, height / 2);
+  let _msg = "Game paused";
+  textSize(48);
+  let _txt_width = textWidth(_msg);
+  fill(color(0, 0, 0, 200));
+  //rect(-_txt_width/2,0,_txt_width,60);
+  rect(-width / 2, -height / 2, width, height)
+  fill(255);
+  textAlign(CENTER);
+  text("Game paused", 0, 36);
+  pop();
+}
+
+// handles the ambient animation
+function drawBackground() {
   /// draw functions
   background(71, 45, 60);
 
@@ -739,9 +797,21 @@ function mainGame() {
     }
   }
 
+
+}
+
+function mainGame() {
+  let _move = {
+    'left': false,
+    'right': false,
+    'up': false,
+    'down': false
+  };
+
   if (!paused) {
     // interact
-    chunkNPCSprites.collide(player, collideNPC);
+    chunkNPCSprites.displace(player, collideNPC);
+    //chunkNPCSprites.collide(player, collideNPC);
     pickupSprites.overlap(player, collidePickup);
 
     // update entities -- not needed?
@@ -859,7 +929,7 @@ function mainGame() {
 
           // special check for non-sprite interactions
           let _rc = getRowCol(player.position.x, player.position.y);
-          let _tile = getTile(chunkIndex, _rc['row'], _rc['col']); 
+          let _tile = getTile(chunkIndex, _rc['row'], _rc['col']);
           if (_tile == TILES.TOWN)
             currentLevelActive = 1;
 
@@ -900,7 +970,7 @@ function mainGame() {
       if (player.speedCtr < 10) {
         if (player.speedCtr < 5)
           player.speed = 1;
-        else 
+        else
           player.speed = 2;
 
         player.speedCtr++;

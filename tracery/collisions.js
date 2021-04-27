@@ -2,6 +2,7 @@
 function collidePickup(e, p) {
   // only pickup is the blue crab
   if (chunkIndex == e.chunk) {
+    player.inventory.push("Blue Crab");
     pickupSprites.remove(e);
     e.remove();
 
