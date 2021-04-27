@@ -4,7 +4,7 @@
 
 var grammars = {
     storyline: {
-        intro: ["TBD"],
+        intro: ["Hi there GI2021!"],
     },
     splash: {
         origin: ["Welcome to CozyRL", "Oh Discordia!", "Hey there adventurer!"],
