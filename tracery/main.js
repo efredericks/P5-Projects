@@ -699,15 +699,16 @@ function draw() {
 
 // show your inventory
 function drawInventory() {
-  push();
-  translate(width / 2, height / 2);
+  //push();
+  //translate(width / 2, height / 2);
   textSize(48);
   fill(color(0, 0, 0, 200));
   //rect(-_txt_width/2,0,_txt_width,60);
-  rect(-width / 2, -height / 2, width, height)
+  //rect(-width / 2, -height / 2, width, height)
+  rect(camera.position.x - width/2, camera.position.y - height/2, camera.position.x + width/2, camera.position.y + height/2);
 
   fill(255);
-  textAlign(CENTER);
+  textAlign(CENTER, CENTER);
 
   let _msg = "You have:";
   if (player.inventory.length === 0)
@@ -716,25 +717,27 @@ function drawInventory() {
     for (let _i = 0; _i < player.inventory.length; _i++)
       _msg += " [" + player.inventory[_i] + "]";
   }
-  text(_msg, 0, 36);
+  //text(_msg, 0, 36);
+  text(_msg, camera.position.x, camera.position.y);
 
-  pop();
+  //pop();
 }
 
 // show the pause menu
 function drawPause() {
-  push();
-  translate(width / 2, height / 2);
+  //push();
+  //translate(width / 2, height / 2);
   let _msg = "Game paused";
   textSize(48);
   let _txt_width = textWidth(_msg);
   fill(color(0, 0, 0, 200));
   //rect(-_txt_width/2,0,_txt_width,60);
-  rect(-width / 2, -height / 2, width, height)
+  //rect(-width / 2, -height / 2, width, height)
+  rect(camera.position.x - width/2, camera.position.y - height/2, camera.position.x + width/2, camera.position.y + height/2);
   fill(255);
-  textAlign(CENTER);
-  text("Game paused", 0, 36);
-  pop();
+  textAlign(CENTER, CENTER);
+  text("Game paused", camera.position.x, camera.position.y);
+  //pop();
 }
 
 // handles the ambient animation
