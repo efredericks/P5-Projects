@@ -373,6 +373,8 @@ function setup() {
   let _chunk = NUM_CHUNKS + TOWN_CHUNKS.FARMHILL;
   gameMap[_chunk] = [];
   let randomOffset = getRandomInteger(0, 10000);
+  let _town_mid_row = (int)(TOWN_ROWS / 2);
+  let _town_mid_col = (int)(TOWN_COLS / 2);
   for (let _r = 0; _r < TOWN_ROWS; _r++) {
     gameMap[_chunk][_r] = [];
     for (let _c = 0; _c < TOWN_COLS; _c++) {
@@ -383,33 +385,37 @@ function setup() {
         ((_r == 0) || (_r == (TOWN_ROWS - 1))))
         _obj = { "type": TILES.WALL, "desc": "Impassable wall" };
       else {
-        /*
-        let _noise = noiseGen.get2DNoise(_c + randomOffset, _r + randomOffset);
-        if (_noise < 0)
-          _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
-        else if (_noise < 0.1)
-          _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
-        else if (_noise < 0.2) {
-          if (random() > 0.90)
-            _obj = { "type": TILES.WATER_ANIM, "desc": env_grammar.flatten("#water#") };
+        if ((_c == _town_mid_col) || (_c == (_town_mid_col + 1)) || (_c == (_town_mid_col - 1)) ||
+          (_r == _town_mid_row) || (_r == (_town_mid_row + 1)) || (_r == (_town_mid_row - 1))) {
+          _obj = { "type": TILES.PAVEMENT, "desc": env_grammar.flatten("#pavement#") };
+        } else {
+          /*
+          let _noise = noiseGen.get2DNoise(_c + randomOffset, _r + randomOffset);
+          if (_noise < 0)
+            _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+          else if (_noise < 0.1)
+            _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
+          else if (_noise < 0.2) {
+            if (random() > 0.90)
+              _obj = { "type": TILES.WATER_ANIM, "desc": env_grammar.flatten("#water#") };
+            else
+              _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
+  
+          } else if (_noise < 0.25)
+            _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
+          else if (_noise < 0.4) {
+            _obj = { "type": getRandomInteger(TREE_SPRITE_START, TREE_SPRITE_END + 1), "desc": env_grammar.flatten("#trees#") };
+            treeMap.push({ 'chunk': _chunk, 'row': _r, 'col': _c }); // lookup table
+          } else if (_noise < 0.5)
+            _obj = { "type": TILES.FOLIAGE, "desc": env_grammar.flatten("#foliage#") };
           else
-            _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
-
-        } else if (_noise < 0.25)
-          _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
-        else if (_noise < 0.4) {
-          _obj = { "type": getRandomInteger(TREE_SPRITE_START, TREE_SPRITE_END + 1), "desc": env_grammar.flatten("#trees#") };
-          treeMap.push({ 'chunk': _chunk, 'row': _r, 'col': _c }); // lookup table
-        } else if (_noise < 0.5)
-          _obj = { "type": TILES.FOLIAGE, "desc": env_grammar.flatten("#foliage#") };
-        else
-        */
-        _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+          */
+          _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+        }
       }
       gameMap[_chunk][_r].push(_obj);
     }
   }
-  let _town_mid_row = (int)(TOWN_ROWS / 2);
   gameMap[NUM_CHUNKS][_town_mid_row][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
   gameMap[NUM_CHUNKS][_town_mid_row - 1][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
   gameMap[NUM_CHUNKS][_town_mid_row + 1][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
@@ -711,7 +717,7 @@ function keyReleased() {
     /*
     eventActive = !eventActive;
     // perhaps add a lookup table to just pick a random index?
-
+ 
     let _cnt = 1;
     while (_cnt > 0) {
       let _ti = getRandomInteger(0, treeMap.length);
@@ -719,15 +725,15 @@ function keyReleased() {
       let _chunk = _t['chunk'];
       let _row = _t['row'];
       let _col = _t['col'];
-
+ 
       gameMap[_chunk][_row][_col]['type'] = TILES.BURN_ANIM;
       gameMap[_chunk][_row][_col]['desc'] = "The trees are afire";
       burnMap.push({ 'chunk': _chunk, 'row': _row, 'col': _col }); // lookup table
       _cnt--;
-
+ 
       activeNPCString = "FIRE AT [" + _chunk + "][" + _row + "][" + _col + "]";
       activeNPCStringTimer = activeNPCStringTime;
-
+ 
     }
     */
   }
@@ -743,7 +749,7 @@ function keyReleased() {
   /*
   else {
     if 
-
+ 
   }*/
 }
 
@@ -1011,16 +1017,19 @@ function mainGame() {
             let _new_pos = getSpritePosition((int)(TOWN_ROWS / 2), 1)
             player.position.x = _new_pos['dx'];
             player.position.y = _new_pos['dy'];
+
+            activeNPCString = "Welcome to Farmhill!";
+            activeNPCStringTimer = activeNPCStringTime;
           }
 
           // tbd: abstract these a bit!
           if ((_tile == TILES.SHIFT_SCREEN_LEFT) && (chunkIndex >= NUM_CHUNKS)) { // a town!
-              chunkIndex = PRIOR_CHUNK;
-              let _new_pos = getSpritePosition(PRIOR_ROW, PRIOR_COL);
-              player.position.x = _new_pos['dx'];
-              player.position.y = _new_pos['dy'];
-              activeNPCString = "Back to chunk: " + chunkIndex;
-              activeNPCStringTimer = activeNPCStringTime;
+            chunkIndex = PRIOR_CHUNK;
+            let _new_pos = getSpritePosition(PRIOR_ROW, PRIOR_COL);
+            player.position.x = _new_pos['dx'];
+            player.position.y = _new_pos['dy'];
+            activeNPCString = "Back to chunk: " + chunkIndex;
+            activeNPCStringTimer = activeNPCStringTime;
           } else {
             if ((_tile == TILES.SHIFT_SCREEN_LEFT) && (chunkIndex > 0)) {
               chunkIndex--;

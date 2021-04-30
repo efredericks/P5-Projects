@@ -20,7 +20,7 @@ var TOWN_COLS;
 // player's last position on the overworld
 var PRIOR_CHUNK;
 var PRIOR_ROW;
-var PRIOR_COL; 
+var PRIOR_COL;
 
 var CANVAS_WIDTH;
 var CANVAS_HEIGHT;
@@ -89,7 +89,7 @@ const SCENES = {
   MAIN_MENU: 2,
   GAME: 3,
   PAUSED: 4,
-  INVENTORY: 5, 
+  INVENTORY: 5,
   GAME_OVER: 6
 };
 
@@ -119,6 +119,7 @@ const TILES = {
   BURN_ANIM2: 21,
   SHIFT_SCREEN_LEFT: 22,
   SHIFT_SCREEN_RIGHT: 23,
+  PAVEMENT: 24,
 };
 const tilePositions = {
   0: { 'row': 17, 'col': 1 }, // wall
@@ -147,6 +148,7 @@ const tilePositions = {
   21: { 'row': 22, 'col': 2 }, // burn animation 2
   22: { 'row': 20, 'col': 26 }, // shift screen left tile
   23: { 'row': 20, 'col': 24 }, // shift screen right tile
+  24: { 'row': 13, 'col': 0 }, // pavement
 };
 const TREE_SPRITE_START = 4;
 const TREE_SPRITE_END = 11;

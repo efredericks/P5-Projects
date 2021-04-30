@@ -20,6 +20,7 @@ var grammars = {
         foliage: ["foliage"],
         ground: ["ground"],
         beach: ["beach"],
+        pavement: ["pavement"],
 
         trees: ["#treeDesc.capitalize# trees #treeAction#"],
         treeDesc: ["gently swaying", "imposing", "scraggly", "sparse"],
