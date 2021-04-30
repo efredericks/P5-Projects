@@ -375,54 +375,126 @@ function setup() {
   let randomOffset = getRandomInteger(0, 10000);
   let _town_mid_row = (int)(TOWN_ROWS / 2);
   let _town_mid_col = (int)(TOWN_COLS / 2);
+
+  console.log(townLookupTable.farmhill.tiles.length);
+  console.log(townLookupTable.farmhill.tiles[0].length);
+
+
+
   for (let _r = 0; _r < TOWN_ROWS; _r++) {
     gameMap[_chunk][_r] = [];
     for (let _c = 0; _c < TOWN_COLS; _c++) {
-
       let _obj = {};
+      let _town_tile = townLookupTable.farmhill.tiles[_r][_c];
+//      _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
 
-      if (((_c == 0) || (_c == (TOWN_COLS - 1))) ||
-        ((_r == 0) || (_r == (TOWN_ROWS - 1))))
+      if (_town_tile == "^")
+        _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
+      else if (_town_tile == "*")
+        _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
+      else if (_town_tile == "#")
         _obj = { "type": TILES.WALL, "desc": "Impassable wall" };
-      else {
-        if ((_c == _town_mid_col) || (_c == (_town_mid_col + 1)) || (_c == (_town_mid_col - 1)) ||
-          (_r == _town_mid_row) || (_r == (_town_mid_row + 1)) || (_r == (_town_mid_row - 1))) {
-          _obj = { "type": TILES.PAVEMENT, "desc": env_grammar.flatten("#pavement#") };
-        } else {
-          /*
-          let _noise = noiseGen.get2DNoise(_c + randomOffset, _r + randomOffset);
-          if (_noise < 0)
-            _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
-          else if (_noise < 0.1)
-            _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
-          else if (_noise < 0.2) {
-            if (random() > 0.90)
-              _obj = { "type": TILES.WATER_ANIM, "desc": env_grammar.flatten("#water#") };
-            else
-              _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
-  
-          } else if (_noise < 0.25)
-            _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
-          else if (_noise < 0.4) {
-            _obj = { "type": getRandomInteger(TREE_SPRITE_START, TREE_SPRITE_END + 1), "desc": env_grammar.flatten("#trees#") };
-            treeMap.push({ 'chunk': _chunk, 'row': _r, 'col': _c }); // lookup table
-          } else if (_noise < 0.5)
-            _obj = { "type": TILES.FOLIAGE, "desc": env_grammar.flatten("#foliage#") };
-          else
-          */
-          _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
-        }
-      }
+      else if (_town_tile == "<")
+        _obj = { "type": TILES.SHIFT_SCREEN_LEFT, "desc": "" };
+      else
+        _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+
       gameMap[_chunk][_r].push(_obj);
     }
   }
-  gameMap[NUM_CHUNKS][_town_mid_row][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
-  gameMap[NUM_CHUNKS][_town_mid_row - 1][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
-  gameMap[NUM_CHUNKS][_town_mid_row + 1][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
 
-  gameMap[NUM_CHUNKS][_town_mid_row][0]['desc'] = "";
-  gameMap[NUM_CHUNKS][_town_mid_row - 1][0]['desc'] = "";
-  gameMap[NUM_CHUNKS][_town_mid_row + 1][0]['desc'] = "";
+  /*
+  for (let _r = 0; _r < townLookupTable.farmhill.tiles.length; _r++) {
+    gameMap[_chunk][_r] = [];
+    for (let _c = 0; _c < townLookupTable.farmhill.tiles[0].length; _c++) {
+      let _obj = {};
+      let _t = townLookupTable.farmhill.tiles[_r][_c];
+      if (_t == "^")
+        _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
+      else if (_t == "*")
+        _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
+      else if (_t == "#")
+        _obj = { "type": TILES.WALL, "desc": "Impassable wall" };
+      else if (_t == "<")
+        _obj = { "type": TILES.SHIFT_SCREEN_LEFT, "desc": "" };
+      else
+        _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+
+      gameMap[_chunk][_r].push(_obj);
+    }
+  }*/
+
+
+  // for (let _r = 0; _r < TOWN_ROWS; _r++) {
+  //   gameMap[_chunk][_r] = [];
+  //   for (let _c = 0; _c < TOWN_COLS; _c++) {
+  //     let _obj = {};
+  //     if (((_c == 0) || (_c == (TOWN_COLS - 1))) ||
+  //       ((_r == 0) || (_r == (TOWN_ROWS - 1)))) {
+  //       _obj = { "type": TILES.WALL, "desc": "Impassable wall" };
+  //       gameMap[_chunk][_r].push(_obj);
+  //     } else {
+  //       _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+  //       gameMap[_chunk][_r].push(_obj);
+  //       // load in town!
+  //       /*
+  //       for (let _y = 0; _y < TOWN_ROWS-2; _y++) {
+  //         for (let _x = 0; _x < TOWN_COLS-2; _x++) {
+  //           let _t = townLookupTable.farmhill.tiles[_y][_x]; 
+  //           let _obj = {};
+  //           if (_t == "^")
+  //             _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
+  //           else if (_t == "*")
+  //             _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
+  //           else
+  //             _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+  //           gameMap[_chunk][_r].push(_obj);
+  //         }
+  //       }
+  //       */
+
+
+
+  //       /*
+  //       if ((_c == _town_mid_col) || (_c == (_town_mid_col + 1)) || (_c == (_town_mid_col - 1)) ||
+  //         (_r == _town_mid_row) || (_r == (_town_mid_row + 1)) || (_r == (_town_mid_row - 1))) {
+  //         _obj = { "type": TILES.PAVEMENT, "desc": env_grammar.flatten("#pavement#") };
+  //       } else {
+  //         */
+  //       /*
+  //       let _noise = noiseGen.get2DNoise(_c + randomOffset, _r + randomOffset);
+  //       if (_noise < 0)
+  //         _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+  //       else if (_noise < 0.1)
+  //         _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
+  //       else if (_noise < 0.2) {
+  //         if (random() > 0.90)
+  //           _obj = { "type": TILES.WATER_ANIM, "desc": env_grammar.flatten("#water#") };
+  //         else
+  //           _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
+
+  //       } else if (_noise < 0.25)
+  //         _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
+  //       else if (_noise < 0.4) {
+  //         _obj = { "type": getRandomInteger(TREE_SPRITE_START, TREE_SPRITE_END + 1), "desc": env_grammar.flatten("#trees#") };
+  //         treeMap.push({ 'chunk': _chunk, 'row': _r, 'col': _c }); // lookup table
+  //       } else if (_noise < 0.5)
+  //         _obj = { "type": TILES.FOLIAGE, "desc": env_grammar.flatten("#foliage#") };
+  //       else
+  //       */
+  //       //_obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+
+  //     }
+  //     //gameMap[_chunk][_r].push(_obj);
+  //   }
+  // }
+  // gameMap[NUM_CHUNKS][_town_mid_row][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
+  // gameMap[NUM_CHUNKS][_town_mid_row - 1][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
+  // gameMap[NUM_CHUNKS][_town_mid_row + 1][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
+
+  // gameMap[NUM_CHUNKS][_town_mid_row][0]['desc'] = "";
+  // gameMap[NUM_CHUNKS][_town_mid_row - 1][0]['desc'] = "";
+  // gameMap[NUM_CHUNKS][_town_mid_row + 1][0]['desc'] = "";
   /////////////////////////////////////
 
 
@@ -641,23 +713,23 @@ function setup() {
   lbutton = createButton('<');
   lbutton.position(10, 90, 65);
   lbutton.mousePressed(tLeft);
-  
+   
   rbutton = createButton('>');
   rbutton.position(40, 90, 65);
   rbutton.mousePressed(tRight);
-  
+   
   ubutton = createButton('^');
   ubutton.position(25, 80, 65);
   ubutton.mousePressed(tUp);
-  
+   
   dbutton = createButton('v');
   dbutton.position(25, 100, 65);
   dbutton.mousePressed(tDown);
-  
+   
   lcbutton = createButton('chunk <');
   lcbutton.position(10, 120, 65);
   lcbutton.mousePressed(sLeft);
-  
+   
   rcbutton = createButton('chunk >');
   rcbutton.position(10, 140, 65);
   rcbutton.mousePressed(sRight);
