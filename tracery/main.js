@@ -18,14 +18,18 @@
 }*/
 
 
-function getTile(_chunk, _row, _col) {
+function getTileType(_chunk, _row, _col) {
   return gameMap[_chunk][_row][_col]['type'];
+}
+function getTile(_chunk, _row, _col) {
+  return gameMap[_chunk][_row][_col];
 }
 
 // get frame index into spritesheet for raw drawing
 function getFrameIndex(row, col) {
   return row * NUM_SPRITE_COLS + col;
 }
+
 
 function getSpriteOffset(row, col) {
   let dx = col * TILE_WIDTH;
@@ -61,9 +65,15 @@ function checkMove(curr_pos, curr_chunk, dirs) {
   else
     console.log("checkMove: something went wrong here");
     */
+  let _map_rows = MAP_ROWS;
+  let _map_cols = MAP_COLS;
+  if (chunkIndex >= NUM_CHUNKS) {
+    _map_rows = TOWN_ROWS;
+    _map_cols = TOWN_COLS;
+  }
 
-  if ((_c >= 0) && (_c <= (MAP_COLS - 1)) && (_r >= 0) && (_r <= (MAP_ROWS - 1))) {
-    let _tile = getTile(curr_chunk, _r, _c);//gameMap[curr_chunk][_r][_c]['type'];
+  if ((_c >= 0) && (_c <= (_map_cols - 1)) && (_r >= 0) && (_r <= (_map_rows - 1))) {
+    let _tile = getTileType(curr_chunk, _r, _c);//gameMap[curr_chunk][_r][_c]['type'];
 
     // non-walkable
     if (_tile == TILES.WALL)
@@ -203,6 +213,13 @@ function loadGameState() {
   ;
 }
 
+function storeLastPosition(_chunk, _pos) {
+  PRIOR_CHUNK = _chunk;
+  let _rc = getRowCol(_pos.x, _pos.y);
+  PRIOR_ROW = _rc['row'];
+  PRIOR_COL = _rc['col'];
+}
+
 function setup() {
   // set globals per https://github.com/processing/p5.js/wiki/p5.js-overview#why-cant-i-assign-variables-using-p5-functions-and-variables-before-setup
   CURRENT_SCENE = SCENES.INTRO;//PRELOAD;
@@ -219,6 +236,9 @@ function setup() {
   MAP_COLS = (int)(MAP_WIDTH / TILE_WIDTH);
   MAP_ROWS = (int)(MAP_HEIGHT / TILE_HEIGHT);
 
+  TOWN_ROWS = 100;
+  TOWN_COLS = 100;
+
   //CANVAS_WIDTH = 800;
   //CANVAS_HEIGHT = 608;
   CANVAS_WIDTH = windowWidth;
@@ -230,6 +250,7 @@ function setup() {
   CANVAS_UI_HEIGHT = CANVAS_HEIGHT;
 
   NUM_CHUNKS = 4;//100;
+  NUM_TOWN_CHUNKS = 4;
   chunkIndex = 1; // start in middle
   currentLevelActive = 0; // overworld active
   subChunkIndex = 0;
@@ -267,6 +288,9 @@ function setup() {
   player.addImage(playerImg);
   player.inventory = [];
 
+  // save players position before transitioning
+  storeLastPosition(chunkIndex, player.position);
+
   // place crab
   let _bc_c = 5;
   let _bc_r = 5;
@@ -277,7 +301,7 @@ function setup() {
   // environment
   treeMap = [];
   burnMap = [];
-  gameMap = new Array(NUM_CHUNKS);
+  gameMap = new Array(NUM_CHUNKS + NUM_TOWN_CHUNKS);
   for (let _chunk = 0; _chunk < NUM_CHUNKS; _chunk++) {
     gameMap[_chunk] = [];
     let randomOffset = getRandomInteger(0, 10000);
@@ -321,15 +345,16 @@ function setup() {
   let _townChunk = getRandomInteger(0, NUM_CHUNKS);
   let _t_col = getRandomInteger(2, MAP_COLS - 2);
   let _t_row = getRandomInteger(2, MAP_ROWS - 2);
-  let _t_tile = getTile(_townChunk, _t_row, _t_col);// gameMap[_townChunk][_t_row][_t_col]['type'];
+  let _t_tile = getTileType(_townChunk, _t_row, _t_col);// gameMap[_townChunk][_t_row][_t_col]['type'];
   while ((_t_tile == TILES.WATER) || (_t_tile == TILES.WATER_ANIM)) {
     _townChunk = getRandomInteger(0, NUM_CHUNKS);
     _t_col = getRandomInteger(2, MAP_COLS - 2);
     _t_row = getRandomInteger(2, MAP_ROWS - 2);
-    _t_tile = getTile(_townChunk, _t_row, _t_col);// gameMap[_townChunk][_t_row][_t_col]['type'];
+    _t_tile = getTileType(_townChunk, _t_row, _t_col);// gameMap[_townChunk][_t_row][_t_col]['type'];
   }
   console.log("Town: ", _townChunk, _t_row, _t_col);
   gameMap[_townChunk][_t_row][_t_col]['type'] = TILES.TOWN;
+  gameMap[_townChunk][_t_row][_t_col]['nextChunk'] = TOWN_CHUNKS.FARMHILL;
 
   // left col
   gameMap[_townChunk][_t_row - 1][_t_col - 1]['type'] = TILES.GROUND_SPECIAL;
@@ -343,16 +368,70 @@ function setup() {
   gameMap[_townChunk][_t_row - 1][_t_col]['type'] = TILES.GROUND_SPECIAL;
   gameMap[_townChunk][_t_row + 1][_t_col]['type'] = TILES.GROUND_SPECIAL;
 
+  //////SETUP TOWNS (abstract away later)
+  //
+  let _chunk = NUM_CHUNKS + TOWN_CHUNKS.FARMHILL;
+  gameMap[_chunk] = [];
+  let randomOffset = getRandomInteger(0, 10000);
+  for (let _r = 0; _r < TOWN_ROWS; _r++) {
+    gameMap[_chunk][_r] = [];
+    for (let _c = 0; _c < TOWN_COLS; _c++) {
+
+      let _obj = {};
+
+      if (((_c == 0) || (_c == (TOWN_COLS - 1))) ||
+        ((_r == 0) || (_r == (TOWN_ROWS - 1))))
+        _obj = { "type": TILES.WALL, "desc": "Impassable wall" };
+      else {
+        /*
+        let _noise = noiseGen.get2DNoise(_c + randomOffset, _r + randomOffset);
+        if (_noise < 0)
+          _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+        else if (_noise < 0.1)
+          _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
+        else if (_noise < 0.2) {
+          if (random() > 0.90)
+            _obj = { "type": TILES.WATER_ANIM, "desc": env_grammar.flatten("#water#") };
+          else
+            _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
+
+        } else if (_noise < 0.25)
+          _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
+        else if (_noise < 0.4) {
+          _obj = { "type": getRandomInteger(TREE_SPRITE_START, TREE_SPRITE_END + 1), "desc": env_grammar.flatten("#trees#") };
+          treeMap.push({ 'chunk': _chunk, 'row': _r, 'col': _c }); // lookup table
+        } else if (_noise < 0.5)
+          _obj = { "type": TILES.FOLIAGE, "desc": env_grammar.flatten("#foliage#") };
+        else
+        */
+        _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+      }
+      gameMap[_chunk][_r].push(_obj);
+    }
+  }
+  let _town_mid_row = (int)(TOWN_ROWS / 2);
+  gameMap[NUM_CHUNKS][_town_mid_row][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
+  gameMap[NUM_CHUNKS][_town_mid_row - 1][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
+  gameMap[NUM_CHUNKS][_town_mid_row + 1][0]['type'] = TILES.SHIFT_SCREEN_LEFT;
+
+  gameMap[NUM_CHUNKS][_town_mid_row][0]['desc'] = "";
+  gameMap[NUM_CHUNKS][_town_mid_row - 1][0]['desc'] = "";
+  gameMap[NUM_CHUNKS][_town_mid_row + 1][0]['desc'] = "";
+  /////////////////////////////////////
+
+
+
+
   // place a campfire
   let _campfireChunk = getRandomInteger(0, NUM_CHUNKS);
   let _cf_col = getRandomInteger(2, MAP_COLS - 2);
   let _cf_row = getRandomInteger(2, MAP_ROWS - 2);
-  _t_tile = getTile(_campfireChunk, _cf_row, _cf_col);// gameMap[_campfireChunk][_cf_row][_cf_col]['type'];
+  _t_tile = getTileType(_campfireChunk, _cf_row, _cf_col);// gameMap[_campfireChunk][_cf_row][_cf_col]['type'];
   while ((_t_tile == TILES.WATER) || (_t_tile == TILES.WATER_ANIM)) {
     _campfireChunk = getRandomInteger(0, NUM_CHUNKS);
     _cf_col = getRandomInteger(2, MAP_COLS - 2);
     _cf_row = getRandomInteger(2, MAP_ROWS - 2);
-    _t_tile = getTile(_campfireChunk, _cf_row, _cf_col);// gameMap[_campfireChunk][_cf_row][_cf_col]['type'];
+    _t_tile = getTileType(_campfireChunk, _cf_row, _cf_col);// gameMap[_campfireChunk][_cf_row][_cf_col]['type'];
   }
   console.log("Campfire: ", _campfireChunk, _cf_row, _cf_col);
   gameMap[_campfireChunk][_cf_row][_cf_col]['type'] = TILES.CAMPFIRE;
@@ -697,19 +776,17 @@ function draw() {
   }
 }
 
-// show your inventory
-function drawInventory() {
-  //push();
-  //translate(width / 2, height / 2);
+function fullScreenMsg(msg) {
   textSize(48);
   fill(color(0, 0, 0, 200));
-  //rect(-_txt_width/2,0,_txt_width,60);
-  //rect(-width / 2, -height / 2, width, height)
-  rect(camera.position.x - width/2, camera.position.y - height/2, camera.position.x + width/2, camera.position.y + height/2);
-
+  rect(camera.position.x - width / 2, camera.position.y - height / 2, camera.position.x + width / 2, camera.position.y + height / 2);
   fill(255);
   textAlign(CENTER, CENTER);
+  text(msg, camera.position.x, camera.position.y);
+}
 
+// show your inventory
+function drawInventory() {
   let _msg = "You have:";
   if (player.inventory.length === 0)
     _msg += " nothing";
@@ -717,27 +794,12 @@ function drawInventory() {
     for (let _i = 0; _i < player.inventory.length; _i++)
       _msg += " [" + player.inventory[_i] + "]";
   }
-  //text(_msg, 0, 36);
-  text(_msg, camera.position.x, camera.position.y);
-
-  //pop();
+  fullScreenMsg(_msg);
 }
 
 // show the pause menu
 function drawPause() {
-  //push();
-  //translate(width / 2, height / 2);
-  let _msg = "Game paused";
-  textSize(48);
-  let _txt_width = textWidth(_msg);
-  fill(color(0, 0, 0, 200));
-  //rect(-_txt_width/2,0,_txt_width,60);
-  //rect(-width / 2, -height / 2, width, height)
-  rect(camera.position.x - width/2, camera.position.y - height/2, camera.position.x + width/2, camera.position.y + height/2);
-  fill(255);
-  textAlign(CENTER, CENTER);
-  text("Game paused", camera.position.x, camera.position.y);
-  //pop();
+  fullScreenMsg("Game paused");
 }
 
 // handles the ambient animation
@@ -746,14 +808,21 @@ function drawBackground() {
   background(71, 45, 60);
 
   if (currentLevelActive == 0) {
-    for (let _r = 0; _r < MAP_ROWS; _r++) {
-      for (let _c = 0; _c < MAP_COLS; _c++) {
+    let _map_rows = MAP_ROWS;
+    let _map_cols = MAP_COLS;
+    if (chunkIndex >= NUM_CHUNKS) {
+      _map_rows = TOWN_ROWS;
+      _map_cols = TOWN_COLS;
+    }
+
+    for (let _r = 0; _r < _map_rows; _r++) {
+      for (let _c = 0; _c < _map_cols; _c++) {
         //https://github.com/processing/p5.js/issues/1567
         //image(img,[sx=0],[sy=0],[sWidth=img.width],[sHeight=img.height],[dx=0],[dy=0],[dWidth],[dHeight])
 
 
         // randomly animate water -- this probably would be better abstracted later on to encapsulate tile animations (otherwise we're going to get deep into if statements)
-        let _tile = getTile(chunkIndex, _r, _c); // gameMap[chunkIndex][_r][_c]['type'];
+        let _tile = getTileType(chunkIndex, _r, _c); // gameMap[chunkIndex][_r][_c]['type'];
         if ((_tile == TILES.WATER) || (_tile == TILES.WATER_ANIM)) {
           if (random() > 0.99) {
             if (_tile == TILES.WATER) {
@@ -849,7 +918,7 @@ function mainGame() {
       let _random_col = getRandomInteger(max(0, _burn_col - 1), min(_burn_col + 1, NUM_SPRITE_COLS));
 
       if ((_burn_row != _random_row) && (_burn_col != _random_col)) { // not the same
-        let _tile = getTile(_burn_chunk, _random_row, _random_col);
+        let _tile = getTileType(_burn_chunk, _random_row, _random_col);
         if (((_tile >= TREE_SPRITE_START) && (_tile <= TREE_SPRITE_END)) || (_tile == TILES.FOLIAGE)) {
           gameMap[_burn_chunk][_random_row][_random_col]['type'] = TILES.BURN_ANIM;
           gameMap[_burn_chunk][_random_row][_random_col]['desc'] = "The trees are afire";
@@ -932,37 +1001,54 @@ function mainGame() {
 
           // special check for non-sprite interactions
           let _rc = getRowCol(player.position.x, player.position.y);
-          let _tile = getTile(chunkIndex, _rc['row'], _rc['col']);
-          if (_tile == TILES.TOWN)
-            currentLevelActive = 1;
+          let _tile = getTileType(chunkIndex, _rc['row'], _rc['col']);
+          let _town_tile = getTile(chunkIndex, _rc['row'], _rc['col']);
+          if (_tile == TILES.TOWN) {
+            // save players position before transitioning
+            storeLastPosition(chunkIndex, player.position);
 
-          // tbd: abstract these a bit!
-          if ((_tile == TILES.SHIFT_SCREEN_LEFT) && (chunkIndex > 0)) {
-            chunkIndex--;
-
-            let _p_rc = getRowCol(player.position.x, player.position.y);
-            let _new_col = MAP_COLS - 2;
-
-            let _new_pos = getSpritePosition(_p_rc['row'], _new_col);
+            chunkIndex = NUM_CHUNKS + gameMap[chunkIndex][_rc['row']][_rc['col']]['nextChunk'];
+            let _new_pos = getSpritePosition((int)(TOWN_ROWS / 2), 1)
             player.position.x = _new_pos['dx'];
             player.position.y = _new_pos['dy'];
-
-            activeNPCString = "Chunk: " + chunkIndex;
-            activeNPCStringTimer = activeNPCStringTime;
           }
 
-          if ((_tile == TILES.SHIFT_SCREEN_RIGHT) && (chunkIndex < (NUM_CHUNKS - 1))) {
-            chunkIndex++;
+          // tbd: abstract these a bit!
+          if ((_tile == TILES.SHIFT_SCREEN_LEFT) && (chunkIndex >= NUM_CHUNKS)) { // a town!
+              chunkIndex = PRIOR_CHUNK;
+              let _new_pos = getSpritePosition(PRIOR_ROW, PRIOR_COL);
+              player.position.x = _new_pos['dx'];
+              player.position.y = _new_pos['dy'];
+              activeNPCString = "Back to chunk: " + chunkIndex;
+              activeNPCStringTimer = activeNPCStringTime;
+          } else {
+            if ((_tile == TILES.SHIFT_SCREEN_LEFT) && (chunkIndex > 0)) {
+              chunkIndex--;
 
-            let _p_rc = getRowCol(player.position.x, player.position.y);
-            let _new_col = 1;
+              let _p_rc = getRowCol(player.position.x, player.position.y);
+              let _new_col = MAP_COLS - 2;
 
-            let _new_pos = getSpritePosition(_p_rc['row'], _new_col);
-            player.position.x = _new_pos['dx'];
-            player.position.y = _new_pos['dy'];
+              let _new_pos = getSpritePosition(_p_rc['row'], _new_col);
+              player.position.x = _new_pos['dx'];
+              player.position.y = _new_pos['dy'];
 
-            activeNPCString = "Chunk: " + chunkIndex;
-            activeNPCStringTimer = activeNPCStringTime;
+              activeNPCString = "Chunk: " + chunkIndex;
+              activeNPCStringTimer = activeNPCStringTime;
+            }
+
+            if ((_tile == TILES.SHIFT_SCREEN_RIGHT) && (chunkIndex < (NUM_CHUNKS - 1))) {
+              chunkIndex++;
+
+              let _p_rc = getRowCol(player.position.x, player.position.y);
+              let _new_col = 1;
+
+              let _new_pos = getSpritePosition(_p_rc['row'], _new_col);
+              player.position.x = _new_pos['dx'];
+              player.position.y = _new_pos['dy'];
+
+              activeNPCString = "Chunk: " + chunkIndex;
+              activeNPCStringTimer = activeNPCStringTime;
+            }
           }
         }
       }
@@ -985,8 +1071,15 @@ function mainGame() {
     }
 
     // clamp camera and draw player 
-    camera.position.x = clamp(player.position.x, CANVAS_WIDTH * 0.5, MAP_WIDTH - CANVAS_WIDTH * 0.5);
-    camera.position.y = clamp(player.position.y, CANVAS_HEIGHT * 0.5, MAP_HEIGHT - CANVAS_HEIGHT * 0.5);
+    let _map_height = MAP_HEIGHT;
+    let _map_width = MAP_WIDTH;
+    if (chunkIndex >= NUM_CHUNKS) {
+      _map_height = TOWN_ROWS * TILE_HEIGHT;
+      _map_width = TOWN_COLS * TILE_WIDTH;
+    }
+
+    camera.position.x = clamp(player.position.x, CANVAS_WIDTH * 0.5, _map_width - CANVAS_WIDTH * 0.5);
+    camera.position.y = clamp(player.position.y, CANVAS_HEIGHT * 0.5, _map_height - CANVAS_HEIGHT * 0.5);
 
     ui_x = camera.position.x - CANVAS_WIDTH / 2;
     ui_y = camera.position.y - CANVAS_HEIGHT / 2;

@@ -14,6 +14,13 @@ var MAP_WIDTH;
 var MAP_HEIGHT;
 var MAP_COLS;
 var MAP_ROWS;
+var TOWN_ROWS; // same size for all towns for now
+var TOWN_COLS;
+
+// player's last position on the overworld
+var PRIOR_CHUNK;
+var PRIOR_ROW;
+var PRIOR_COL; 
 
 var CANVAS_WIDTH;
 var CANVAS_HEIGHT;
@@ -24,6 +31,7 @@ var ui_x;
 var ui_y;
 
 var NUM_CHUNKS;
+var NUM_TOWN_CHUNKS;
 var chunkIndex;
 var subChunkIndex;
 var currentLevelActive; // 0-overworld, 1-subworld
@@ -84,6 +92,14 @@ const SCENES = {
   INVENTORY: 5, 
   GAME_OVER: 6
 };
+
+// NUM_CHUNKS + TOWN_CHUNKS = CHUNK (make sure added in order) --> could make this a dict to be smarter later on
+const TOWN_CHUNKS = {
+  FARMHILL: 0,
+  LUB: 1,
+  MORTE: 2,
+  AUBER: 3,
+}
 
 const TILES = {
   WALL: 0,
