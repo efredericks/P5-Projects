@@ -120,6 +120,8 @@ const TILES = {
   SHIFT_SCREEN_LEFT: 22,
   SHIFT_SCREEN_RIGHT: 23,
   PAVEMENT: 24,
+  DOCK: 25,
+  DOCK2: 26,
 };
 const tilePositions = {
   0: { 'row': 17, 'col': 1 }, // wall
@@ -149,6 +151,9 @@ const tilePositions = {
   22: { 'row': 20, 'col': 26 }, // shift screen left tile
   23: { 'row': 20, 'col': 24 }, // shift screen right tile
   24: { 'row': 13, 'col': 0 }, // pavement
+  25: { 'row': 22, 'col': 5 }, // dock
+  26: { 'row': 22, 'col': 6 }, // dock2
+  //25: { 'row': 5, 'col': 16 }, // dock
 };
 const TREE_SPRITE_START = 4;
 const TREE_SPRITE_END = 11;

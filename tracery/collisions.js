@@ -23,13 +23,13 @@ function collideNPC(e, p) {
     activeNPCString = e.vipTitle + " " + e.name + ", " + e.occupation + " [" + e.mood + "]";
     activeNPCStringTimer = activeNPCStringTime;
 
-    console.log(e);
+    //console.log(e);
 
     if (e.questGiver) { // display message 
       if (e.quest["done"])
         activeNPCString += " : " + e.quest["thanks"];
       else
-        if (e.quest["quest"] == "body") {
+        if ((e.quest["quest"] == "body") || (e.quest["quest"] == "fish")) {
           activeNPCString += ": " + npc.quest["questDialogue"][npc.dialogue_index];
           npc.dialogue_index++;
           if (npc.dialogue_index >= npc.quest["questDialogue"].length)

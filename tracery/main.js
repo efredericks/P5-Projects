@@ -386,18 +386,36 @@ function setup() {
     for (let _c = 0; _c < TOWN_COLS; _c++) {
       let _obj = {};
       let _town_tile = townLookupTable.farmhill.tiles[_r][_c];
-//      _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+      //      _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
 
       if (_town_tile == "^")
         _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
       else if (_town_tile == "*")
         _obj = { "type": TILES.BEACH, "desc": env_grammar.flatten("#beach#") };
+      else if (_town_tile == "~")
+        _obj = { "type": TILES.DOCK, "desc": "Dock" };
+      else if (_town_tile == "|")
+        _obj = { "type": TILES.DOCK2, "desc": "Dock" };
       else if (_town_tile == "#")
         _obj = { "type": TILES.WALL, "desc": "Impassable wall" };
       else if (_town_tile == "<")
         _obj = { "type": TILES.SHIFT_SCREEN_LEFT, "desc": "" };
-      else
-        _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+      else if (_town_tile == "-") {
+        if (random() > 0.7)
+          _obj = { "type": TILES.GROUND_SPECIAL, "desc": env_grammar.flatten("#ground#") };
+        else
+          _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+      }
+      else {
+        let _rand = random();
+        if (_rand > 0.1) {
+          _obj = { "type": getRandomInteger(TREE_SPRITE_START, TREE_SPRITE_END + 1), "desc": env_grammar.flatten("#trees#") };
+          treeMap.push({ 'chunk': _chunk, 'row': _r, 'col': _c });
+          //        } else if (_rand > 0.5)
+          //          _obj = { "type": TILES.FOLIAGE, "desc": env_grammar.flatten("#foliage#") };
+        } else
+          _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
+      }
 
       gameMap[_chunk][_r].push(_obj);
     }
@@ -584,13 +602,16 @@ function setup() {
 
   // npc
   let questGiver = getRandomInteger(0, numGenericNPCs);
-  for (let _n = 0; _n < numGenericNPCs + 1; _n++) {
+  for (let _n = 0; _n < numGenericNPCs + 2; _n++) {
     let _c = getRandomInteger(1, MAP_COLS - 1);
     let _r = getRandomInteger(1, MAP_ROWS - 1);
 
     if (_n == numGenericNPCs) { // campfire friend
       _r = _cf_row;
       _c = _cf_col;
+    } else if (_n == numGenericNPCs+1) { // fisherman friend
+      _r = 50;
+      _c = 61;
     }
 
     npc = createSprite((TILE_WIDTH * _c) + (TILE_WIDTH / 2), (TILE_HEIGHT * _r) + (TILE_HEIGHT / 2), TILE_WIDTH, TILE_HEIGHT);
@@ -634,7 +655,26 @@ function setup() {
         "done": false
       };
       console.log(npc.quest["questDialogue"]);
-
+    } else if (_n == numGenericNPCs+1) { // mike the fisherman
+      npc.name = "Mike the Fisherman";
+      npc.questGiver = true;
+      npc.ai = "loiter";
+      npc.chunk = NUM_CHUNKS+TOWN_CHUNKS.FARMHILL;
+      npc.quest = {
+        "quest": "fish", // make this a list?
+        "questDialogue": [
+          "Hey there",
+          /*event_grammar.flatten("#campfire1#"),
+          event_grammar.flatten("#campfire2#"),
+          event_grammar.flatten("#campfire3#"),
+          event_grammar.flatten("#campfire4#"),
+          event_grammar.flatten("#campfire5#"),
+          event_grammar.flatten("#campfire6#"),
+          event_grammar.flatten("#campfire7#"),*/
+        ],
+        "thanks": "Thank you!",
+        "done": false
+      };
     } else {
       npc.questGiver = false;
       npc.ai = "wander";
@@ -642,8 +682,8 @@ function setup() {
 
     npc.draw = function () {
       if (chunkIndex == this.chunk) {
-        if (this.questGiver)
-          rect(this.deltaX * 2, this.deltaY * 2, this.width + 5, this.height + 5);
+        //if (this.questGiver)
+          //rect(this.deltaX * 2, this.deltaY * 2, this.width + 5, this.height + 5);
         image(npcImg, this.deltaX * 2, this.deltaY * 2);
       }
     }
