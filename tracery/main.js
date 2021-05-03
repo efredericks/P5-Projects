@@ -1,6 +1,7 @@
 // Simplex noise library:
 // Tracery: http://tracery.io/
 // Kenney 1-bit asset pack: https://www.kenney.nl/assets/bit-pack
+// Clouds: https://latenightcoffe.itch.io/2d-pixel-art-semi-realistic-clouds
 
 // Intro music: Joel Steudler; www.patreon.com/joelsteudler; joel@joelsteudlermusic.com (Menu - Bringer of Doom)
 
@@ -16,7 +17,6 @@
           text(textAdd, textX, textY+5+textH);
       }
 }*/
-
 
 function getTileType(_chunk, _row, _col) {
   return gameMap[_chunk][_row][_col]['type'];
@@ -182,11 +182,19 @@ function preload() {
   envSprites = new Group();
   npcSprites = new Group();
   chunkNPCSprites = new Group();
+//  cloudSprites = new Group();
 
   let kenneyPath = "assets/1bitpack_kenney_1.1/Tilesheet/colored_packed_modified.png";
   spriteSheet = loadImage(kenneyPath);
   playerImg = loadImage("assets/separate/player.png");
   npcImg = loadImage("assets/separate/npc.png");
+
+  // setup clouds
+  // cloudImgs = [];
+  // for (let i = 1; i <= 6; i++) {
+  //   let _img = loadImage("assets/clouds/cloud-" + i + ".png");
+  //   cloudImgs.push(_img);
+  // }
 
 
   // crab
@@ -246,6 +254,8 @@ function setup() {
   CANVAS_COLS = (int)(CANVAS_WIDTH / TILE_WIDTH);
   CANVAS_ROWS = (int)(CANVAS_HEIGHT / TILE_HEIGHT);
 
+  bg_buffer = createGraphics(MAP_WIDTH, MAP_HEIGHT);
+
   CANVAS_UI_WIDTH = 200;
   CANVAS_UI_HEIGHT = CANVAS_HEIGHT;
 
@@ -279,7 +289,6 @@ function setup() {
 
   startupMsg = splash_grammar.flatten("#origin#");
 
-
   // player [col:35, row: 14]
   player = createSprite((TILE_WIDTH * 2) + (TILE_WIDTH / 2), (TILE_HEIGHT * 2) + (TILE_HEIGHT / 2), TILE_WIDTH, TILE_HEIGHT);
   player.depth = CHARACTER_INDEX;
@@ -296,6 +305,11 @@ function setup() {
   let _bc_r = 5;
   blueCrab.position.x = _bc_c * TILE_WIDTH + (TILE_WIDTH / 2);
   blueCrab.position.y = _bc_r * TILE_HEIGHT + (TILE_HEIGHT / 2);
+
+  /// TEST NPC
+  let _test_npc = createCharacter("testy mctesterson",
+    10, 10, "npc", "loiter", npcImg, 1);
+  npcSprites.add(_test_npc);
 
 
   // environment
@@ -354,7 +368,7 @@ function setup() {
   }
   console.log("Town: ", _townChunk, _t_row, _t_col);
   gameMap[_townChunk][_t_row][_t_col]['type'] = TILES.TOWN;
-  gameMap[_townChunk][_t_row][_t_col]['nextChunk'] = TOWN_CHUNKS.FARMHILL;
+  gameMap[_townChunk][_t_row][_t_col]['nextChunk'] = TOWN_CHUNKS.FRILL;
 
   // left col
   gameMap[_townChunk][_t_row - 1][_t_col - 1]['type'] = TILES.GROUND_SPECIAL;
@@ -370,22 +384,14 @@ function setup() {
 
   //////SETUP TOWNS (abstract away later)
   //
-  let _chunk = NUM_CHUNKS + TOWN_CHUNKS.FARMHILL;
+  let _chunk = NUM_CHUNKS + TOWN_CHUNKS.FRILL;
   gameMap[_chunk] = [];
-  let randomOffset = getRandomInteger(0, 10000);
-  let _town_mid_row = (int)(TOWN_ROWS / 2);
-  let _town_mid_col = (int)(TOWN_COLS / 2);
-
-  console.log(townLookupTable.farmhill.tiles.length);
-  console.log(townLookupTable.farmhill.tiles[0].length);
-
-
 
   for (let _r = 0; _r < TOWN_ROWS; _r++) {
     gameMap[_chunk][_r] = [];
     for (let _c = 0; _c < TOWN_COLS; _c++) {
       let _obj = {};
-      let _town_tile = townLookupTable.farmhill.tiles[_r][_c];
+      let _town_tile = townLookupTable.frill.tiles[_r][_c];
       //      _obj = { "type": TILES.GROUND, "desc": env_grammar.flatten("#ground#") };
 
       if (_town_tile == "^")
@@ -422,11 +428,11 @@ function setup() {
   }
 
   /*
-  for (let _r = 0; _r < townLookupTable.farmhill.tiles.length; _r++) {
+  for (let _r = 0; _r < townLookupTable.frill.tiles.length; _r++) {
     gameMap[_chunk][_r] = [];
-    for (let _c = 0; _c < townLookupTable.farmhill.tiles[0].length; _c++) {
+    for (let _c = 0; _c < townLookupTable.frill.tiles[0].length; _c++) {
       let _obj = {};
-      let _t = townLookupTable.farmhill.tiles[_r][_c];
+      let _t = townLookupTable.frill.tiles[_r][_c];
       if (_t == "^")
         _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
       else if (_t == "*")
@@ -458,7 +464,7 @@ function setup() {
   //       /*
   //       for (let _y = 0; _y < TOWN_ROWS-2; _y++) {
   //         for (let _x = 0; _x < TOWN_COLS-2; _x++) {
-  //           let _t = townLookupTable.farmhill.tiles[_y][_x]; 
+  //           let _t = townLookupTable.frill.tiles[_y][_x]; 
   //           let _obj = {};
   //           if (_t == "^")
   //             _obj = { "type": TILES.WATER, "desc": env_grammar.flatten("#water#") };
@@ -609,7 +615,7 @@ function setup() {
     if (_n == numGenericNPCs) { // campfire friend
       _r = _cf_row;
       _c = _cf_col;
-    } else if (_n == numGenericNPCs+1) { // fisherman friend
+    } else if (_n == numGenericNPCs + 1) { // fisherman friend
       _r = 50;
       _c = 61;
     }
@@ -655,11 +661,11 @@ function setup() {
         "done": false
       };
       console.log(npc.quest["questDialogue"]);
-    } else if (_n == numGenericNPCs+1) { // mike the fisherman
+    } else if (_n == numGenericNPCs + 1) { // mike the fisherman
       npc.name = "Mike the Fisherman";
       npc.questGiver = true;
       npc.ai = "loiter";
-      npc.chunk = NUM_CHUNKS+TOWN_CHUNKS.FARMHILL;
+      npc.chunk = NUM_CHUNKS + TOWN_CHUNKS.FRILL;
       npc.quest = {
         "quest": "fish", // make this a list?
         "questDialogue": [
@@ -683,7 +689,7 @@ function setup() {
     npc.draw = function () {
       if (chunkIndex == this.chunk) {
         //if (this.questGiver)
-          //rect(this.deltaX * 2, this.deltaY * 2, this.width + 5, this.height + 5);
+        //rect(this.deltaX * 2, this.deltaY * 2, this.width + 5, this.height + 5);
         image(npcImg, this.deltaX * 2, this.deltaY * 2);
       }
     }
@@ -818,6 +824,16 @@ function keyReleased() {
         CURRENT_SCENE = PRIOR_SCENE;
     }
   }
+  else if (key == "c") { // DEBUG - MAP INFO
+    if (CURRENT_SCENE === SCENES.GAME) {
+      PRIOR_SCENE = CURRENT_SCENE;
+      CURRENT_SCENE = SCENES.MAP_INFO;
+    } else {
+      if (CURRENT_SCENE === SCENES.MAP_INFO) // lock to only P
+        CURRENT_SCENE = PRIOR_SCENE;
+    }
+
+  }
   else if (key == "p") {
     if (CURRENT_SCENE === SCENES.GAME) {
       PRIOR_SCENE = CURRENT_SCENE;
@@ -883,6 +899,11 @@ function draw() {
       drawBackground();
       drawInventory();
       break;
+    case SCENES.MAP_INFO:
+      frameRate(2);
+      drawBackground();
+      drawMapInfo(chunkIndex);
+      break;
     case SCENES.MAIN_MENU:
     case SCENES.GAME:
     case SCENES.GAME_OVER:
@@ -890,9 +911,49 @@ function draw() {
       frameRate(20);
       drawBackground();
       mainGame();
+
+//      if (chunkIndex == 2)
+//        drawClouds();
       break;
   }
 }
+
+// function addCloud(x,y) {
+//   let c = createSprite(x,y);
+//   c.addImage(cloudImgs[getRandomInteger(0, cloudImgs.length)]);
+//   c.life = random(40, 60);
+//   c.setVelocity(random(-0.5,-2),random(-0.5,-2));
+//   //c.setVelocity(-2,-2);
+//   c.update = function () {
+//     if (chunkIndex == 2) {
+//       c.position.x += c.velocity.x;
+//       c.position.y += c.velocity.y;
+//       //c.velocity.x = -2;
+//       //c.velocity.y = -2;
+//       c.life = 50;
+//     } else {
+//       c.life = -1;
+//     }
+//     if ((c.position.x < -10) || (c.position.y < -10))
+//       c.remove();
+
+//   }
+//   return c;
+// }
+// function drawClouds() {
+//   if (cloudSprites.size() == 0) { // add clouds
+//     for (let i = 0; i < random(5000); i++) {
+//       cloudSprites.add(addCloud(random(MAP_WIDTH),random(MAP_HEIGHT)));
+//     }
+//   } else {
+//     // draw clouds
+//     // add random clouds
+//     for (let i = 0; i < random(5000-cloudSprites.size()); i++) {
+//       cloudSprites.add(addCloud(MAP_WIDTH+random(MAP_WIDTH),MAP_HEIGHT+random(MAP_HEIGHT)));
+//     }
+//   }
+//   drawSprites(cloudSprites);
+// }
 
 function fullScreenMsg(msg) {
   textSize(48);
@@ -901,6 +962,15 @@ function fullScreenMsg(msg) {
   fill(255);
   textAlign(CENTER, CENTER);
   text(msg, camera.position.x, camera.position.y);
+}
+
+function sideScreenMsg(msg) {
+  textSize(24);
+  fill(color(0, 0, 0, 200));
+  rect(camera.position.x + width / 4, camera.position.y - height / 2, camera.position.x + width / 2, camera.position.y + height / 2);
+  fill(255);
+  textAlign(TOP, CENTER);
+  text(msg, camera.position.x + width / 4 + 20, camera.position.y - height / 2 + 20);
 }
 
 // show your inventory
@@ -920,10 +990,17 @@ function drawPause() {
   fullScreenMsg("Game paused");
 }
 
+// show info on chunk when you enter
+function drawMapInfo(_chunk) {
+  sideScreenMsg("hi");
+}
+
 // handles the ambient animation
 function drawBackground() {
+  bg_buffer.background(71, 45, 60);
+
   /// draw functions
-  background(71, 45, 60);
+  //background(71, 45, 60);
 
   if (currentLevelActive == 0) {
     let _map_rows = MAP_ROWS;
@@ -972,7 +1049,7 @@ function drawBackground() {
         }
 
         let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
-        image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+        bg_buffer.image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
       }
     }
   } else {
@@ -982,10 +1059,12 @@ function drawBackground() {
         //image(img,[sx=0],[sy=0],[sWidth=img.width],[sHeight=img.height],[dx=0],[dy=0],[dWidth],[dHeight])
         let _tile = subMap[0][_r][_c];
         let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
-        image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+        bg_buffer.image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
       }
     }
   }
+  //test me on old lappy
+  image(bg_buffer,0,0);
 
 
 }
@@ -1130,7 +1209,7 @@ function mainGame() {
             player.position.x = _new_pos['dx'];
             player.position.y = _new_pos['dy'];
 
-            activeNPCString = "Welcome to Farmhill!";
+            activeNPCString = "Welcome to Frill!";
             activeNPCStringTimer = activeNPCStringTime;
           }
 

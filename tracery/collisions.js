@@ -25,6 +25,8 @@ function collideNPC(e, p) {
 
     //console.log(e);
 
+    // if one quest is finished, all quests are finished!!
+
     if (e.questGiver) { // display message 
       if (e.quest["done"])
         activeNPCString += " : " + e.quest["thanks"];

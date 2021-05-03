@@ -9,6 +9,11 @@ var grammars = {
     splash: {
         origin: ["Welcome to CozyRL", "Oh Discordia!", "Hey there adventurer!"],
     },
+    towns: {
+        frill: ["The lost town of Frill"],
+        lub: ["The dessicated city of Lub"],
+        morte: ["The gray town of Morte"],
+    },
     npcs: {
         name: ["Arjun", "Yuuma", "Darcy", "Mia", "Chiaki", "Izzi", "Azra", "Lina", "Murph", "Anne", "Jefferson", "Dag", "Yaz"],
         mood: ["vexed", "indignant", "impassioned", "wistful", "astute", "courteous"],

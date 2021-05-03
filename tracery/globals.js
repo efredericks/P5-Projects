@@ -40,7 +40,9 @@ var eventActive;
 
 /// sprites
 var spriteSheet;
+var bg_buffer;
 var envSprites;
+//var cloudSprites;
 
 // npcSprites is the group for ALL sprites
 // chunkNPCSprites gets dynamically added/removed from for collisions and updates
@@ -56,6 +58,8 @@ var npcImg;
 
 var blueCrabImg;
 var blueCrab;
+
+//var cloudImgs;
 
 /// sprite depths
 var CHARACTER_INDEX;
@@ -90,12 +94,13 @@ const SCENES = {
   GAME: 3,
   PAUSED: 4,
   INVENTORY: 5,
-  GAME_OVER: 6
+  MAP_INFO: 6,
+  GAME_OVER: 7,
 };
 
 // NUM_CHUNKS + TOWN_CHUNKS = CHUNK (make sure added in order) --> could make this a dict to be smarter later on
 const TOWN_CHUNKS = {
-  FARMHILL: 0,
+  FRILL: 0,
   LUB: 1,
   MORTE: 2,
   AUBER: 3,
