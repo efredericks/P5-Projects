@@ -41,6 +41,7 @@ var eventActive;
 /// sprites
 var spriteSheet;
 var bg_buffer;
+var cloud_buffer;
 var envSprites;
 //var cloudSprites;
 

@@ -254,6 +254,7 @@ function setup() {
   CANVAS_COLS = (int)(CANVAS_WIDTH / TILE_WIDTH);
   CANVAS_ROWS = (int)(CANVAS_HEIGHT / TILE_HEIGHT);
 
+  cloud_buffer = createGraphics(MAP_WIDTH, MAP_HEIGHT);
   bg_buffer = createGraphics(MAP_WIDTH, MAP_HEIGHT);
 
   CANVAS_UI_WIDTH = 200;
@@ -912,10 +913,21 @@ function draw() {
       drawBackground();
       mainGame();
 
-//      if (chunkIndex == 2)
-//        drawClouds();
+      if (chunkIndex == NUM_CHUNKS+TOWN_CHUNKS.FRILL) // && quest not done
+        drawClouds();
       break;
   }
+}
+
+function drawClouds() {
+  cloud_buffer.clear();
+
+  if (random() > 0.99)
+    cloud_buffer.fill(color(255,255,255,180));
+  else
+    cloud_buffer.fill(color(0,0,0,180));
+  cloud_buffer.rect(0,0,MAP_WIDTH,MAP_HEIGHT);
+  image(cloud_buffer,0,0);
 }
 
 // function addCloud(x,y) {
@@ -1063,10 +1075,8 @@ function drawBackground() {
       }
     }
   }
-  //test me on old lappy
+
   image(bg_buffer,0,0);
-
-
 }
 
 function mainGame() {
