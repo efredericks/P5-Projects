@@ -805,6 +805,11 @@ function tDown() {
   player.position.y += TILE_HEIGHT;
 }
 
+function keyPressed() {
+  if (CURRENT_SCENE == SCENES.MAP_INFO)
+    CURRENT_SCENE = SCENES.GAME;
+}
+
 function keyReleased() {
   if (key == "a")
     shiftScreen("left");
@@ -967,13 +972,23 @@ function drawClouds() {
 //   drawSprites(cloudSprites);
 // }
 
-function fullScreenMsg(msg) {
-  textSize(48);
+function fullScreenMsg(msg, _font_size=48) {
+  textSize(_font_size);
   fill(color(0, 0, 0, 200));
   rect(camera.position.x - width / 2, camera.position.y - height / 2, camera.position.x + width / 2, camera.position.y + height / 2);
   fill(255);
   textAlign(CENTER, CENTER);
-  text(msg, camera.position.x, camera.position.y);
+
+  if (_font_size == 48)
+    text(msg, camera.position.x - width/2, camera.position.y - height/2, width, height);
+  else {
+    //fill(color(255,255,255,128));
+    //textSize(getRandomInteger(_font_size-2,_font_size+2));
+    //text(msg, camera.position.x - width/2 + 100, camera.position.y - height/2, width - 200, height);
+    fill(255);
+    textSize(_font_size);
+    text(msg, camera.position.x - width/2 + 100, camera.position.y - height/2, width - 200, height);
+  }
 }
 
 function sideScreenMsg(msg) {
@@ -1004,7 +1019,9 @@ function drawPause() {
 
 // show info on chunk when you enter
 function drawMapInfo(_chunk) {
-  sideScreenMsg("hi");
+  if (_chunk == NUM_CHUNKS) {
+    fullScreenMsg(townLookupTable.frill.description, 24);
+  }
 }
 
 // handles the ambient animation
@@ -1221,6 +1238,8 @@ function mainGame() {
 
             activeNPCString = "Welcome to Frill!";
             activeNPCStringTimer = activeNPCStringTime;
+
+            CURRENT_SCENE = SCENES.MAP_INFO;
           }
 
           // tbd: abstract these a bit!

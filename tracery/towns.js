@@ -1,5 +1,10 @@
 var townLookupTable = {
+  morte: {
+    description: "The town was once a bustling farm village, wreathed in smoke from cook fires.  Now, it is a shell of its former self.  Dour, cold, empty.  A great sadness has overtaken this town.",
+    tiles: []
+  },
   frill: {
+    description: "Frill was a trading village nestled in the heart of the Great Forest, home to keen woodsfolk skilled in trailcraft and animal husbandry. The yearly Festival of Night was held here, attracting tourists throughout the realm to don the devilmask and frolic in the wood. All that remains is a lone fisherman, desperately seeking the prize fish that will bring back the light.",
     tiles: ["####################################################################################################",
             "#..................................................................................................#",
             "#..................................................................................................#",
@@ -100,6 +105,6 @@ var townLookupTable = {
             "#..................................................................................................#",
             "#..................................................................................................#",
             "####################################################################################################"
-          ],
+          ]
   },
 };

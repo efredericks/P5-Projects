@@ -17,7 +17,8 @@ function createCharacter(name, row, col, char_type, ai, img, chunk) {
     }
   }
   spr.update = function () {
-    if ((chunkIndex == this.chunk) && (!paused))  // only update on current chunk / not paused
+    //if ((chunkIndex == this.chunk) && (!paused))  // only update on current chunk / not paused
+    if ((chunkIndex == this.chunk) && (CURRENT_SCENE == SCENES.GAME))  // only update on current chunk / not paused
       chunkNPCSprites.add(this);
     else
       chunkNPCSprites.remove(this);
