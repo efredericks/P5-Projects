@@ -9,21 +9,62 @@ let amplitude = 75.0; // Height of wave
 let period = 500.0; // How many pixels before the wave repeats
 let dx; // Value for incrementing x
 let yvalues; // Using an array to store height values for the wave
+let fps = 30;
+
+let capturer;
+let record;
+
+let initial_y;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);//710, 400);
+  createCanvas(960,540);//windowWidth, windowHeight);
+
   w = width + 16;
   dx = (TWO_PI / period) * xspacing;
   yvalues = new Array(floor(w / xspacing));
 
   // remap amplitude as ratio to window height
   amplitude = map(amplitude, 0, 350, 0, windowHeight);
+
+  // Create a capturer that exports PNG images in a TAR file
+  capturer = new CCapture( { format: 'webm', framerate: fps } );
+  //capturer.start();
+  //record = true;
+  frameRate(fps);
+}
+
+function keyReleased() {
+  /*
+  if (key == "r")
+    record = !record;
+
+  if (!record)
+    capturer.save();
+    */
 }
 
 function draw() {
+  if (frameCount === 1)
+    capturer.start();
+
   background(0);
   calcWave();
   renderWave();
+
+
+
+  //if (record)
+  capturer.capture( document.getElementById("defaultCanvas0") );
+
+  if (frameCount === 1)
+    initial_y = yvalues[0];
+
+  //if ((frameCount > 1) && ((initial_y >= (yvalues[0]-.5)) && (initial_y <= (yvalues[0]+.5))))
+  if (frameCount == (yvalues.length*6)) {
+    capturer.save();
+    //capturer.stop();
+  }
+//    console.log(initial_y, yvalues[0]);
 }
 
 function calcWave() {
