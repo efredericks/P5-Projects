@@ -105,7 +105,8 @@ function setup() {
   let _c4 = new cv(4, 0, 0);
   
   smooth();
-  createCanvas(windowWidth,windowHeight);//800, 800);
+  createCanvas(600,600);//windowWidth,windowHeight);//800, 800);
+  
   background(0);
   
   for (let i = 0; i < numBranches; i++) {

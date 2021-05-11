@@ -26,3 +26,7 @@ Aggregation of various playthings in P5JS
 ## Sine
 
 [Sine](sine)
+
+## Branching
+
+[Branching](branching)
