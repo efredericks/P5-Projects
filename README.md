@@ -26,4 +26,4 @@ Aggregation of various playthings in P5JS
 
 # Phaser demos
 
-### [Breakout](breakout)
+### [Breakout](phaser-breakout)
