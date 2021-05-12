@@ -105,7 +105,14 @@ function create() {
   // colliders
   player.setCollideWorldBounds(true);
   ball.setCollideWorldBounds(true);
-  ball.setBounce(1, 1)
+  ball.setBounce(1, 1);
+  ball.setInteractive();
+
+  // add a cooldown for this?
+  ball.on('pointerdown', function(pointer) {
+    console.log(this.body.velocity.x);
+    this.setVelocityX(-this.body.velocity.x);
+  });
   this.physics.world.checkCollision.down = false;
 
   this.physics.add.collider(ball, violetBricks, hitBrick, null, this);
