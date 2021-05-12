@@ -6,6 +6,8 @@ let player, ball, violetBricks, yellowBricks, redBricks, cursors;
 let openingText, gameOverText, playerWonText;
 let gameStarted = false;
 
+let ballAngleUpdate;
+
 let points, stars, maxDepth;
 
 const config = {
@@ -46,6 +48,7 @@ function hitBrick(ball, brick) {
     else
       ball.body.setVelocityX(-150);
   }
+  ballAngleUpdate *= -1;
 }
 
 function hitPlayer(ball, player) {
@@ -53,10 +56,12 @@ function hitPlayer(ball, player) {
   ball.setVelocityY(ball.body.velocity.y - 5);
 
   let newXVelocity = Math.abs(ball.body.velocity.x) + 5;
-  if (ball.x < player.x)
+  if (ball.x < player.x) {
     ball.setVelocityX(-newXVelocity);
-  else
+  } else {
     ball.setVelocityX(newXVelocity);
+  }
+  ballAngleUpdate *= -1;
 }
 
 const game = new Phaser.Game(config);
@@ -72,6 +77,8 @@ function create() {
   // setup sprites
   player = this.physics.add.sprite(400, 600, 'paddle');
   ball = this.physics.add.sprite(400, 565, 'ball');
+
+  ballAngleUpdate = 1;
 
   violetBricks = this.physics.add.group({
     key: 'brick1',
@@ -175,10 +182,10 @@ function update() {
     let px = point.x * (128 / point.z) + (this.game.config.width * 0.5);
     let py = point.y * (128 / point.z) + (this.game.config.height * 0.5);
     let circle = new Phaser.Geom.Circle(
-      px, py, (1 - point.z/32) * 2
+      px, py, (1 - point.z / 32) * 2
     );
-    let graphics = this.add.graphics({fillStyle: {color: 0xffffff}});
-    graphics.setAlpha((1 - point.z/32));
+    let graphics = this.add.graphics({ fillStyle: { color: 0xffffff } });
+    graphics.setAlpha((1 - point.z / 32));
     graphics.fillCircleShape(circle);
     stars.add(graphics);
   }
@@ -204,11 +211,16 @@ function update() {
         ball.setVelocityY(-200);
         openingText.setVisible(false);
       }
+    } else {
+      ball.angle += ballAngleUpdate;
+      if (ball.angle > 360) ball.angle = 0;
+      if (ball.angle < -360) ball.angle = 0;
     }
     if (cursors.left.isDown)
       player.body.setVelocityX(-350);
     else if (cursors.right.isDown) {
       player.body.setVelocityX(350);
     }
+
   }
 }
