@@ -1,32 +1,29 @@
 # P5-Projects
+
 Aggregation of various playthings in P5JS
 
-## Platformer
+### Platformer
  
 [Infinite(ish) Runner with P5.Play](platformer)
 
-## Tracery
+### Tracery
 
 [Tracery + Tilemaps + Chunking Demo](tracery)
 
-## Bullet Hell
+### Bullet Hell (tbd)
 
-## Maurer Rose
+### [Maurer Rose](maurer-rose) - based on [CodingTrain Demo](https://thecodingtrain.com/challenges/coding-in-the-cabana/001-maurer-rose.html)
 
-[Maurer Rose](maurer-rose) - based on [CodingTrain Demo](https://thecodingtrain.com/challenges/coding-in-the-cabana/001-maurer-rose.html)
+### [Polar Lines](polar)
 
-## Polar Things
+### [Truchet Halftones](truchet)
 
-[Polar Lines](polar)
+### [Sine](sine)
 
-## Truchet Halftones
+### [Branching (exceedingly laggy - need to fix)](branching)
 
-[Truchet Halftones](truchet)
+---
 
-## Sine
+# Phaser demos
 
-[Sine](sine)
-
-## Branching (exceedingly laggy - need to fix)
-
-[Branching](branching)
+### [Breakout](breakout)
