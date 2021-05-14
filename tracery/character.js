@@ -1,9 +1,13 @@
-function createCharacter(name, row, col, char_type, ai, img, chunk) {
-  let spr = createSprite((TILE_WIDTH * 2) + (TILE_WIDTH / 2), (TILE_HEIGHT * 2) + (TILE_HEIGHT / 2), TILE_WIDTH, TILE_HEIGHT);
+function createCharacter(name, row, col, char_type, ai, img, chunk, grammar, questGiver) {//} mood, vipTitle, occupation, speed, quest, questGiver) {
+  let spr = createSprite((TILE_WIDTH * col) + (TILE_WIDTH / 2), (TILE_HEIGHT * row) + (TILE_HEIGHT / 2), TILE_WIDTH, TILE_HEIGHT);
   spr.addImage(img);
   spr.image = img;
 
-  spr.name = name;
+  if (name)
+    spr.name = name;
+  else
+    spr.name = grammar.flatten("#name#");
+
   spr.row = row;
   spr.col = col;
   spr.char_type = char_type; // NPC, enemy
@@ -11,16 +15,171 @@ function createCharacter(name, row, col, char_type, ai, img, chunk) {
   spr.chunk = chunk;
   spr.depth = NPC_INDEX;
 
+  spr.mood = grammar.flatten("#mood#");
+  spr.vipTitle = grammar.flatten("#vipTitle#");
+  spr.occupation = grammar.flatten("#occupation#");
+  spr.speed = 2;//speed;
+  spr.chunk = chunk;
+
+  if ((questGiver !== undefined) && (questGiver)) {
+    spr.questGiver = true;
+    if (name === "Mike the Fisherman") {
+      spr.dialogue_index = 0;
+      spr.name = "Mike";
+      spr.occupation = "Fisherman";
+      spr.quest = {
+        "quest": "fish", // make this a list?
+        "questDialogue": [
+          "Hey there",
+          /*event_grammar.flatten("#campfire1#"),
+          event_grammar.flatten("#campfire2#"),
+          event_grammar.flatten("#campfire3#"),
+          event_grammar.flatten("#campfire4#"),
+          event_grammar.flatten("#campfire5#"),
+          event_grammar.flatten("#campfire6#"),
+          event_grammar.flatten("#campfire7#"),*/
+        ],
+        "thanks": "Thank you!",
+        "done": false
+      };
+    }
+  }
+  //spr.quest = quest;
+  //spr.questGiver = questGiver;
+
+
+  // npc.name = npc_grammar.flatten("#name#");
+  // npc.mood = npc_grammar.flatten("#mood#");
+  // npc.vipTitle = npc_grammar.flatten("#vipTitle#");
+  // npc.occupation = npc_grammar.flatten("#occupation#");
+  // ///
+  // npc.depth = NPC_INDEX;
+  // //npc.addImage = npcImg;
+  // npc.chunk = getRandomInteger(0, NUM_CHUNKS); //1;
+  // npc.speed = 2; // tbd
+  // npc.dialogue_index = 0;
+
+  // if (_n == questGiver) {
+  //   npc.questGiver = true;
+  //   npc.ai = "follow";
+  //   console.log("Questy McQuesterson on: " + npc.chunk);
+  //   npc.quest = {
+  //     "quest": "Have you seen my BLUE CRAB?", // make this a list?
+  //     "thanks": "Thanks m8",
+  //     "done": false
+  //   };
+  // } else if (_n == numGenericNPCs) { // last one hangs by the campfire
+  //   npc.questGiver = true;
+  //   npc.ai = "loiter";
+  //   npc.chunk = _campfireChunk;
+  //   npc.quest = {
+  //     "quest": "body", // make this a list?
+  //     "questDialogue": [
+  //       event_grammar.flatten("#campfire1#"),
+  //       event_grammar.flatten("#campfire2#"),
+  //       event_grammar.flatten("#campfire3#"),
+  //       event_grammar.flatten("#campfire4#"),
+  //       event_grammar.flatten("#campfire5#"),
+  //       event_grammar.flatten("#campfire6#"),
+  //       event_grammar.flatten("#campfire7#"),
+  //     ],
+  //     "thanks": "Thanks m8",
+  //     "done": false
+  //   };
+  //   console.log(npc.quest["questDialogue"]);
+  // } else if (_n == numGenericNPCs + 1) { // mike the fisherman
+  //   npc.name = "Mike the Fisherman";
+  //   npc.questGiver = true;
+  //   npc.ai = "loiter";
+  //   npc.chunk = NUM_CHUNKS + TOWN_CHUNKS.FRILL;
+  //   npc.quest = {
+  //     "quest": "fish", // make this a list?
+  //     "questDialogue": [
+  //       "Hey there",
+  //       /*event_grammar.flatten("#campfire1#"),
+  //       event_grammar.flatten("#campfire2#"),
+  //       event_grammar.flatten("#campfire3#"),
+  //       event_grammar.flatten("#campfire4#"),
+  //       event_grammar.flatten("#campfire5#"),
+  //       event_grammar.flatten("#campfire6#"),
+  //       event_grammar.flatten("#campfire7#"),*/
+  //     ],
+  //     "thanks": "Thank you!",
+  //     "done": false
+  //   };
+  // } else {
+  //   npc.questGiver = false;
+  //   npc.ai = "wander";
+  // }
+
+  // npc.draw = function () {
+  //   if (chunkIndex == this.chunk) {
+
+
+
+
+
+
+
+
+
+
   spr.draw = function () {
     if (chunkIndex == spr.chunk) {
       image(spr.image, spr.deltaX * 2, spr.deltaY * 2);
     }
   }
   spr.update = function () {
-    //if ((chunkIndex == this.chunk) && (!paused))  // only update on current chunk / not paused
-    if ((chunkIndex == this.chunk) && (CURRENT_SCENE == SCENES.GAME))  // only update on current chunk / not paused
+    if ((chunkIndex == this.chunk) && (CURRENT_SCENE == SCENES.GAME)) { // only update on current chunk / not paused
       chunkNPCSprites.add(this);
-    else
+
+      // update based on AI type
+      if (spr.ai == "wander") {
+        if (random() > 0.9) { // decide to move
+
+          // pick a direction
+          let _dirs = ["up", "down", "left", "right"];
+          let _move = {};
+          _move[_dirs[Math.floor(Math.random() * _dirs.length)]] = true;
+          let _retval = checkMove(spr.position, chunkIndex, _move);
+          //_dirs[Math.floor(Math.random() * _dirs.length)]);
+          if (_retval['state']) { // true -- move
+            spr.position.x = _retval['pos']['dx'];
+            spr.position.y = _retval['pos']['dy'];
+          }
+        }
+      } else if (spr.ai == "loiter") {
+        ;
+      } else if (spr.ai == "follow") {
+        // https://stackoverflow.com/questions/20044791/how-to-make-an-enemy-follow-the-player-in-pygame
+        if (random() > 0.8) { // move towards player
+          // direction vector
+          let dx = player.position.x - spr.position.x;
+          let dy = player.position.y - spr.position.y;
+          let dist = Math.hypot(dx, dy);
+
+          // normalize
+          dx /= dist;
+          dy /= dist;
+
+          if (!(dist == 16)) {
+            if (random() > 0.5) { // move x
+              if (dx > 0)
+                spr.position.x += TILE_WIDTH;
+              else if (dx < 0)
+                spr.position.x -= TILE_WIDTH;
+            } else { // move y
+              if (dy > 0)
+                spr.position.y += TILE_HEIGHT;
+              else if (dy < 0)
+                spr.position.y -= TILE_HEIGHT;
+            }
+          }
+          //spr.position.x += dx * spr.speed;
+          //spr.position.y += dy * spr.speed;
+        }
+      }
+    } else
       chunkNPCSprites.remove(this);
   }
 

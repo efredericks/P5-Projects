@@ -20,9 +20,16 @@
 		},
 		{
 			"path": "..\\P5-Projects\\sine"
+		},
+		{
+			"path": "..\\P5-Projects\\branching"
+		},
+		{
+			"path": "..\\P5-Projects\\phaser-breakout"
 		}
 	],
 	"settings": {
-		"activestate.promptRuntimeCreation": false
+		"activestate.promptRuntimeCreation": false,
+		"twee3LanguageTools.storyformat.current": "sugarcube-2"
 	}
 }

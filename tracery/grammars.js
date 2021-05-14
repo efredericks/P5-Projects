@@ -22,7 +22,10 @@ var grammars = {
         occupation: ["space #occupationBase#", "manic #occupationBase#", "professional #occupationBase#", "gentleman #occupationBase#", "#occupationBase#"],
     },
     environments: {
-        foliage: ["foliage"],
+        foliage: ["#foliageDesc.capitalize# #foliageTypes# #foliageActions#"],
+        foliageDesc: ["short", "wavy", "thin", "sparse", "gently swaying", "prickly", "stunted", "parched", "wispy"],
+        foliageTypes: ["grasses", "blades of grass"],
+        foliageActions: ["crunch underfoot", "whisper as you pass", "stand at attention", "part at your passing", "flatten underfoot", "glare angrily upwards"],
         ground: ["ground"],
         beach: ["beach"],
         pavement: ["pavement"],

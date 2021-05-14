@@ -96,7 +96,8 @@ const SCENES = {
   PAUSED: 4,
   INVENTORY: 5,
   MAP_INFO: 6,
-  GAME_OVER: 7,
+  NPC_INTERACT: 7,
+  GAME_OVER: 8,
 };
 
 // NUM_CHUNKS + TOWN_CHUNKS = CHUNK (make sure added in order) --> could make this a dict to be smarter later on

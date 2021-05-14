@@ -30,14 +30,16 @@ function collideNPC(e, p) {
     if (e.questGiver) { // display message 
       if (e.quest["done"])
         activeNPCString += " : " + e.quest["thanks"];
-      else
+      else {
+        console.log(e);
         if ((e.quest["quest"] == "body") || (e.quest["quest"] == "fish")) {
-          activeNPCString += ": " + npc.quest["questDialogue"][npc.dialogue_index];
-          npc.dialogue_index++;
-          if (npc.dialogue_index >= npc.quest["questDialogue"].length)
-            npc.dialogue_index = 0;
+          activeNPCString += ": " + e.quest["questDialogue"][e.dialogue_index];
+          e.dialogue_index++;
+          if (e.dialogue_index >= e.quest["questDialogue"].length)
+            e.dialogue_index = 0;
         } else
           activeNPCString += " : " + e.quest["quest"];
+      }
     }
     //textSize(24);
     //fill(255);
