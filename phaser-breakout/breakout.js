@@ -6,6 +6,13 @@ let player, ball, violetBricks, yellowBricks, redBricks, cursors;
 let openingText, gameOverText, playerWonText;
 let gameStarted = false;
 
+let currentLevel = 'intro';
+let levels = {
+  'intro': {
+    'yellow': [{ 'x': 400, 'y': 20 }],
+  },
+};
+
 let ballAngleUpdate;
 
 let points, stars, maxDepth;
@@ -20,7 +27,7 @@ const config = {
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
   scene: {
-    preload, create, update,
+    preload, create, update, npc
   },
   physics: {
     default: 'arcade',
@@ -32,11 +39,19 @@ const config = {
   roundPixels: true,
 };
 
+function npc() {
+
+}
+
 function isGameOver(world) {
   return ball.body.y > world.bounds.height;
 }
 function isWon() {
-  return violetBricks.countActive() + yellowBricks.countActive() + redBricks.countActive() === 0;
+  if (currentLevel == 'intro')
+    return yellowBricks.countActive() === 0;
+  else
+    return false;
+  //return violetBricks.countActive() + yellowBricks.countActive() + redBricks.countActive() === 0;
 }
 function hitBrick(ball, brick) {
   brick.disableBody(true, true);
@@ -80,6 +95,17 @@ function create() {
 
   ballAngleUpdate = 1;
 
+  if (currentLevel == 'intro') {
+    yellowBricks = this.physics.add.group();
+    for (let i = 0; i < levels.intro.yellow.length; i++) {
+      let _b = levels.intro.yellow[i];
+      let _brick = this.physics.add.sprite(_b.x, _b.y, 'brick1');
+      _brick.setImmovable(true);
+      yellowBricks.add(_brick);
+    }
+  }
+
+  /*
   violetBricks = this.physics.add.group({
     key: 'brick1',
     repeat: 9,
@@ -98,6 +124,7 @@ function create() {
     immovable: true,
     setXY: { x: 80, y: 40, stepX: 70 }
   });
+  */
 
   // inputs
   cursors = this.input.keyboard.createCursorKeys();
@@ -109,7 +136,7 @@ function create() {
   ball.setInteractive();
 
   // add a cooldown for this?
-  ball.on('pointerdown', function(pointer) {
+  ball.on('pointerdown', function (pointer) {
     console.log(this.body.velocity.x);
     this.setVelocityX(-this.body.velocity.x);
   });

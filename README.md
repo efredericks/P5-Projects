@@ -27,3 +27,9 @@ Aggregation of various playthings in P5JS
 # Phaser demos
 
 ### [Breakout](phaser-breakout)
+
+---
+
+# JS demos
+
+### [Magicka-like](magicka-like) - based on the [JavaScript Brough-like tutorial](https://nluqo.github.io/broughlike-tutorial/)

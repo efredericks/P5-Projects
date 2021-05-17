@@ -123,6 +123,8 @@ function preload() {
 }
 
 function setup() {
+  randomSeed(1);
+
   div = createDiv();
   CANVAS_WIDTH = windowWidth;
   CANVAS_HEIGHT = windowHeight;
@@ -159,7 +161,23 @@ function draw() {
     capturer.capture(document.getElementById('defaultCanvas0'));
   */
 
+  // loadPixels();
+  // for (let i = 0; i < (width * height); i++) {
+  //   //let _shift = random(-30, 30);
+  //   rv = red(pixels[i]) + random(-30, 30);// _shift;
+  //   bv = blue(pixels[i]) + random(-30, 30);// _shift;
+  //   gv = green(pixels[i]) + random(-30, 30);// _shift;
 
+  //   rv = max(0, min(rv, 255));
+  //   gv = max(0, min(gv, 255));
+  //   bv = max(0, min(bv, 255));
+
+  //   pixels[i] = color(rv, gv, bv);
+  // }
+  // updatePixels();
+
+
+  // noLoop();
   if ((frameCount % 100) == 0) {
     hideDrawing = !hideDrawing;
     hideLogo = !hideLogo;

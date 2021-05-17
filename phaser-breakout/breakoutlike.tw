@@ -1,0 +1,28 @@
+:: StoryTitle
+BreakoutLike
+
+:: StoryData
+{
+	"ifid": "F891172E-6C06-4CAC-AD88-C267809FEFD2",
+	"format": "SugarCube",
+	"format-version": "2.31.1",
+	"start": "Begin",
+	"zoom": 1
+}
+
+:: Story Stylesheet [stylesheet]
+/* $ tweego -o index.html SugarCaves.twee styles scripts */
+
+:: Story JavaScript [script]
+/* js/constants.js, js/room.js, js/traceryGen.js, js/person.js, js/macroWhen.js */
+
+:: StoryInit 
+/* 
+  * Backgrounds c/o Unsplash images
+  * Pixelation handled by: https://www.cssscript.com/demo/pixelate-images-canvas-pixasso/
+*/
+
+:: Begin [noinventory] 
+
+Hey there traveler.  
+
