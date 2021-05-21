@@ -15,6 +15,9 @@ let shakeAmount;
 let shakeX;
 let shakeY;
 
+const keyboardConfig = {
+};
+
 function setupCanvas() {
   canvas = document.querySelector("canvas");
   ctx = canvas.getContext("2d");
@@ -55,17 +58,29 @@ function tick() {
     }
   }
 
+  for (let k = npcs.length - 1; k >= 0; k--) {
+    if (!npcs[k].dead) {
+      npcs[k].update();
+    } else {
+      npcs.splice(k, 1);
+    }
+  }
+
   player.update();
   if (player.dead) {
     addScore(score, false);
     gameState = 'dead';
   }
 
-  spawnCounter--;
-  if (spawnCounter <= 0) {
-    spawnMonster();
-    spawnCounter = spawnRate;
-    spawnRate--;
+  // no monsters on level 1 unless if you pick up the gold
+  if (level > 1) {
+    spawnCounter--;
+    if (spawnCounter <= 0) {
+      spawnMonster();
+      spawnCounter = spawnRate;
+      spawnRate--;
+    }
+
   }
 }
 
@@ -99,7 +114,7 @@ function drawScores() {
       let scoreText = rightPad([scores[i].run, scores[i].score, scores[i].totalScore]);
       drawText(
         scoreText,
-        18,
+        14,
         true,
         canvas.height / 2 + 24 + i * 24,
         i == 0 ? "aqua" : "violet"
@@ -123,7 +138,7 @@ function rightPad(textArray) {
 function startGame() {
   level = 1;
   score = 0;
-  numSpells = 9;//1;
+  numSpells = 0;
   startLevel(startingHP);
   gameState = 'running';
 }
@@ -195,15 +210,19 @@ function draw() {
     for (let i = 0; i < monsters.length; i++) {
       monsters[i].draw();
     }
+    for (let i = 0; i < npcs.length; i++) {
+      npcs[i].draw();
+    }
+
 
     player.draw();
 
-    drawText("Level: " + level, 30, false, 40, "violet");
-    drawText("Score: " + score, 30, false, 70, "violet");
+    drawText("Level: " + level, 20, false, 40, "violet");
+    drawText("Score: " + score, 20, false, 70, "violet");
 
     for (let i = 0; i < player.spells.length; i++) {
       let spellText = (i + 1) + ") " + (player.spells[i] || "");
-      drawText(spellText, 20, false, 110 + i * 40, "aqua");
+      drawText(spellText, 14, false, 110 + i * 40, "aqua");
     }
 
     ctx.closePath();
@@ -225,8 +244,8 @@ function drawText(text, size, centered, textY, color) {
 }
 
 window.onload = function init() {
-  tileSize = 64;
-  numTiles = 9;
+  tileSize = 32;//64;
+  numTiles = 18;//9;
   uiWidth = 4;
 
   level = 1;
@@ -250,10 +269,17 @@ window.onload = function init() {
     } else if (gameState == 'dead') {
       showTitle();
     } else if (gameState == 'running') {
-      if (e.key == "w") player.tryMove(0, -1);
-      if (e.key == "s") player.tryMove(0, 1);
-      if (e.key == "a") player.tryMove(-1, 0);
-      if (e.key == "d") player.tryMove(1, 0);
+      if ((e.key == "w") || (e.key == "k")) player.tryMove(0, -1);
+      if ((e.key == "s") || (e.key == "j")) player.tryMove(0, 1);
+      if ((e.key == "a") || (e.key == "h")) player.tryMove(-1, 0);
+      if ((e.key == "d") || (e.key == "l")) player.tryMove(1, 0);
+
+      if (e.key == "y") player.tryMove(-1, -1);
+      if (e.key == "b") player.tryMove(-1, 1);
+      if (e.key == "u") player.tryMove(1, -1);
+      if (e.key == "n") player.tryMove(1, 1);
+
+
       if (e.key == ".") player.wait();
       if (e.key >= 1 && e.key <= 9)
         player.castSpell(e.key - 1);

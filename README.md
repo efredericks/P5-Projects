@@ -2,6 +2,10 @@
 
 Aggregation of various playthings in P5JS
 
+### Starfield
+
+[Calvin and Hobbes - Starfield](ch-starfield)
+
 ### Platformer
  
 [Infinite(ish) Runner with P5.Play](platformer)

@@ -16,6 +16,7 @@ const TileTable = {
   'dash': { 'row': 4, 'col': 41 },
   'bolt': { 'row': 11, 'col': 30 },
   'explosion': { 'row': 4, 'col': 41 },
+  'npc': { 'row': 14, 'col': 37 },
 };
 
 class Tile {

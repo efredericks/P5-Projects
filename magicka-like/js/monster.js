@@ -113,6 +113,19 @@ class Monster {
   }
 }
 
+class NPC extends Monster {
+  constructor(tile) {
+    super(tile, 'npc', 99);
+    this.isNPC = true;
+  }
+
+  interact() {
+  }
+
+  doStuff() {
+  }
+}
+
 class Player extends Monster {
   constructor(tile) {
     super(tile, 'player', 5);
@@ -132,6 +145,7 @@ class Player extends Monster {
   }
 
   wait() {
+    this.heal(0.5)
     tick();
   }
 
