@@ -59,7 +59,7 @@ Star.prototype.draw = function () {
   }
 
   // twinkle twinkle
-  if (random() > 0.98) {
+  if (random() > 0.99) {
     if (this.w == 2) {
       this.w = 3;
       this.h = 3;
@@ -78,6 +78,8 @@ Star.prototype.draw = function () {
 Star.prototype.shoot = function() {
   this.shooting = true;
   this.alpha = 255;
+  this.w++;
+  this.h++;
   this.xoff = random(-10, 10);
   this.yoff = random(-10, 10);
 }
@@ -111,7 +113,7 @@ function setup() {
   initializeGradient();
   initializeStars();
 
-  frameRate(20);
+  frameRate(30);
 }
 
 function draw() {
@@ -127,7 +129,7 @@ function draw() {
       stars.splice(i, 1);
   }
   //stars.forEach(elem => updateStars(elem));
-  if (frameCount % 100 == 0) {
+  if (frameCount % 400 == 0) {
     star = random(stars);
     star.shoot();
   }
