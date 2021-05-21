@@ -2,10 +2,11 @@
 // Modified image: http://i.imgur.com/ZrlSb.png
 // Starfield based on: https://codeburst.io/sunsets-and-shooting-stars-in-p5-js-92244d238e2b
 // Shooting star based on: https://openprocessing.org/sketch/510610
+// Image alignment/placement helped by: https://editor.p5js.org/L05/sketches/o1a4f6XpE
 
 // Script modified by Erik Fredericks
 
-let orig_img,img;
+let orig_img, img;
 let color1, color2;
 let stars;
 let numStars;
@@ -40,12 +41,22 @@ function Star() {
   this.w = 2;
   this.h = 2;
 
-  this.color = color(200, 200, 200, random(50, 255));
+  this.alpha = random(50, 255);
+
+  this.shooting = false;
+  this.color = color(200, 200, 200, this.alpha);
 }
 Star.prototype.draw = function () {
   noStroke();
   fill(this.color);
   ellipse(this.x, this.y, this.w, this.h);
+
+  // shooting star
+  if (this.shooting) {
+    this.x += this.xoff;
+    this.y += this.yoff;
+    this.alpha -= 5;
+  }
 
   // twinkle twinkle
   if (random() > 0.98) {
@@ -56,9 +67,20 @@ Star.prototype.draw = function () {
       this.w = 2;
       this.h = 2;
     }
-    this.color = color(200, 200, 200, random(50, 255));
+    this.alpha = random(50, 255);
+    this.color = color(200, 200, 200, this.alpha);
   }
+
+  if (this.x > width || this.x < -width || this.y > height || this.y < -height)
+    return false;
+  return true;
 };
+Star.prototype.shoot = function() {
+  this.shooting = true;
+  this.alpha = 255;
+  this.xoff = random(-10, 10);
+  this.yoff = random(-10, 10);
+}
 
 function initializeGradient() {
   color1 = color(0, 0, random(153));
@@ -99,10 +121,23 @@ function draw() {
   setGradient(0, 0, width, height, color1, color2, "Y");
 
   // stars
-  stars.forEach((elem) => elem.draw());
+  for (i = stars.length - 1; i >= 0; i--) {
+    let retval = stars[i].draw();
+    if (!retval)
+      stars.splice(i, 1);
+  }
+  //stars.forEach(elem => updateStars(elem));
+  if (frameCount % 100 == 0) {
+    star = random(stars);
+    star.shoot();
+  }
 
   // draw/scale image
-  let h = img.height*width/img.width;
+  let h = img.height * width / img.width;
   imageMode(CORNER);
-  image(img, 0, height-h, width, h); // to fit width
+  image(img, 0, height - h, width, h); // to fit width
+
+  while (stars.length < numStars) {
+    stars.push(new Star());
+  }
 }
