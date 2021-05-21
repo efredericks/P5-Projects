@@ -60,6 +60,24 @@ Star.prototype.draw = function () {
   }
 };
 
+function initializeGradient() {
+  color1 = color(0, 0, random(153));
+  color2 = color(0, 0, 0);
+}
+
+function initializeStars() {
+  numStars = random(200,1000);
+  stars = [];
+  for (let i = 0; i < numStars; i++) {
+    stars.push(new Star());
+  }
+}
+
+function mousePressed() {
+  initializeGradient();
+  initializeStars();
+}
+
 function preload() {
   img = loadImage("calvin-and-hobbes-transparent.png");
 }
@@ -67,14 +85,8 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight);//2048, 1152);
 
-  color1 = color(0, 0, random(153));
-  color2 = color(0, 0, 0);
-
-  numStars = 400;
-  stars = [];
-  for (let i = 0; i < numStars; i++) {
-    stars.push(new Star());
-  }
+  initializeGradient();
+  initializeStars();
 
   frameRate(20);
 }
