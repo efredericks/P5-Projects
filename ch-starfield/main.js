@@ -36,7 +36,7 @@ function setGradient(x, y, w, h, c1, c2, axis) {
 
 function Star() {
   this.x = random(width);
-  this.y = random(height - 100);
+  this.y = random(height - 20);
 
   this.w = 2;
   this.h = 2;
@@ -75,7 +75,7 @@ Star.prototype.draw = function () {
     return false;
   return true;
 };
-Star.prototype.shoot = function() {
+Star.prototype.shoot = function () {
   this.shooting = true;
   this.alpha = 255;
   this.w++;
