@@ -46,6 +46,24 @@ function drawHealthBar(x, y, w, h, perc) {
   ctx.closePath();
 }
 
+function drawSpriteDirect(sprite, x, y, scale) {
+  console.assert(TileTable.hasOwnProperty(sprite));
+  let offset = getSpriteOffset(TileTable[sprite].row, TileTable[sprite].col, 16, 16);//tileSize, tileSize);
+  ctx.drawImage(
+    spriteSheet,
+    offset['dx'],
+    offset['dy'],
+    16,
+    16,
+    x,//x * tileSize + shakeX,
+    y,//y * tileSize + shakeY,
+    scale,//tileSize,
+    scale//tileSize
+  );
+  // let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
+  // bg_buffer.image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+}
+
 function drawSprite(sprite, x, y) {
   console.assert(TileTable.hasOwnProperty(sprite));
   let offset = getSpriteOffset(TileTable[sprite].row, TileTable[sprite].col, 16, 16);//tileSize, tileSize);
@@ -262,6 +280,34 @@ function drawText(text, size, centered, textY, color) {
   ctx.fillText(text, textX, textY);
 }
 
+function dialogueText(monster) {
+  let txt = monster.getDialogue();
+
+  // draw text background
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(0,0,0,0.8)";
+  ctx.fillRect(10, canvas.height-105, canvas.width-20,100-5);
+  ctx.lineJoin = "bevel"; // round
+  ctx.lineWidth = "10";
+  ctx.strokeStyle = "rgba(255,255,255,1.0)";
+  ctx.strokeRect(10, canvas.height - 100 - 10, canvas.width-20, 100);
+  ctx.closePath();
+
+  // draw avatar
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(71,45,60,1.0)";
+  ctx.fillRect(40, canvas.height-165, 75, 75);
+  ctx.lineJoin = "bevel"; // round
+  ctx.lineWidth = "10";
+  ctx.strokeStyle = "rgba(255,255,255,1.0)";
+  ctx.strokeRect(40, canvas.height-165, 75, 75);
+  drawSpriteDirect('npc', 54, canvas.height-152, 48);
+  ctx.closePath();
+
+  // draw text
+  drawText(txt, 24, true, canvas.height - 50 , "white");
+}
+
 function debugText() {
   drawText("Magicka-like", 40, true, canvas.height / 2 - 40, "white");
 }
@@ -306,12 +352,11 @@ window.onload = function init() {
         debugText();
       }
 
-
       if (e.key == ".") player.wait();
       if (e.key >= 1 && e.key <= 9)
         player.castSpell(e.key - 1);
     } else if (gameState == "dialogue") {
-      if (e.key == "[") {
+      if (e.key == " " || e.key == "Enter") {
         gameState = "running";
       }
     }

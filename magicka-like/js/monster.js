@@ -87,7 +87,10 @@ class Monster {
       if (!newTile.monster) {
         this.move(newTile);
       } else {
-        if (this.isPlayer != newTile.monster.isPlayer) {
+        if (newTile.monster.isNPC) {
+          gameState = "dialogue";
+          dialogueText(newTile.monster);
+        } else if (this.isPlayer != newTile.monster.isPlayer) {
           this.attackedThisTurn = true;
           newTile.monster.stunned = true;
           newTile.monster.hit(1 + this.bonusAttack);
@@ -142,6 +145,16 @@ class NPC extends Monster {
   constructor(tile) {
     super(tile, 'npc', 99, 99);
     this.isNPC = true;
+    this.dialogue = ["Hey there adventurer", "How's it hangin?", "Did you know there's a hidden Ring of Fart?"];
+    this.dialogueIndex = 0;
+  }
+
+  getDialogue() {
+    let ret_text = this.dialogue[this.dialogueIndex];
+    this.dialogueIndex++;
+    if (this.dialogueIndex > (this.dialogue.length-1))
+      this.dialogueIndex = 0;
+    return ret_text;
   }
 
   interact() {
