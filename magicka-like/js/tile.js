@@ -11,6 +11,8 @@ const TileTable = {
   'enemyTP': { 'row': 21, 'col': 40 },
   'stairs': { 'row': 6, 'col': 3 },
   'treasure': { 'row': 4, 'col': 41 },
+  'water': { 'row': 5, 'col': 8 },
+  'potion': { 'row': 13, 'col': 32 },
   ///
   'aura': { 'row': 4, 'col': 41 },
   'dash': { 'row': 4, 'col': 41 },
@@ -103,6 +105,9 @@ class Tile {
     if (this.treasure) {
       drawSprite('treasure', this.x, this.y);
     }
+    if (this.potion) {
+      drawSprite('potion', this.x, this.y);
+    }
 
     if (this.effectCounter) {
       this.effectCounter--;
@@ -119,7 +124,10 @@ class Tile {
 }
 
 class Floor extends Tile {
-  constructor(x, y) {
+  constructor(x, y, s) {
+    if (s) // pass in a sprite
+      super(x, y, s, true);
+    else
     super(x, y, 'floor', true);
   }
 
@@ -132,7 +140,16 @@ class Floor extends Tile {
       }
       this.treasure = false;
       spawnMonster();
+    } else if (monster.isPlayer && this.potion) {
+      player.heal(3);
+      this.potion = false;
     }
+  }
+}
+
+class Water extends Floor {
+  constructor(x, y) {
+    super(x, y, 'water', true);
   }
 }
 

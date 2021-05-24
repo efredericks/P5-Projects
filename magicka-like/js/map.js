@@ -1,16 +1,21 @@
 function generateLevel() {
+  npcs = [];
+
   tryTo('generate map', function () {
     return generateTiles() == randomPassableTile().getConnectedTiles().length;
   });
-  if (level > 1)
+  if (level > 1) {
     generateMonsters();
-  else {
+  } else {
     monsters = [];
     generateNPCs();
   }
 
+  // abstract this to be *any* item
   for (let i = 0; i < 3; i++) {
     randomPassableTile().treasure = true;
+    if (Math.random() > 0.5)
+      randomPassableTile().potion = true;
   }
 }
 
@@ -22,7 +27,11 @@ function generateTiles() {
     for (let j = 0; j < numTiles; j++) {
       if (level == 1) {
         if (inBounds(i, j)) {
-          tiles[i][j] = new Floor(i, j);
+          // bound with a moat for level 1
+          if (i == 1 || i == (numTiles - 2) || j == 1 || j == (numTiles - 2))
+            tiles[i][j] = new Water(i, j);
+          else
+            tiles[i][j] = new Floor(i, j);
           passableTiles++;
         } else {
           tiles[i][j] = new Wall(i, j);
