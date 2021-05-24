@@ -1,8 +1,9 @@
 class Monster {
-  constructor(tile, sprite, hp) {
+  constructor(tile, sprite, hp, maxHP) {
     this.move(tile);
     this.sprite = sprite;
     this.hp = hp;
+    this.maxHP = maxHP;
     this.teleportCounter = 2;
     this.offsetX = 0;
     this.offsetY = 0;
@@ -22,17 +23,41 @@ class Monster {
     this.offsetY -= Math.sign(this.offsetY) * (1/8);
   }
 
+// function drawSprite(sprite, x, y) {
+//   console.assert(TileTable.hasOwnProperty(sprite));
+//   let offset = getSpriteOffset(TileTable[sprite].row, TileTable[sprite].col, 16, 16);//tileSize, tileSize);
+//   ctx.drawImage(
+//     spriteSheet,
+//     offset['dx'],
+//     offset['dy'],
+//     //sprite*16,
+//     //0,
+//     16,
+//     16,
+//     x * tileSize + shakeX,
+//     y * tileSize + shakeY,
+//     tileSize,
+//     tileSize
+//   );
+//   // let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
+//   // bg_buffer.image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+// }
+
+
   drawHP() {
-    for (let i = 0; i < this.hp; i++) {
-      drawSprite('health',
+    let percHealth = this.hp / this.maxHP;
+
+    let i = 0;
+      drawHealthBar(
         this.getDisplayX() + (i % 3) * (5 / 16),
-        this.getDisplayY() - Math.floor(i / 3) * (5 / 16)
+        this.getDisplayY() - Math.floor(i / 3) * (5 / 16),
+        100, 24,
+        percHealth
       );
-    }
   }
 
   heal(damage) {
-    this.hp = Math.min(maxHP, this.hp + damage);
+    this.hp = Math.min(this.maxHP, this.hp + damage);
   }
 
   update() {
@@ -115,7 +140,7 @@ class Monster {
 
 class NPC extends Monster {
   constructor(tile) {
-    super(tile, 'npc', 99);
+    super(tile, 'npc', 99, 99);
     this.isNPC = true;
   }
 
@@ -128,7 +153,7 @@ class NPC extends Monster {
 
 class Player extends Monster {
   constructor(tile) {
-    super(tile, 'player', 5);
+    super(tile, 'player', 5, 10);
     this.isPlayer = true;
     this.teleportCounter = 0;
     this.spells = shuffle(Object.keys(spells)).splice(0, numSpells);
@@ -166,7 +191,7 @@ class Player extends Monster {
 
 class BlueCrab extends Monster {
   constructor(tile) {
-    super(tile, 'blueCrab', 3);
+    super(tile, 'blueCrab', 3, 3);
   }
 
   doStuff() {
@@ -181,7 +206,7 @@ class BlueCrab extends Monster {
 
 class Goblin extends Monster {
   constructor(tile) {
-    super(tile, 'goblin', 5);
+    super(tile, 'goblin', 5, 5);
   }
 
   update() {
@@ -196,7 +221,7 @@ class Goblin extends Monster {
 
 class Mage extends Monster {
   constructor(tile) {
-    super(tile, 'mage', 5);
+    super(tile, 'mage', 5, 5);
   }
 
   // eat walls for health because reasons
@@ -213,7 +238,7 @@ class Mage extends Monster {
 
 class Ghost extends Monster {
   constructor(tile) {
-    super(tile, 'ghost', 5);
+    super(tile, 'ghost', 5, 5);
   }
 
   // move randomly

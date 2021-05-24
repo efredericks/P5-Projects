@@ -9,7 +9,6 @@ let gameState;
 let startingHP;
 let numLevels;
 let numSpells;
-let maxHP;
 let score;
 let shakeAmount;
 let shakeX;
@@ -27,6 +26,24 @@ function setupCanvas() {
   canvas.style.width = canvas.width + 'px';
   canvas.style.height = canvas.height + 'px';
   ctx.imageSmoothingEnabled = false;
+}
+
+function drawHealthBar(x, y, w, h, perc) {
+  let _x = x * tileSize + shakeX;
+  let _y = y * tileSize + shakeY + tileSize - 4;
+  let _w = (tileSize - 4) * perc;
+
+  // outer bar
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(0,0,0,0.8)";
+  ctx.fillRect(_x, _y, tileSize, 6);
+  ctx.closePath();
+
+  // inner bar
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(0,255,0,0.8)";
+  ctx.fillRect(_x+2, _y+2, _w, 2);
+  ctx.closePath();
 }
 
 function drawSprite(sprite, x, y) {
@@ -228,6 +245,8 @@ function draw() {
     ctx.closePath();
 
     //drawSprite(6, x, y); // only works on first line
+  } else if (gameState == "dialogue") {
+    ;
   }
 }
 
@@ -243,6 +262,10 @@ function drawText(text, size, centered, textY, color) {
   ctx.fillText(text, textX, textY);
 }
 
+function debugText() {
+  drawText("Magicka-like", 40, true, canvas.height / 2 - 40, "white");
+}
+
 window.onload = function init() {
   tileSize = 32;//64;
   numTiles = 18;//9;
@@ -252,7 +275,6 @@ window.onload = function init() {
 
   gameState = 'loading';
   startingHP = 3;
-  maxHP = 6;
   numLevels = 6;
 
   shakeAmount = 0;
@@ -279,12 +301,20 @@ window.onload = function init() {
       if (e.key == "u") player.tryMove(1, -1);
       if (e.key == "n") player.tryMove(1, 1);
 
+      if (e.key == "[") {
+        gameState = "dialogue";
+        debugText();
+      }
+
 
       if (e.key == ".") player.wait();
       if (e.key >= 1 && e.key <= 9)
         player.castSpell(e.key - 1);
+    } else if (gameState == "dialogue") {
+      if (e.key == "[") {
+        gameState = "running";
+      }
     }
-
   };
 
   setInterval(draw, 15);
