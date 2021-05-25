@@ -268,7 +268,7 @@ function draw() {
   }
 }
 
-function drawText(text, size, centered, textY, color) {
+function drawText(text, size, centered, textY, color, inTextX) {
   ctx.fillStyle = color;
   ctx.font = size + "px monospace";
   let textX;
@@ -276,6 +276,9 @@ function drawText(text, size, centered, textY, color) {
     textX = (canvas.width - ctx.measureText(text).width) / 2;
   else
     textX = canvas.width - uiWidth * tileSize + 25;
+
+  if (inTextX)
+    textX = inTextX;
 
   ctx.fillText(text, textX, textY);
 }
@@ -301,8 +304,11 @@ function dialogueText(monster) {
   ctx.lineWidth = "10";
   ctx.strokeStyle = "rgba(255,255,255,1.0)";
   ctx.strokeRect(40, canvas.height-165, 75, 75);
-  drawSpriteDirect('npc', 54, canvas.height-152, 48);
+  drawSpriteDirect(monster.sprite, 54, canvas.height-152, 48);
   ctx.closePath();
+
+  // avatar name
+  drawText(monster.name, 24, false, canvas.height-120, "white", 124);
 
   // draw text
   drawText(txt, 24, true, canvas.height - 50 , "white");

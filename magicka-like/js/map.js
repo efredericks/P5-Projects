@@ -85,7 +85,7 @@ function randomPassableTile() {
 function generateNPCs() {
   npcs = [];
   if (level == 1) {
-    let npc = new NPC(randomPassableTile());
+    let npc = new NPC(randomPassableTile(), "Ingmar Tutorialman");
     npcs.push(npc);
   }
 }
