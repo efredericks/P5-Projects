@@ -286,6 +286,8 @@ function drawText(text, size, centered, textY, color, inTextX) {
 function dialogueText(monster) {
   let txt = monster.getDialogue();
 
+  /// TBD: I'm willing to be this can be done a lot more intelligently than pixel positioning
+
   // draw text background
   ctx.beginPath();
   ctx.fillStyle = "rgba(0,0,0,0.8)";

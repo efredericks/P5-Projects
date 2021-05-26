@@ -22,39 +22,76 @@ function generateLevel() {
 function generateTiles() {
   let passableTiles = 0;
   tiles = [];
-  for (let i = 0; i < numTiles; i++) {
-    tiles[i] = [];
-    for (let j = 0; j < numTiles; j++) {
-      if (level == 1) {
-        if (inBounds(i, j)) {
-          // bound with a moat for level 1
-          if (i == 1 || i == (numTiles - 2) || j == 1 || j == (numTiles - 2))
-            tiles[i][j] = new Water(i, j);
-          else
-            tiles[i][j] = new Floor(i, j);
-          passableTiles++;
-        } else {
-          tiles[i][j] = new Wall(i, j);
-        }
 
-      } else if (level > 2) {
-        if (Math.random() < 0.3 || !inBounds(i, j)) {
+  // if we have a preset
+  if (levels[level]) {
+
+
+    for (let i = 0; i < numTiles; i++) {
+      tiles[i] = [];
+      for (let j = 0; j < numTiles; j++) {
+        if (TileLookup[levels[level][j][i]] == "wall")
           tiles[i][j] = new Wall(i, j);
+        else if (TileLookup[levels[level][j][i]] == "water"){
+          tiles[i][j] = new Water(i, j);
+          passableTiles++;
+        } else if (TileLookup[levels[level][j][i]] == "torch"){
+          tiles[i][j] = new Torch(i, j);
+          passableTiles++;
         } else {
           tiles[i][j] = new Floor(i, j);
           passableTiles++;
-        }
-      } else {
-        if (inBounds(i, j)) {
-          tiles[i][j] = new Floor(i, j);
-          passableTiles++;
-        } else {
-          tiles[i][j] = new Wall(i, j);
         }
       }
+    }
 
+
+
+
+
+
+
+  } else {
+    for (let i = 0; i < numTiles; i++) {
+      tiles[i] = [];
+      for (let j = 0; j < numTiles; j++) {
+        if (level == 1) {
+          if (inBounds(i, j)) {
+            // bound with a moat for level 1
+            if (i == 1 || i == (numTiles - 2) || j == 1 || j == (numTiles - 2))
+              tiles[i][j] = new Water(i, j);
+            else
+              tiles[i][j] = new Floor(i, j);
+            passableTiles++;
+          } else {
+            tiles[i][j] = new Wall(i, j);
+          }
+
+        } else if (level > 2) {
+          if (Math.random() < 0.3 || !inBounds(i, j)) {
+            tiles[i][j] = new Wall(i, j);
+          } else {
+            tiles[i][j] = new Floor(i, j);
+            passableTiles++;
+          }
+        } else {
+          if (inBounds(i, j)) {
+            tiles[i][j] = new Floor(i, j);
+            passableTiles++;
+          } else {
+            tiles[i][j] = new Wall(i, j);
+          }
+        }
+      }
     }
   }
+
+  // post processing
+  if (level == 1) {
+    let _mid = Math.floor(numTiles / 2);
+    tiles[_mid][_mid].replace(Teleporter);
+  }
+
   return passableTiles;
 }
 
