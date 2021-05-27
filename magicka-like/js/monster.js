@@ -87,7 +87,7 @@ class Monster {
       if (!newTile.monster) {
         this.move(newTile);
       } else {
-        if (newTile.monster.isNPC) {
+        if (newTile.monster.isNPC && this.isPlayer) {
           gameState = "dialogue";
           dialogueText(newTile.monster);
         } else if (this.isPlayer != newTile.monster.isPlayer) {

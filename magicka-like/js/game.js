@@ -257,7 +257,7 @@ function draw() {
 
     player.draw();
 
-    drawText("Level: " + level, 20, false, 40, "violet");
+    drawText("Level: " + level, 20, false, 40, "rgba(255,255,255)");
     drawText("Score: " + score, 20, false, 70, "violet");
 
     for (let i = 0; i < player.spells.length; i++) {
@@ -328,7 +328,7 @@ function debugText() {
 window.onload = function init() {
   tileSize = 32;//64;
   numTiles = 18;//9;
-  uiWidth = 4;
+  uiWidth = 8;
 
   level = 1;
 

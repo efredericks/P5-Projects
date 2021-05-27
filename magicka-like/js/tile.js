@@ -153,7 +153,9 @@ class Floor extends Tile {
       this.treasure = false;
       spawnMonster();
     } else if (monster.isPlayer && this.crown) { /// TBD: EXTEND THIS TO ANY QUEST ITEM!!!!!
-      player.heal(player.maxHP);
+      level = 1;
+      chunk = level;
+      startLevel(Math.min(player.maxHP, player.hp + 1));
       score += 50;
       this.crown = false;
       for (let i = 0; i < npcs.length; i++) {
@@ -237,6 +239,7 @@ class Exit extends Tile {
   stepOn(monster) {
     if (monster.isPlayer) {
       if (level == numLevels) {
+        player.priorLocation = (this.x,this.y);
         addScore(score, true);
         showTitle();
       } else {

@@ -18,7 +18,10 @@ let dialogue = {
     ],
     'questDone': [
       "Thanks for retrieving that!",
-      "I'm looking fly."
+      "I'm looking fly.",
+      "If you had kept that, I wouldn't have minded.",
+      "See you later agitator",
+      "Be sure to heal up before you go!",
     ],
   }
 };
