@@ -15,6 +15,7 @@ const TileTable = {
   'water': { 'row': 5, 'col': 8 },
   'potion': { 'row': 13, 'col': 32 },
   'torch': { 'row': 10, 'col': 15 },
+  'crown': { 'row': 2, 'col': 43 },
   /// directions
   'left': { 'row': 21, 'col': 31 },
   'right': { 'row': 21, 'col': 29 },
@@ -116,6 +117,9 @@ class Tile {
     if (this.potion) {
       drawSprite('potion', this.x, this.y);
     }
+    if (this.crown) {
+      drawSprite('crown', this.x, this.y);
+    }
 
     if (this.effectCounter) {
       this.effectCounter--;
@@ -148,6 +152,14 @@ class Floor extends Tile {
       }
       this.treasure = false;
       spawnMonster();
+    } else if (monster.isPlayer && this.crown) { /// TBD: EXTEND THIS TO ANY QUEST ITEM!!!!!
+      player.heal(player.maxHP);
+      score += 50;
+      this.crown = false;
+      for (let i = 0; i < npcs.length; i++) {
+        if (npcs[i].name == "Ingmar Tutorialman")
+          npcs[i].dialogue.quest = "done";
+      }
     } else if (monster.isPlayer && this.potion) {
       player.heal(3);
       this.potion = false;

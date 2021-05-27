@@ -19,41 +19,41 @@ class Monster {
       this.drawHP();
     }
 
-    this.offsetX -= Math.sign(this.offsetX) * (1/8);
-    this.offsetY -= Math.sign(this.offsetY) * (1/8);
+    this.offsetX -= Math.sign(this.offsetX) * (1 / 8);
+    this.offsetY -= Math.sign(this.offsetY) * (1 / 8);
   }
 
-// function drawSprite(sprite, x, y) {
-//   console.assert(TileTable.hasOwnProperty(sprite));
-//   let offset = getSpriteOffset(TileTable[sprite].row, TileTable[sprite].col, 16, 16);//tileSize, tileSize);
-//   ctx.drawImage(
-//     spriteSheet,
-//     offset['dx'],
-//     offset['dy'],
-//     //sprite*16,
-//     //0,
-//     16,
-//     16,
-//     x * tileSize + shakeX,
-//     y * tileSize + shakeY,
-//     tileSize,
-//     tileSize
-//   );
-//   // let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
-//   // bg_buffer.image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
-// }
+  // function drawSprite(sprite, x, y) {
+  //   console.assert(TileTable.hasOwnProperty(sprite));
+  //   let offset = getSpriteOffset(TileTable[sprite].row, TileTable[sprite].col, 16, 16);//tileSize, tileSize);
+  //   ctx.drawImage(
+  //     spriteSheet,
+  //     offset['dx'],
+  //     offset['dy'],
+  //     //sprite*16,
+  //     //0,
+  //     16,
+  //     16,
+  //     x * tileSize + shakeX,
+  //     y * tileSize + shakeY,
+  //     tileSize,
+  //     tileSize
+  //   );
+  //   // let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
+  //   // bg_buffer.image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
+  // }
 
 
   drawHP() {
     let percHealth = this.hp / this.maxHP;
 
     let i = 0;
-      drawHealthBar(
-        this.getDisplayX() + (i % 3) * (5 / 16),
-        this.getDisplayY() - Math.floor(i / 3) * (5 / 16),
-        100, 24,
-        percHealth
-      );
+    drawHealthBar(
+      this.getDisplayX() + (i % 3) * (5 / 16),
+      this.getDisplayY() - Math.floor(i / 3) * (5 / 16),
+      100, 24,
+      percHealth
+    );
   }
 
   heal(damage) {
@@ -148,15 +148,31 @@ class NPC extends Monster {
     super(tile, 'npc', 99, 99);
     this.name = name;
     this.isNPC = true;
-    this.dialogue = dialogue[this.name];//["Hey there adventurer", "How's it hangin?", "Did you know there's a hidden Ring of Fart?"];
+    this.dialogue = dialogue[this.name];
     this.dialogueIndex = 0;
   }
 
   getDialogue() {
-    let ret_text = this.dialogue[this.dialogueIndex];
-    this.dialogueIndex++;
-    if (this.dialogueIndex > (this.dialogue.length-1))
-      this.dialogueIndex = 0;
+    let ret_text;
+
+    if (this.dialogue.quest == "done") {
+      let indx = getRandomInteger(0,this.dialogue.questDone.length);
+      ret_text = this.dialogue.questDone[indx];
+    } else if (this.dialogue.quest == "active") {
+      ret_text = this.dialogue.questActive[this.dialogueIndex];
+      this.dialogueIndex++;
+      if (this.dialogueIndex > (this.dialogue.questActive.length - 1)) {
+        this.dialogueIndex = 0;
+      }
+    } else {
+      ret_text = this.dialogue.chatter[this.dialogueIndex];
+      this.dialogueIndex++;
+      if (this.dialogueIndex > (this.dialogue.chatter.length - 1)) {
+        this.dialogueIndex = 0;
+        this.dialogue.quest = "active";
+      }
+    }
+
     return ret_text;
   }
 

@@ -107,6 +107,9 @@ function generateTiles() {
     let _mid = Math.floor(numTiles / 2);
     tiles[chunk][_mid][_mid].replace(Teleporter);
     tiles[chunk][_mid][_mid].stairs = true;
+
+    let _t = randomPassableTile();
+    _t.crown = true;
   }
 
   return passableTiles;
