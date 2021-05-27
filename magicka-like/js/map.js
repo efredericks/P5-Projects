@@ -21,72 +21,81 @@ function generateLevel() {
 
 function generateTiles() {
   let passableTiles = 0;
-  tiles = [];
+  tiles = {};
+  let startChunk = 1;
 
   // if we have a preset
   if (levels[level]) {
     for (const [key, value] of Object.entries(levels[level])) {
       if (key == "start") // starting point
-        chunk = value;
+        startChunk = value;
       else {
-        if (chunk == key) {
-          for (let i = 0; i < numTiles; i++) {
-            tiles[i] = [];
-            for (let j = 0; j < numTiles; j++) {
-              if (inBounds(i, j)) { // ignore walls
-                if (value[j][i] == "1")
-                  tiles[i][j] = new Floor(i, j);
-                else if (value[j][i] == "2")
-                  tiles[i][j] = new Water(i, j);
-                else if (value[j][i] == "a") { // an arrow
-                  if (i == 1)
-                    tiles[i][j] = new Arrow(i, j, "left");
-                  else if (i == (numTiles-2))
-                    tiles[i][j] = new Arrow(i, j, "right");
-                  else if (j == 1)
-                    tiles[i][j] = new Arrow(i, j, "up");
-                  else
-                    tiles[i][j] = new Arrow(i, j, "down");
-                  tiles[i][j].stairs = true;
-                }
-                passableTiles++;
-              } else {
-                tiles[i][j] = new Wall(i, j);
+        chunk = key;
+        tiles[chunk] = [];
+
+        // link up blocks, lowercase letters only at this point
+        let dirTiles = "abcdefghijklmnopqrstuvwxyz";
+
+        for (let i = 0; i < numTiles; i++) {
+          tiles[chunk][i] = [];
+          for (let j = 0; j < numTiles; j++) {
+            if (inBounds(i, j)) { // ignore walls
+              if (value[j][i] == "1")
+                tiles[chunk][i][j] = new Floor(i, j);
+              else if (value[j][i] == "2")
+                tiles[chunk][i][j] = new Water(i, j);
+              else if (dirTiles.indexOf(value[j][i]) >= 0) { // an arrow
+                if (i == 1)
+                  tiles[chunk][i][j] = new Arrow(i, j, "left");
+                else if (i == (numTiles - 2))
+                  tiles[chunk][i][j] = new Arrow(i, j, "right");
+                else if (j == 1)
+                  tiles[chunk][i][j] = new Arrow(i, j, "up");
+                else
+                  tiles[chunk][i][j] = new Arrow(i, j, "down");
+                tiles[chunk][i][j].stairs = true;
+                tiles[chunk][i][j].nextChunk = value[j][i];
               }
+              passableTiles++;
+            } else {
+              tiles[chunk][i][j] = new Wall(i, j);
             }
           }
         }
       }
     }
+    chunk = startChunk; // set starting chunk
   } else {
+    chunk = level;
+    tiles[chunk] = [];
     for (let i = 0; i < numTiles; i++) {
-      tiles[i] = [];
+      tiles[chunk][i] = [];
       for (let j = 0; j < numTiles; j++) {
         if (level == 1) {
           if (inBounds(i, j)) {
             // bound with a moat for level 1
             if (i == 1 || i == (numTiles - 2) || j == 1 || j == (numTiles - 2))
-              tiles[i][j] = new Water(i, j);
+              tiles[chunk][i][j] = new Water(i, j);
             else
-              tiles[i][j] = new Floor(i, j);
+              tiles[chunk][i][j] = new Floor(i, j);
             passableTiles++;
           } else {
-            tiles[i][j] = new Wall(i, j);
+            tiles[chunk][i][j] = new Wall(i, j);
           }
 
         } else if (level > 2) {
           if (Math.random() < 0.3 || !inBounds(i, j)) {
-            tiles[i][j] = new Wall(i, j);
+            tiles[chunk][i][j] = new Wall(i, j);
           } else {
-            tiles[i][j] = new Floor(i, j);
+            tiles[chunk][i][j] = new Floor(i, j);
             passableTiles++;
           }
         } else {
           if (inBounds(i, j)) {
-            tiles[i][j] = new Floor(i, j);
+            tiles[chunk][i][j] = new Floor(i, j);
             passableTiles++;
           } else {
-            tiles[i][j] = new Wall(i, j);
+            tiles[chunk][i][j] = new Wall(i, j);
           }
         }
       }
@@ -96,8 +105,8 @@ function generateTiles() {
   // post processing
   if (level == 1) {
     let _mid = Math.floor(numTiles / 2);
-    tiles[_mid][_mid].replace(Teleporter);
-    tiles[_mid][_mid].stairs = true;
+    tiles[chunk][_mid][_mid].replace(Teleporter);
+    tiles[chunk][_mid][_mid].stairs = true;
   }
 
   return passableTiles;
@@ -110,7 +119,7 @@ function inBounds(x, y) {
 
 function getTile(x, y) {
   if (inBounds(x, y)) {
-    return tiles[x][y];
+    return tiles[chunk][x][y];
   } else {
     return new Wall(x, y);
   }
@@ -122,7 +131,7 @@ function randomPassableTile() {
     let x = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
     let y = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
     tile = getTile(x, y);
-    while (!tile.passable && !tile.monster) {
+    while (!tile.passable && !tile.monster && !tile.stairs) {
       x = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
       y = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
       tile = getTile(x, y);

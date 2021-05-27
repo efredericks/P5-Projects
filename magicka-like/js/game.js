@@ -13,6 +13,7 @@ let score;
 let shakeAmount;
 let shakeX;
 let shakeY;
+let chunk;
 
 const keyboardConfig = {
 };

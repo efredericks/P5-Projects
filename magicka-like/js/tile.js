@@ -1,13 +1,3 @@
-const TileLookup = {
-  "0": "wall",
-  "1": "floor",
-  "2": "water",
-  "3": "torch",
-  "a": "floor",
-  "b": "floor",
-  "c": "floor",
-  "d": "floor",
-}
 const TileTable = {
   'player': { 'row': 14, 'col': 35 },
   'health': { 'row': 22, 'col': 7 },
@@ -48,8 +38,8 @@ class Tile {
   }
 
   replace(newTileType) {
-    tiles[this.x][this.y] = new newTileType(this.x, this.y);
-    return tiles[this.x, this.y];
+    tiles[chunk][this.x][this.y] = new newTileType(this.x, this.y);
+    return tiles[chunk][this.x, this.y];
   }
 
   // manhattan distance
@@ -212,7 +202,17 @@ class Arrow extends Tile {
 
   stepOn(monster) {
     if (monster.isPlayer) {
-      console.log("Im leaving!");
+      //console.log("Im leaving to " + this.nextChunk);
+      //console.log(tiles);
+      chunk = this.nextChunk;
+      if (monster.tile.x == 1)
+        monster.tryMove(1,0);
+      else if (monster.tile.x == (numTiles-2))
+        monster.tryMove(-1,0);
+      else if (monster.tile.y == 1)
+        monster.tryMove(0,1);
+      else
+        monster.tryMove(0,-1);
     }
   }
 }
@@ -229,6 +229,7 @@ class Exit extends Tile {
         showTitle();
       } else {
         level++;
+        chunk = level;
         startLevel(Math.min(player.maxHP, player.hp + 1));
       }
     }
