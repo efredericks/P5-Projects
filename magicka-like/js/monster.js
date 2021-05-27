@@ -149,6 +149,7 @@ class NPC extends Monster {
     this.name = name;
     this.isNPC = true;
     this.dialogue = dialogue[this.name];
+    this.dialogue.quest = "inactive";
     this.dialogueIndex = 0;
     this.chunk = chunk;
   }
