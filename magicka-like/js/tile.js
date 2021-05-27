@@ -3,7 +3,13 @@ const TileTable = {
   'health': { 'row': 22, 'col': 7 },
   'wall': { 'row': 17, 'col': 1 },
   'teleporter': { 'row': 18, 'col': 14 },
-  'floor': { 'row': 0, 'col': 1 },
+  'floor': { 'row': 0, 'col': 0 },
+  'floor2': { 'row': 0, 'col': 1 },
+  'floor3': { 'row': 0, 'col': 2 },
+  'floor4': { 'row': 0, 'col': 3 },
+  'floor5': { 'row': 0, 'col': 4 },
+  'tile1': { 'row': 0, 'col': 16 },
+  'tile2': { 'row': 0, 'col': 17 },
   'blueCrab': { 'row': 7, 'col': 18 },
   'goblin': { 'row': 2, 'col': 29 },
   'corpse': { 'row': 15, 'col': 0 },
@@ -140,8 +146,20 @@ class Floor extends Tile {
   constructor(x, y, s) {
     if (s) // pass in a sprite
       super(x, y, s, true);
-    else
-      super(x, y, 'floor', true);
+    else {
+      let _r = Math.random();
+      if (_r > 0.5)
+        super(x, y, 'floor', true);
+      else if (_r > 0.3)
+        super(x, y, 'floor2', true);
+      else if (_r > 0.2)
+        super(x, y, 'floor3', true);
+      else if (_r > 0.05)
+        super(x, y, 'floor4', true);
+      else
+        super(x, y, 'floor5', true);
+
+    }
   }
 
   stepOn(monster) {
@@ -241,6 +259,9 @@ class StairsUp extends Tile {
     if (monster.isPlayer) {
       if (level == numLevels) {
         player.priorLocation = (this.x,this.y);
+        level = 1;
+        chunk = level;
+        startLevel(Math.min(player.maxHP, player.hp + 1));
         addScore(score, true);
         showTitle();
       } else {

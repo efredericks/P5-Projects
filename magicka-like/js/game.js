@@ -350,7 +350,6 @@ window.onload = function init() {
     if (gameState == 'title') {
       startGame();
     } else if (gameState == 'dead') {
-      for (let i = 0; i < npcs.length; i++)
       showTitle();
     } else if (gameState == 'running') {
       if ((e.key == "w") || (e.key == "k")) player.tryMove(0, -1);

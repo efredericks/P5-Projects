@@ -44,7 +44,12 @@ function generateTiles() {
                 tiles[chunk][i][j] = new Floor(i, j);
               else if (value[j][i] == "2")
                 tiles[chunk][i][j] = new Water(i, j);
-              else if (dirTiles.indexOf(value[j][i]) >= 0) { // an arrow
+              else if (value[j][i] == "3") {
+                if (Math.random() > 0.5)
+                  tiles[chunk][i][j] = new Floor(i, j, 'tile1');
+                else
+                  tiles[chunk][i][j] = new Floor(i, j, 'tile2');
+              } else if (dirTiles.indexOf(value[j][i]) >= 0) { // an arrow
                 if (i == 1)
                   tiles[chunk][i][j] = new Arrow(i, j, "left");
                 else if (i == (numTiles - 2))
