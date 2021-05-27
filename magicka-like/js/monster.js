@@ -123,6 +123,7 @@ class Monster {
   }
 
   move(tile) {
+    //console.log(tile);
     if (this.tile) {
       this.tile.monster = null;
       this.offsetX = this.tile.x - tile.x;
@@ -130,7 +131,8 @@ class Monster {
     }
     this.tile = tile;
     tile.monster = this;
-    tile.stepOn(this);
+    if (!this.isNPC)
+      tile.stepOn(this);
   }
 
   getDisplayX() {

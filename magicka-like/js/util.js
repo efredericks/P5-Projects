@@ -13,11 +13,12 @@ function getSpriteOffset(row, col, twidth, theight) {
 }
 
 function tryTo(desc, callback) {
-  for (let timeout = 1000; timeout > 0; timeout--) {
-    if (callback())
-      return;
-  }
-  throw "Timeout while trying to " + desc;
+  callback();
+  // for (let timeout = 1000; timeout > 0; timeout--) {
+  //   if (callback())
+  //     return;
+  // }
+  // throw "Timeout while trying to " + desc;
 }
 
 function shuffle(arr) {

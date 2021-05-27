@@ -25,32 +25,39 @@ function generateTiles() {
 
   // if we have a preset
   if (levels[level]) {
-
-
-    for (let i = 0; i < numTiles; i++) {
-      tiles[i] = [];
-      for (let j = 0; j < numTiles; j++) {
-        if (TileLookup[levels[level][j][i]] == "wall")
-          tiles[i][j] = new Wall(i, j);
-        else if (TileLookup[levels[level][j][i]] == "water"){
-          tiles[i][j] = new Water(i, j);
-          passableTiles++;
-        } else if (TileLookup[levels[level][j][i]] == "torch"){
-          tiles[i][j] = new Torch(i, j);
-          passableTiles++;
-        } else {
-          tiles[i][j] = new Floor(i, j);
-          passableTiles++;
+    for (const [key, value] of Object.entries(levels[level])) {
+      if (key == "start") // starting point
+        chunk = value;
+      else {
+        if (chunk == key) {
+          for (let i = 0; i < numTiles; i++) {
+            tiles[i] = [];
+            for (let j = 0; j < numTiles; j++) {
+              if (inBounds(i, j)) { // ignore walls
+                if (value[j][i] == "1")
+                  tiles[i][j] = new Floor(i, j);
+                else if (value[j][i] == "2")
+                  tiles[i][j] = new Water(i, j);
+                else if (value[j][i] == "a") { // an arrow
+                  if (i == 1)
+                    tiles[i][j] = new Arrow(i, j, "left");
+                  else if (i == (numTiles-2))
+                    tiles[i][j] = new Arrow(i, j, "right");
+                  else if (j == 1)
+                    tiles[i][j] = new Arrow(i, j, "up");
+                  else
+                    tiles[i][j] = new Arrow(i, j, "down");
+                  tiles[i][j].stairs = true;
+                }
+                passableTiles++;
+              } else {
+                tiles[i][j] = new Wall(i, j);
+              }
+            }
+          }
         }
       }
     }
-
-
-
-
-
-
-
   } else {
     for (let i = 0; i < numTiles; i++) {
       tiles[i] = [];
@@ -90,6 +97,7 @@ function generateTiles() {
   if (level == 1) {
     let _mid = Math.floor(numTiles / 2);
     tiles[_mid][_mid].replace(Teleporter);
+    tiles[_mid][_mid].stairs = true;
   }
 
   return passableTiles;
@@ -114,7 +122,12 @@ function randomPassableTile() {
     let x = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
     let y = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
     tile = getTile(x, y);
-    return tile.passable && !tile.monster;
+    while (!tile.passable && !tile.monster) {
+      x = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
+      y = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
+      tile = getTile(x, y);
+    }
+    return tile.passable && !tile.monster && !tile.stairs;
   });
   return tile;
 }

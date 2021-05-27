@@ -3,6 +3,10 @@ const TileLookup = {
   "1": "floor",
   "2": "water",
   "3": "torch",
+  "a": "floor",
+  "b": "floor",
+  "c": "floor",
+  "d": "floor",
 }
 const TileTable = {
   'player': { 'row': 14, 'col': 35 },
@@ -21,7 +25,13 @@ const TileTable = {
   'water': { 'row': 5, 'col': 8 },
   'potion': { 'row': 13, 'col': 32 },
   'torch': { 'row': 10, 'col': 15 },
-  ///
+  /// directions
+  'left': { 'row': 21, 'col': 31 },
+  'right': { 'row': 21, 'col': 29 },
+  'up': { 'row': 21, 'col': 28 },
+  'down': { 'row': 21, 'col': 30 },
+
+  /// spells
   'aura': { 'row': 4, 'col': 41 },
   'dash': { 'row': 4, 'col': 41 },
   'bolt': { 'row': 11, 'col': 30 },
@@ -170,11 +180,34 @@ class Wall extends Tile {
   constructor(x, y) {
     super(x, y, 'wall', false);
   }
+
+  stepOn(monster) {
+    console.log("WhY");
+  }
 }
 
 class Teleporter extends Tile {
   constructor(x, y) {
     super(x, y, 'teleporter', true);
+  }
+
+  stepOn(monster) {
+    if (monster.isPlayer) {
+      console.log("Im leaving!");
+    }
+  }
+}
+
+class Arrow extends Tile {
+  constructor(x, y, dir) {
+    if (dir == "left")
+      super(x, y, 'left', true);
+    else if (dir == "right")
+      super(x, y, 'right', true);
+    else if (dir == "up")
+      super(x, y, 'up', true);
+    else
+      super(x, y, 'down', true);
   }
 
   stepOn(monster) {

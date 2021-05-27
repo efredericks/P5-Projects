@@ -124,7 +124,7 @@ function showTitle() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   gameState = 'title';
 
-  drawText("Magicka-like", 40, true, canvas.height / 2 - 40, "white");
+  drawText("CozyRL", 40, true, canvas.height / 2 - 40, "white");
   drawScores();
 }
 
@@ -182,7 +182,7 @@ function startLevel(playerHP, playerSpells) {
   spawnRate = 15;
   spawnCounter = spawnRate;
   generateLevel();
-  player = new Player(randomPassableTile());
+  player = new Player(getTile(2,2));//randomPassableTile());
   player.hp = playerHP;
 
   if (playerSpells)
@@ -317,7 +317,7 @@ function dialogueText(monster) {
 }
 
 function debugText() {
-  drawText("Magicka-like", 40, true, canvas.height / 2 - 40, "white");
+  drawText("CozyRL", 40, true, canvas.height / 2 - 40, "white");
 }
 
 window.onload = function init() {
