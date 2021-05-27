@@ -190,7 +190,9 @@ function startLevel(playerHP, playerSpells) {
   if (playerSpells)
     player.spells = playerSpells;
 
-  randomPassableTile().replace(Exit);
+  randomPassableTile().replace(StairsDown);
+  if (level > 1)
+    randomPassableTile().replace(StairsUp);
 }
 
 function getScores() {

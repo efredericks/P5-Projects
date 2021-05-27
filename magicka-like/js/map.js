@@ -68,6 +68,11 @@ function generateTiles() {
   } else {
     chunk = level;
     tiles[chunk] = [];
+
+    // if (level == 2) {
+
+    // } else {
+
     for (let i = 0; i < numTiles; i++) {
       tiles[chunk][i] = [];
       for (let j = 0; j < numTiles; j++) {
@@ -98,6 +103,7 @@ function generateTiles() {
             tiles[chunk][i][j] = new Wall(i, j);
           }
         }
+        //        }
       }
     }
   }

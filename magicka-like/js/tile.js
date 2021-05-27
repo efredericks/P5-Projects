@@ -10,7 +10,8 @@ const TileTable = {
   'mage': { 'row': 1, 'col': 24 },
   'ghost': { 'row': 6, 'col': 26 },
   'enemyTP': { 'row': 21, 'col': 40 },
-  'stairs': { 'row': 6, 'col': 3 },
+  'stairsDown': { 'row': 6, 'col': 3 },
+  'stairsUp': { 'row': 6, 'col': 2 },
   'treasure': { 'row': 4, 'col': 41 },
   'water': { 'row': 5, 'col': 8 },
   'potion': { 'row': 13, 'col': 32 },
@@ -231,9 +232,29 @@ class Arrow extends Tile {
   }
 }
 
-class Exit extends Tile {
+class StairsUp extends Tile {
   constructor(x, y) {
-    super(x, y, 'stairs', true);
+    super(x, y, 'stairsUp', true);
+  }
+
+  stepOn(monster) {
+    if (monster.isPlayer) {
+      if (level == numLevels) {
+        player.priorLocation = (this.x,this.y);
+        addScore(score, true);
+        showTitle();
+      } else {
+        level--;
+        chunk = level;
+        startLevel(Math.min(player.maxHP, player.hp + 1));
+      }
+    }
+  }
+}
+
+class StairsDown extends Tile {
+  constructor(x, y) {
+    super(x, y, 'stairsDown', true);
   }
 
   stepOn(monster) {
