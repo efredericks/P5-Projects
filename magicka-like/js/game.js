@@ -246,8 +246,11 @@ function draw() {
     for (let i = 0; i < monsters.length; i++) {
       monsters[i].draw();
     }
-    for (let i = 0; i < npcs.length; i++) {
-      npcs[i].draw();
+
+    //TBD: do same for monsters
+    chunkNPCs = npcs.filter(t => t.chunk == chunk);
+    for (let i = 0; i < chunkNPCs.length; i++) {
+      chunkNPCs[i].draw();
     }
 
 

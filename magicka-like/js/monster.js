@@ -144,12 +144,13 @@ class Monster {
 }
 
 class NPC extends Monster {
-  constructor(tile, name) {
+  constructor(tile, name, chunk) {
     super(tile, 'npc', 99, 99);
     this.name = name;
     this.isNPC = true;
     this.dialogue = dialogue[this.name];
     this.dialogueIndex = 0;
+    this.chunk = chunk;
   }
 
   getDialogue() {
