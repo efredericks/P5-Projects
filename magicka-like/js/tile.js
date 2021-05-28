@@ -23,6 +23,7 @@ const TileTable = {
   'potion': { 'row': 13, 'col': 32 },
   'torch': { 'row': 10, 'col': 15 },
   'crown': { 'row': 2, 'col': 43 },
+  'campfire': { 'row': 10, 'col': 14 },
   /// directions
   'left': { 'row': 21, 'col': 31 },
   'right': { 'row': 21, 'col': 29 },
@@ -196,6 +197,11 @@ class Water extends Floor {
 class Torch extends Floor {
   constructor(x, y) {
     super(x, y, 'torch', true);
+  }
+}
+class Campfire extends Floor {
+  constructor(x, y) {
+    super(x, y, 'campfire', true);
   }
 }
 

@@ -40,8 +40,8 @@ function generateTiles() {
           tiles[chunk][i] = [];
           for (let j = 0; j < numTiles; j++) {
             if (inBounds(i, j)) { // ignore walls
-              if (value[j][i] == "1")
-                tiles[chunk][i][j] = new Floor(i, j);
+              if (value[j][i] == "0")
+                tiles[chunk][i][j] = new Wall(i, j);
               else if (value[j][i] == "2")
                 tiles[chunk][i][j] = new Water(i, j);
               else if (value[j][i] == "3") {
@@ -60,6 +60,8 @@ function generateTiles() {
                   tiles[chunk][i][j] = new Arrow(i, j, "down");
                 tiles[chunk][i][j].stairs = true;
                 tiles[chunk][i][j].nextChunk = value[j][i];
+              } else {
+                tiles[chunk][i][j] = new Campfire(i, j);
               }
               passableTiles++;
             } else {
