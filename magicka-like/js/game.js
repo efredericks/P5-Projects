@@ -15,8 +15,52 @@ let shakeX;
 let shakeY;
 let chunk;
 
+// scrolling map - https://gamedev.stackexchange.com/questions/44256/how-to-add-a-scrolling-camera-to-a-2d-java-game
+let mapWidth = 200;
+let mapHeight = 200;
+let viewportWidth = 18;
+let viewportHeight = 18;
+let offsetMaxX = mapWidth - viewportWidth;
+let offsetMaxY = mapHeight - viewportHeight;
+let offsetMinX = 0;
+let offsetMinY = 0;
+
+let chunksWidth = 100;
+let chunksHeight = 100;
+
+let noiseGen;
+
 const keyboardConfig = {
 };
+
+// http://technologies4.me/articles/viewport-culling-tile-map-a3/
+// var viewport = {
+//   screen: [0,0],
+//   startTile: [0,0],
+//   endTile: [0,0],
+//   offset: [0,0],
+
+//   update: function(px, py) {
+//     this.offset[0] = Math.floor((this.screen[0]/2) - px);
+//     this.offset[1] = Math.floor((this.screen[1]/2) - py);
+
+//     var tile = [Math.floor(px / tileSize), Math.floor(py / tileSize)];
+
+//     this.startTile[0] = tile[0] - 1 - Math.ceil((this.screen[0]/2) / tileSize);
+//     this.startTile[1] = tile[1] - 1 - Math.ceil((this.screen[1]/2) / tileSize);
+
+//     if (this.startTile[0] < 0) this.startTile[0] = 0;
+//     if (this.startTile[1] < 0) this.startTile[1] = 0;
+
+//     this.endTile[0] = tile[0] + 1 + Math.ceil((this.screen[0]/2) / tileSize);
+//     this.endTile[1] = tile[1] + 1 + Math.ceil((this.screen[1]/2) / tileSize);
+
+//     if (this.endTile[0] > mapWidth) this.endTile[0] = mapWidth-1;
+//     if (this.endTile[1] > mapHeight) this.endTile[1] = mapHeight-1;
+
+//   },
+
+// };
 
 function setupCanvas() {
   canvas = document.querySelector("canvas");
@@ -43,7 +87,7 @@ function drawHealthBar(x, y, w, h, perc) {
   // inner bar
   ctx.beginPath();
   ctx.fillStyle = "rgba(0,255,0,0.8)";
-  ctx.fillRect(_x+2, _y+2, _w, 2);
+  ctx.fillRect(_x + 2, _y + 2, _w, 2);
   ctx.closePath();
 }
 
@@ -65,22 +109,42 @@ function drawSpriteDirect(sprite, x, y, scale) {
   // bg_buffer.image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
 }
 
-function drawSprite(sprite, x, y) {
+function drawSprite(sprite, x, y, alpha) {
   console.assert(TileTable.hasOwnProperty(sprite));
   let offset = getSpriteOffset(TileTable[sprite].row, TileTable[sprite].col, 16, 16);//tileSize, tileSize);
-  ctx.drawImage(
-    spriteSheet,
-    offset['dx'],
-    offset['dy'],
-    //sprite*16,
-    //0,
-    16,
-    16,
-    x * tileSize + shakeX,
-    y * tileSize + shakeY,
-    tileSize,
-    tileSize
-  );
+
+  if (alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(
+      spriteSheet,
+      offset['dx'],
+      offset['dy'],
+      //sprite*16,
+      //0,
+      16,
+      16,
+      x * tileSize + shakeX,
+      y * tileSize + shakeY,
+      tileSize,
+      tileSize
+    );
+    ctx.restore();
+  } else {
+    ctx.drawImage(
+      spriteSheet,
+      offset['dx'],
+      offset['dy'],
+      //sprite*16,
+      //0,
+      16,
+      16,
+      x * tileSize + shakeX,
+      y * tileSize + shakeY,
+      tileSize,
+      tileSize
+    );
+  }
   // let offset = getSpriteOffset(tilePositions[_tile]['row'], tilePositions[_tile]['col']);
   // bg_buffer.image(spriteSheet, _c * TILE_WIDTH, _r * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
 }
@@ -184,15 +248,17 @@ function startLevel(playerHP, playerSpells) {
   spawnRate = 15;
   spawnCounter = spawnRate;
   generateLevel();
-  player = new Player(getTile(2,2));//randomPassableTile());
+  player = new Player(getTile(2, 2));//randomPassableTile());
   player.hp = playerHP;
 
   if (playerSpells)
     player.spells = playerSpells;
 
-  randomPassableTile().replace(StairsDown);
-  if (level > 1)
-    randomPassableTile().replace(StairsUp);
+  if (level != "overworld") {
+    randomPassableTile().replace(StairsDown);
+    if (level > 1)
+      randomPassableTile().replace(StairsUp);
+  }
 }
 
 function getScores() {
@@ -240,11 +306,32 @@ function draw() {
     //ctx.fillStyle = "#472D3C";
     //ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    // let camX = player.tile.x - Math.floor(viewportWidth / 2);
+    // let camY = player.tile.y - Math.floor(viewportHeight / 2);
+    // if (camX > offsetMaxX)
+    //   camX = offsetMaxX;
+    // else if (camX < offsetMinX)
+    //   camX = offsetMinX;
+    // if (camY > offsetMaxY)
+    //   camY = offsetMaxY;
+    // else if (camY < offsetMinY)
+    //   camY = offsetMinY;
+
+    // translate to world space
+    // if (level == 2) {
+    //   for (let i = camX; i < camX+numTiles; i++) {
+    //     for (let j = camY; j < camY+numTiles; j++) {
+    //       getTile(i, j, mapWidth, mapHeight).draw();
+    //     }
+    //   }
+
+    // } else {
     for (let i = 0; i < numTiles; i++) {
       for (let j = 0; j < numTiles; j++) {
         getTile(i, j).draw();
       }
     }
+    //}
 
     for (let i = 0; i < monsters.length; i++) {
       monsters[i].draw();
@@ -261,6 +348,8 @@ function draw() {
 
     drawText("Level: " + level, 20, false, 40, "rgba(255,255,255)");
     drawText("Score: " + score, 20, false, 70, "violet");
+    drawText("Chunk", 20, false, 110, "rgba(255,255,255");
+    drawText(chunk, 20, false, 140, "rgba(255,255,255");
 
     for (let i = 0; i < player.spells.length; i++) {
       let spellText = (i + 1) + ") " + (player.spells[i] || "");
@@ -298,29 +387,29 @@ function dialogueText(monster) {
   // draw text background
   ctx.beginPath();
   ctx.fillStyle = "rgba(0,0,0,0.8)";
-  ctx.fillRect(10, canvas.height-105, canvas.width-20,100-5);
+  ctx.fillRect(10, canvas.height - 105, canvas.width - 20, 100 - 5);
   ctx.lineJoin = "bevel"; // round
   ctx.lineWidth = "10";
   ctx.strokeStyle = "rgba(255,255,255,1.0)";
-  ctx.strokeRect(10, canvas.height - 100 - 10, canvas.width-20, 100);
+  ctx.strokeRect(10, canvas.height - 100 - 10, canvas.width - 20, 100);
   ctx.closePath();
 
   // draw avatar
   ctx.beginPath();
   ctx.fillStyle = "rgba(71,45,60,1.0)";
-  ctx.fillRect(40, canvas.height-165, 75, 75);
+  ctx.fillRect(40, canvas.height - 165, 75, 75);
   ctx.lineJoin = "bevel"; // round
   ctx.lineWidth = "10";
   ctx.strokeStyle = "rgba(255,255,255,1.0)";
-  ctx.strokeRect(40, canvas.height-165, 75, 75);
-  drawSpriteDirect(monster.sprite, 54, canvas.height-152, 48);
+  ctx.strokeRect(40, canvas.height - 165, 75, 75);
+  drawSpriteDirect(monster.sprite, 54, canvas.height - 152, 48);
   ctx.closePath();
 
   // avatar name
-  drawText(monster.name, 24, false, canvas.height-120, "white", 124);
+  drawText(monster.name, 24, false, canvas.height - 120, "white", 124);
 
   // draw text
-  drawText(txt, 24, true, canvas.height - 50 , "white");
+  drawText(txt, 24, true, canvas.height - 50, "white");
 }
 
 function debugText() {
@@ -345,6 +434,8 @@ window.onload = function init() {
   spriteSheet = new Image();
   spriteSheet.src = "./assets/colored_packed_modified.png";
   spriteSheet.onload = showTitle;
+
+  noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });
 
   document.querySelector("html").onkeypress = function (e) {
     if (gameState == 'title') {

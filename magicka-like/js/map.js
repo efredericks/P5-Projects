@@ -24,6 +24,9 @@ function generateTiles() {
   tiles = {};
   let startChunk = 1;
 
+  // link up blocks, lowercase letters only at this point
+  let dirTiles = "abcdefghijklmnopqrstuvwxyz";
+
   // if we have a preset
   if (levels[level]) {
     for (const [key, value] of Object.entries(levels[level])) {
@@ -32,10 +35,6 @@ function generateTiles() {
       else {
         chunk = key;
         tiles[chunk] = [];
-
-        // link up blocks, lowercase letters only at this point
-        let dirTiles = "abcdefghijklmnopqrstuvwxyz";
-
         for (let i = 0; i < numTiles; i++) {
           tiles[chunk][i] = [];
           for (let j = 0; j < numTiles; j++) {
@@ -72,12 +71,79 @@ function generateTiles() {
       }
     }
     chunk = startChunk; // set starting chunk
+  } else if (level == "overworld") {
+    // try for 100x100
+    for (let map_c = 0; map_c < chunksWidth; map_c++) {
+      for (let map_r = 0; map_r < chunksHeight; map_r++) {
+        let _chunk = getChunkID(map_r, map_c);
+        tiles[_chunk] = [];
+
+        mid_r = Math.floor(numTiles / 2);
+        mid_c = mid_r;
+
+        for (let i = 0; i < numTiles; i++) {
+          tiles[_chunk][i] = [];
+          for (let j = 0; j < numTiles; j++) {
+            if (inBounds(i, j)) {
+              if (i == 1 && j == mid_c && map_c > 0) {
+                tiles[_chunk][i][j] = new Arrow(i, j, "left");
+                tiles[_chunk][i][j].stairs = true;
+                tiles[_chunk][i][j].nextChunk = getChunkID(map_r, map_c - 1);
+              } else if (i == (numTiles - 2) && j == mid_c && map_c < (chunksWidth - 1)) {
+                tiles[_chunk][i][j] = new Arrow(i, j, "right");
+                tiles[_chunk][i][j].stairs = true;
+                tiles[_chunk][i][j].nextChunk = getChunkID(map_r, map_c + 1);
+              } else if (j == 1 && i == mid_r && map_r > 0) {
+                tiles[_chunk][i][j] = new Arrow(i, j, "up");
+                tiles[_chunk][i][j].stairs = true;
+                tiles[_chunk][i][j].nextChunk = getChunkID(map_r - 1, map_c);
+              } else if (j == (numTiles - 2) && i == mid_r && map_r < (chunksHeight - 1)) {
+                tiles[_chunk][i][j] = new Arrow(i, j, "down");
+                tiles[_chunk][i][j].stairs = true;
+                tiles[_chunk][i][j].nextChunk = getChunkID(map_r + 1, map_c);
+              } else {
+
+                // simplex
+                let _noise = noiseGen.get2DNoise(j * map_c, i * map_r);
+                if (_noise < 0.2)
+                  tiles[_chunk][i][j] = new Floor(i, j);
+                else if (_noise < 0.4)
+                  tiles[_chunk][i][j] = new Beach(i, j);
+                else if (_noise < 0.6)
+                  tiles[_chunk][i][j] = new Water(i, j);
+                else if (_noise < 0.65)
+                  tiles[_chunk][i][j] = new Beach(i, j);
+                else if (_noise < 0.8)
+                  tiles[_chunk][i][j] = new Foliage(i, j);
+                else
+                  tiles[_chunk][i][j] = new Floor(i, j);
+
+              }
+              passableTiles++;
+            } else {
+              tiles[_chunk][i][j] = new Tree(i, j);
+            }
+          }
+        }
+      }
+    }
+
   } else {
     chunk = level;
     tiles[chunk] = [];
 
     // if (level == 2) {
-
+    //   for (let i = 0; i < mapWidth; i++) {
+    //     tiles[chunk][i] = [];
+    //     for (let j = 0; j < mapHeight; j++) {
+    //       if (inBounds(i, j, mapWidth, mapHeight)) {
+    //         tiles[chunk][i][j] = new Floor(i, j);
+    //         passableTiles++;
+    //       } else {
+    //         tiles[chunk][i][j] = new Wall(i, j);
+    //       }
+    //     }
+    //   }
     // } else {
 
     for (let i = 0; i < numTiles; i++) {
@@ -110,9 +176,9 @@ function generateTiles() {
             tiles[chunk][i][j] = new Wall(i, j);
           }
         }
-        //        }
       }
     }
+    //}
   }
 
   // post processing
@@ -120,6 +186,7 @@ function generateTiles() {
     let _mid = Math.floor(numTiles / 2);
     tiles[chunk][_mid][_mid].replace(Teleporter);
     tiles[chunk][_mid][_mid].stairs = true;
+    tiles[chunk][_mid][_mid].dest = getChunkID(Math.floor(chunksHeight / 2), Math.floor(chunksWidth / 2));
   } else if (level == numLevels) {
     let _t = randomPassableTile();
     _t.crown = true;
@@ -128,17 +195,28 @@ function generateTiles() {
   return passableTiles;
 }
 
-function inBounds(x, y) {
-  return x > 0 && y > 0 && x < numTiles - 1 && y < numTiles - 1;
+function inBounds(x, y, maxw, maxh) {
+  if (maxw && maxh) // large map
+    return x > 0 && y > 0 && x < maxw - 1 && y < maxh - 1;
+  else // small map
+    return x > 0 && y > 0 && x < numTiles - 1 && y < numTiles - 1;
 }
 
 
-function getTile(x, y) {
-  if (inBounds(x, y)) {
-    return tiles[chunk][x][y];
-  } else {
-    return new Wall(x, y);
-  }
+function getTile(x, y, maxw, maxh) {
+  // if (maxw && maxh) {
+  //   if (inBounds(x, y, maxw, maxh)) { // larger map
+  //     return tiles[chunk][x][y];
+  //   } else {
+  //     return new Wall(x, y);
+  //   }
+  // } else {
+  //   if (inBounds(x, y)) {
+  return tiles[chunk][x][y];
+  //   } else {
+  //     return new Wall(x, y);
+  //   }
+  // }
 }
 
 function randomPassableTile() {

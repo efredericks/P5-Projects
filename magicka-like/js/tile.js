@@ -24,6 +24,25 @@ const TileTable = {
   'torch': { 'row': 10, 'col': 15 },
   'crown': { 'row': 2, 'col': 43 },
   'campfire': { 'row': 10, 'col': 14 },
+
+  'beach': { 'row': 6, 'col': 47},
+
+  'tree1': { 'row': 1, 'col': 0 },
+  'tree2': { 'row': 1, 'col': 1 },
+  'tree3': { 'row': 1, 'col': 2 },
+  'tree4': { 'row': 1, 'col': 3 },
+  'tree5': { 'row': 1, 'col': 4 },
+  'tree6': { 'row': 1, 'col': 5 },
+  'tree7': { 'row': 2, 'col': 3 },
+  'tree8': { 'row': 2, 'col': 4 },
+
+  'foliage1': { 'row': 0, 'col': 5 },
+  'foliage2': { 'row': 0, 'col': 6 },
+  'foliage3': { 'row': 0, 'col': 7 },
+  'foliage4': { 'row': 2, 'col': 0 },
+
+
+
   /// directions
   'left': { 'row': 21, 'col': 31 },
   'right': { 'row': 21, 'col': 29 },
@@ -117,7 +136,10 @@ class Tile {
   // }
 
   draw() {
-    drawSprite(this.sprite, this.x, this.y);
+    if (!inBounds(this.x, this.y))
+      drawSprite(this.sprite, this.x, this.y, 0.3);
+    else
+      drawSprite(this.sprite, this.x, this.y);
 
     if (this.treasure) {
       drawSprite('treasure', this.x, this.y);
@@ -199,9 +221,34 @@ class Torch extends Floor {
     super(x, y, 'torch', true);
   }
 }
+
 class Campfire extends Floor {
   constructor(x, y) {
     super(x, y, 'campfire', true);
+  }
+}
+
+class Foliage extends Floor {
+  constructor(x, y) {
+    let foliage = ["foliage1", "foliage2", "foliage3", "foliage4"];
+    super(x, y, foliage[getRandomInteger(0,foliage.length)], true);
+  }
+}
+
+class Beach extends Floor {
+  constructor(x, y) {
+    super(x, y, 'beach', true);
+  }
+}
+
+class Tree extends Tile {
+  constructor(x, y) {
+    let trees = ["tree1", "tree2", "tree3", "tree4", "tree5", "tree6", "tree7", "tree8"];
+    super(x, y, trees[getRandomInteger(0, trees.length)], false);
+  }
+
+  stepOn(monster) {
+    console.log("violation: tree");
   }
 }
 
@@ -211,20 +258,30 @@ class Wall extends Tile {
   }
 
   stepOn(monster) {
-    console.log("WhY");
+    console.log("violation: wall");
   }
 }
 
 class Teleporter extends Tile {
-  constructor(x, y) {
+  constructor(x, y, dest) {
     super(x, y, 'teleporter', true);
+    this.dest = dest;
   }
 
   stepOn(monster) {
     if (monster.isPlayer) {
-      console.log("Im leaving!");
+      level = "overworld"
+      chunk = this.dest;
+      addScore(score, true);
+      startLevel(Math.min(player.maxHP, player.hp + 1));
     }
   }
+
+  // stepOn(monster) {
+  //   if (monster.isPlayer) {
+  //     console.log("Im leaving!");
+  //   }
+  // }
 }
 
 class Arrow extends Tile {
@@ -245,13 +302,13 @@ class Arrow extends Tile {
       //console.log(tiles);
       chunk = this.nextChunk;
       if (monster.tile.x == 1)
-        monster.tryMove(1,0);
-      else if (monster.tile.x == (numTiles-2))
-        monster.tryMove(-1,0);
+        monster.tryMove(1, 0);
+      else if (monster.tile.x == (numTiles - 2))
+        monster.tryMove(-1, 0);
       else if (monster.tile.y == 1)
-        monster.tryMove(0,1);
+        monster.tryMove(0, 1);
       else
-        monster.tryMove(0,-1);
+        monster.tryMove(0, -1);
     }
   }
 }
@@ -264,7 +321,7 @@ class StairsUp extends Tile {
   stepOn(monster) {
     if (monster.isPlayer) {
       if (level == numLevels) {
-        player.priorLocation = (this.x,this.y);
+        player.priorLocation = (this.x, this.y);
         level = 1;
         chunk = level;
         startLevel(Math.min(player.maxHP, player.hp + 1));
@@ -287,7 +344,7 @@ class StairsDown extends Tile {
   stepOn(monster) {
     if (monster.isPlayer) {
       if (level == numLevels) {
-        player.priorLocation = (this.x,this.y);
+        player.priorLocation = (this.x, this.y);
         addScore(score, true);
         showTitle();
       } else {

@@ -2,6 +2,10 @@ function clamp(num, min, max) {
   return Math.min(Math.max(num, min), max);
 }
 
+function getChunkID(r, c) {
+  return "overworld_r" + r + "_c" + c;
+}
+
 function getRandomInteger(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
