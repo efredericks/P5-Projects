@@ -139,7 +139,7 @@ function generateTiles() {
         }
 
         if (map_c == caves_c && map_r == caves_r) {
-          tiles[_chunk][2][2] = new Spire(2,2, 1);
+          tiles[_chunk][2][2] = new Cave(2,2,"caves1");
         }
       }
     }
