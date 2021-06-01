@@ -77,6 +77,8 @@ function generateTiles() {
     let map_mid_r = Math.floor(chunksHeight/2)
     let map_mid_c = Math.floor(chunksWidth/2)
 
+    let caves_r = map_mid_r; // randomize
+    let caves_c = 0; // randomize
 
     for (let map_c = 0; map_c < chunksWidth; map_c++) {
       for (let map_r = 0; map_r < chunksHeight; map_r++) {
@@ -133,7 +135,11 @@ function generateTiles() {
 
         // let the player visit the tutorial castle again?
         if (map_c == map_mid_c && map_r == map_mid_r) {
-          tiles[_chunk][mid_c][mid_r] = new StairsUp(mid_c, mid_r, 1);
+          tiles[_chunk][mid_c][mid_r] = new Spire(mid_c, mid_r, 1);
+        }
+
+        if (map_c == caves_c && map_r == caves_r) {
+          tiles[_chunk][2][2] = new Spire(2,2, 1);
         }
       }
     }

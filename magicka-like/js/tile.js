@@ -24,6 +24,7 @@ const TileTable = {
   'torch': { 'row': 10, 'col': 15 },
   'crown': { 'row': 2, 'col': 43 },
   'campfire': { 'row': 10, 'col': 14 },
+  'spire': { 'row': 19, 'col': 2 },
 
   'beach': { 'row': 6, 'col': 47},
 
@@ -340,6 +341,21 @@ class StairsUp extends Tile {
         chunk = level;
         startLevel(Math.min(player.maxHP, player.hp + 1));
       }
+    }
+  }
+}
+
+class Spire extends Tile {
+  constructor(x, y, nextChunk) {
+    super(x, y, 'spire', true);
+    this.nextChunk = nextChunk;
+  }
+
+  stepOn(monster) {
+    if (monster.isPlayer) {
+      chunk = this.nextChunk;
+      level = this.nextChunk;
+      startLevel(Math.min(player.maxHP, player.hp + 1));
     }
   }
 }
