@@ -43,6 +43,7 @@ function generateTiles() {
                 tiles[chunk][i][j] = new Wall(i, j);
               else if (value[j][i] == "2")
                 tiles[chunk][i][j] = new Water(i, j);
+                //tiles[chunk][i][j] = new Water(i, j);
               else if (value[j][i] == "3") {
                 if (Math.random() > 0.5)
                   tiles[chunk][i][j] = new Floor(i, j, 'tile1');
@@ -73,6 +74,10 @@ function generateTiles() {
     chunk = startChunk; // set starting chunk
   } else if (level == "overworld") {
     // try for 100x100
+    let map_mid_r = Math.floor(chunksHeight/2)
+    let map_mid_c = Math.floor(chunksWidth/2)
+
+
     for (let map_c = 0; map_c < chunksWidth; map_c++) {
       for (let map_r = 0; map_r < chunksHeight; map_r++) {
         let _chunk = getChunkID(map_r, map_c);
@@ -107,13 +112,13 @@ function generateTiles() {
                 let _noise = noiseGen.get2DNoise(j * map_c, i * map_r);
                 if (_noise < 0.2)
                   tiles[_chunk][i][j] = new Floor(i, j);
+                else if (_noise < 0.1)
+                  tiles[_chunk][i][j] = new Beach(i, j);
                 else if (_noise < 0.4)
-                  tiles[_chunk][i][j] = new Beach(i, j);
-                else if (_noise < 0.6)
                   tiles[_chunk][i][j] = new Water(i, j);
-                else if (_noise < 0.65)
+                else if (_noise < 0.45)
                   tiles[_chunk][i][j] = new Beach(i, j);
-                else if (_noise < 0.8)
+                else if (_noise < 0.7)
                   tiles[_chunk][i][j] = new Foliage(i, j);
                 else
                   tiles[_chunk][i][j] = new Floor(i, j);
@@ -124,6 +129,11 @@ function generateTiles() {
               tiles[_chunk][i][j] = new Tree(i, j);
             }
           }
+        }
+
+        // let the player visit the tutorial castle again?
+        if (map_c == map_mid_c && map_r == map_mid_r) {
+          tiles[_chunk][mid_c][mid_r] = new StairsUp(mid_c, mid_r, 1);
         }
       }
     }

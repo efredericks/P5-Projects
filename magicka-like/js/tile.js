@@ -314,8 +314,12 @@ class Arrow extends Tile {
 }
 
 class StairsUp extends Tile {
-  constructor(x, y) {
+  constructor(x, y, nextChunk) {
     super(x, y, 'stairsUp', true);
+
+    if (nextChunk) {
+      this.nextChunk = nextChunk;
+    }
   }
 
   stepOn(monster) {
@@ -327,6 +331,10 @@ class StairsUp extends Tile {
         startLevel(Math.min(player.maxHP, player.hp + 1));
         addScore(score, true);
         showTitle();
+      } else if (this.nextChunk) {
+        chunk = this.nextChunk;
+        level = this.nextChunk;
+        startLevel(Math.min(player.maxHP, player.hp + 1));
       } else {
         level--;
         chunk = level;
