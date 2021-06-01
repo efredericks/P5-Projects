@@ -240,6 +240,8 @@ function startGame() {
   score = 0;
   numSpells = 0;
 
+  generateGame();
+
   startLevel(startingHP);
   gameState = 'running';
 }
@@ -247,7 +249,11 @@ function startGame() {
 function startLevel(playerHP, playerSpells) {
   spawnRate = 15;
   spawnCounter = spawnRate;
-  generateLevel();
+
+  //generateLevel();
+  generateGame(); // TBD
+
+
   player = new Player(getTile(2, 2));//randomPassableTile());
   player.hp = playerHP;
 
@@ -303,8 +309,8 @@ function draw() {
 
     screenshake();
 
-    //ctx.fillStyle = "#472D3C";
-    //ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#472D3C";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // let camX = player.tile.x - Math.floor(viewportWidth / 2);
     // let camY = player.tile.y - Math.floor(viewportHeight / 2);
@@ -432,7 +438,8 @@ window.onload = function init() {
   shakeY = 0;
 
   spriteSheet = new Image();
-  spriteSheet.src = "./assets/colored_packed_modified.png";
+//  spriteSheet.src = "./assets/colored_packed_modified.png";
+  spriteSheet.src = "./assets/colored_transparent_packed.png";
   spriteSheet.onload = showTitle;
 
   noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });

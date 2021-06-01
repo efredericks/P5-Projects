@@ -1,3 +1,9 @@
+function generateGame() {
+  // iterate overall possible chunks
+  generateLevel();
+
+}
+
 function generateLevel() {
   npcs = [];
 
