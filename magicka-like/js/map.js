@@ -39,11 +39,14 @@ function generateTiles() {
           tiles[chunk][i] = [];
           for (let j = 0; j < numTiles; j++) {
             if (inBounds(i, j)) { // ignore walls
-              if (value[j][i] == "0")
-                tiles[chunk][i][j] = new Wall(i, j);
-              else if (value[j][i] == "2")
+              if (value[j][i] == "0") {
+                if (String(level).indexOf("cave") >= 0) {// rock walls
+                  tiles[chunk][i][j] = new ImpassableRock(i, j); // normal walls else
+                } else
+                  tiles[chunk][i][j] = new Wall(i, j); // normal walls else
+              } else if (value[j][i] == "2")
                 tiles[chunk][i][j] = new Water(i, j);
-                //tiles[chunk][i][j] = new Water(i, j);
+              //tiles[chunk][i][j] = new Water(i, j);
               else if (value[j][i] == "3") {
                 if (Math.random() > 0.5)
                   tiles[chunk][i][j] = new Floor(i, j, 'tile1');
@@ -65,7 +68,11 @@ function generateTiles() {
               }
               passableTiles++;
             } else {
-              tiles[chunk][i][j] = new Wall(i, j);
+              if (String(level).indexOf("cave") >= 0) {// rock walls
+                tiles[chunk][i][j] = new ImpassableRock(i, j); // normal walls else
+              } else
+                tiles[chunk][i][j] = new Wall(i, j); // normal walls else
+              // tiles[chunk][i][j] = new Wall(i, j);
             }
           }
         }
@@ -74,8 +81,8 @@ function generateTiles() {
     chunk = startChunk; // set starting chunk
   } else if (level == "overworld") {
     // try for 100x100
-    let map_mid_r = Math.floor(chunksHeight/2)
-    let map_mid_c = Math.floor(chunksWidth/2)
+    let map_mid_r = Math.floor(chunksHeight / 2)
+    let map_mid_c = Math.floor(chunksWidth / 2)
 
     let caves_r = map_mid_r; // randomize
     let caves_c = 0; // randomize
@@ -139,7 +146,7 @@ function generateTiles() {
         }
 
         if (map_c == caves_c && map_r == caves_r) {
-          tiles[_chunk][2][2] = new Cave(2,2,"caves1");
+          tiles[_chunk][2][2] = new Cave(2, 2, "caves1");
         }
       }
     }

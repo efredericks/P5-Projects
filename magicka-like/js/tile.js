@@ -26,6 +26,7 @@ const TileTable = {
   'campfire': { 'row': 10, 'col': 14 },
   'spire': { 'row': 19, 'col': 2 },
   'cave': { 'row': 9, 'col': 6 },
+  'rock': { 'row': 2, 'col': 5 },
 
   'beach': { 'row': 6, 'col': 47},
 
@@ -240,6 +241,17 @@ class Foliage extends Floor {
 class Beach extends Floor {
   constructor(x, y) {
     super(x, y, 'beach', true);
+  }
+}
+
+class ImpassableRock extends Tile {
+  constructor(x, y) {
+    //let trees = ["tree1", "tree2", "tree3", "tree4", "tree5", "tree6", "tree7", "tree8"];
+    super(x, y, "rock", false);
+  }
+
+  stepOn(monster) {
+    console.log("violation: rock");
   }
 }
 
