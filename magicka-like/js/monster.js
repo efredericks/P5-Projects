@@ -163,6 +163,13 @@ class NPC extends Monster {
     if (this.dialogue.quest == "done") {
       let indx = getRandomInteger(0, this.dialogue.questDone.length);
       ret_text = this.dialogue.questDone[indx];
+
+      // give it back!
+      if (player.inventory['CROWN'] == 1) {
+        player.inventory['CROWN']--;
+        items.CROWN("remove");
+      }
+
     } else if (this.dialogue.quest == "active") {
       ret_text = this.dialogue.questActive[this.dialogueIndex];
       this.dialogueIndex++;
@@ -195,6 +202,7 @@ class Player extends Monster {
     this.teleportCounter = 0;
     this.spells = shuffle(Object.keys(spells)).splice(0, numSpells);
     this.xp = 1;
+    this.ac = 1;
 
     this.inventory = {};
     for (let k = 0; k < Object.keys(items).length; k++) {

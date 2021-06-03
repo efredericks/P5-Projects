@@ -202,7 +202,12 @@ class Floor extends Tile {
       chunk = level;
       startLevel(Math.min(player.maxHP, player.hp + 1));
       score += 50;
+
+      // add to inventory and auto-equip
       this.crown = false;
+      player.addItem('CROWN');
+      items['CROWN']("add");
+
       for (let i = 0; i < npcs.length; i++) {
         if (npcs[i].name == "Ingmar Tutorialman")
           npcs[i].dialogue.quest = "done";
@@ -211,7 +216,6 @@ class Floor extends Tile {
       //player.heal(3);
       player.addItem('HP');
       this.potion = false;
-      console.log(player.inventory);
     }
   }
 }

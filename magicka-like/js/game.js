@@ -368,7 +368,7 @@ function draw() {
     drawText("Coin: " + score, 20, false, 60, "violet");
     drawText("Chunk", 20, false, 90, "rgba(255,255,255");
     drawText(chunk, 20, false, 120, "rgba(255,255,255");
-    drawText("XP: " + player.xp, 20, false, 150, "rgba(255,255,255");
+    drawText("XP: " + player.xp + ", AC: " + player.ac, 20, false, 150, "rgba(255,255,255");
     drawText("Potion: " + player.inventory['HP'], 20, false, 180, "rgba(255,255,255");
 
 
@@ -440,7 +440,7 @@ function debugText() {
 
 window.onload = function init() {
   tileSize = 32;//64;
-  numTiles = 18;//9;
+  numTiles = 19;//9;
   uiWidth = 8;
 
   level = 1;

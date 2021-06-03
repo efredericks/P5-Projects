@@ -288,5 +288,5 @@ function spawnMonster(level) {
   let monsterType = shuffle([BlueCrab, Goblin, Mage, Ghost])[0];
   let monster = new monsterType(randomPassableTile(), chunk);
   monsters.push(monster);
-  console.log(monsters);
+  //console.log(monsters);
 }
