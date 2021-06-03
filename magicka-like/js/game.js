@@ -30,6 +30,8 @@ let chunksHeight = 100;
 
 let noiseGen;
 
+let gameMap = {};
+
 const keyboardConfig = {
 };
 
@@ -242,6 +244,9 @@ function startGame() {
 
   generateGame();
 
+  //generateGame(); // TBD
+  player = new Player(getTile(2, 2));//randomPassableTile());
+
   startLevel(startingHP);
   gameState = 'running';
 }
@@ -254,8 +259,11 @@ function startLevel(playerHP, playerSpells) {
   generateGame(); // TBD
 
 
-  player = new Player(getTile(2, 2));//randomPassableTile());
+  //player = new Player(getTile(2, 2));//randomPassableTile());
   player.hp = playerHP;
+  player.tile = randomPassableTile();
+  //player.tile.x = 2;
+  //player.tile.y = 2;
 
   if (playerSpells)
     player.spells = playerSpells;
@@ -339,8 +347,12 @@ function draw() {
     }
     //}
 
-    for (let i = 0; i < monsters.length; i++) {
-      monsters[i].draw();
+    // for (let i = 0; i < monsters.length; i++) {
+    //   monsters[i].draw();
+    // }
+    chunkMonsters = monsters.filter(t => t.chunk == chunk);
+    for (let i = 0; i < chunkMonsters.length; i++) {
+      chunkMonsters[i].draw();
     }
 
     //TBD: do same for monsters
@@ -352,14 +364,18 @@ function draw() {
 
     player.draw();
 
-    drawText("Level: " + level, 20, false, 40, "rgba(255,255,255)");
-    drawText("Score: " + score, 20, false, 70, "violet");
-    drawText("Chunk", 20, false, 110, "rgba(255,255,255");
-    drawText(chunk, 20, false, 140, "rgba(255,255,255");
+    drawText("Level: " + level, 20, false, 30, "rgba(255,255,255)");
+    drawText("Coin: " + score, 20, false, 60, "violet");
+    drawText("Chunk", 20, false, 90, "rgba(255,255,255");
+    drawText(chunk, 20, false, 120, "rgba(255,255,255");
+    drawText("XP: " + player.xp, 20, false, 150, "rgba(255,255,255");
+    drawText("Potion: " + player.inventory['HP'], 20, false, 180, "rgba(255,255,255");
+
+
 
     for (let i = 0; i < player.spells.length; i++) {
       let spellText = (i + 1) + ") " + (player.spells[i] || "");
-      drawText(spellText, 14, false, 110 + i * 40, "aqua");
+      drawText(spellText, 14, false, 210 + i * 40, "aqua");
     }
 
     ctx.closePath();
@@ -463,6 +479,13 @@ window.onload = function init() {
       if (e.key == "[") {
         gameState = "dialogue";
         debugText();
+      }
+
+      if (e.key == 'p') {
+        if (player.inventory['HP'] > 0) {
+          player.heal(5);
+          player.inventory['HP']--;
+        }
       }
 
       if (e.key == ".") player.wait();

@@ -1,5 +1,6 @@
+// update is handled on a per-chunk basis -- if overriding ensure you add the check!
 class Monster {
-  constructor(tile, sprite, hp, maxHP) {
+  constructor(tile, sprite, hp, maxHP, chunk) {
     this.move(tile);
     this.sprite = sprite;
     this.hp = hp;
@@ -9,6 +10,7 @@ class Monster {
     this.offsetY = 0;
     this.lastMove = [-1, 0];
     this.bonusAttack = 0;
+    this.chunk = chunk;
   }
 
   draw() {
@@ -61,13 +63,14 @@ class Monster {
   }
 
   update() {
-    this.teleportCounter--;
-    if (this.stunned || this.teleportCounter > 0) {
-      this.stunned = false;
-      return;
+    if (chunk == this.chunk) {
+      this.teleportCounter--;
+      if (this.stunned || this.teleportCounter > 0) {
+        this.stunned = false;
+        return;
+      }
+      this.doStuff();
     }
-
-    this.doStuff();
   }
 
   doStuff() {
@@ -158,7 +161,7 @@ class NPC extends Monster {
     let ret_text;
 
     if (this.dialogue.quest == "done") {
-      let indx = getRandomInteger(0,this.dialogue.questDone.length);
+      let indx = getRandomInteger(0, this.dialogue.questDone.length);
       ret_text = this.dialogue.questDone[indx];
     } else if (this.dialogue.quest == "active") {
       ret_text = this.dialogue.questActive[this.dialogueIndex];
@@ -191,6 +194,12 @@ class Player extends Monster {
     this.isPlayer = true;
     this.teleportCounter = 0;
     this.spells = shuffle(Object.keys(spells)).splice(0, numSpells);
+    this.xp = 1;
+
+    this.inventory = {};
+    for (let k = 0; k < Object.keys(items).length; k++) {
+      this.inventory[Object.keys(items)[k]] = 0;
+    }
   }
 
   update() {
@@ -206,6 +215,10 @@ class Player extends Monster {
   wait() {
     this.heal(0.5)
     tick();
+  }
+
+  addItem(item) {
+    this.inventory[item]++;
   }
 
   addSpell() {
@@ -224,8 +237,8 @@ class Player extends Monster {
 }
 
 class BlueCrab extends Monster {
-  constructor(tile) {
-    super(tile, 'blueCrab', 3, 3);
+  constructor(tile, chunk) {
+    super(tile, 'blueCrab', 3, 3, chunk);
   }
 
   doStuff() {
@@ -239,23 +252,25 @@ class BlueCrab extends Monster {
 }
 
 class Goblin extends Monster {
-  constructor(tile) {
-    super(tile, 'goblin', 5, 5);
+  constructor(tile, chunk) {
+    super(tile, 'goblin', 5, 5, chunk);
   }
 
   update() {
-    let startStunned = this.stunned;
-    super.update();
+    if (this.chunk == chunk) {
+      let startStunned = this.stunned;
+      super.update();
 
-    if (!startStunned) {
-      this.stunned = true;
+      if (!startStunned) {
+        this.stunned = true;
+      }
     }
   }
 }
 
 class Mage extends Monster {
   constructor(tile) {
-    super(tile, 'mage', 5, 5);
+    super(tile, 'mage', 5, 5, chunk);
   }
 
   // eat walls for health because reasons
@@ -271,8 +286,8 @@ class Mage extends Monster {
 }
 
 class Ghost extends Monster {
-  constructor(tile) {
-    super(tile, 'ghost', 5, 5);
+  constructor(tile, chunk) {
+    super(tile, 'ghost', 5, 5, chunk);
   }
 
   // move randomly

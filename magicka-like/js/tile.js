@@ -196,7 +196,7 @@ class Floor extends Tile {
         player.addSpell();
       }
       this.treasure = false;
-      spawnMonster();
+      spawnMonster(chunk);
     } else if (monster.isPlayer && this.crown) { /// TBD: EXTEND THIS TO ANY QUEST ITEM!!!!!
       level = 1;
       chunk = level;
@@ -208,8 +208,10 @@ class Floor extends Tile {
           npcs[i].dialogue.quest = "done";
       }
     } else if (monster.isPlayer && this.potion) {
-      player.heal(3);
+      //player.heal(3);
+      player.addItem('HP');
       this.potion = false;
+      console.log(player.inventory);
     }
   }
 }
@@ -308,6 +310,8 @@ class Arrow extends Tile {
       super(x, y, 'up', true);
     else
       super(x, y, 'down', true);
+
+    this.stairs = true;
   }
 
   stepOn(monster) {

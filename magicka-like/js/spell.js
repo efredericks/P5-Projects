@@ -81,23 +81,23 @@ spells = {
       }
     });
   },
-  POWER: function() {
+  POWER: function () {
     player.bonusAttack = 5;
   },
-  BUBBLE: function() {
-    for (let i = player.spells.length-1; i > 0; i--) {
+  BUBBLE: function () {
+    for (let i = player.spells.length - 1; i > 0; i--) {
       if (!player.spells[i]) {
-        player.spells[i] = player.spells[i-1];
+        player.spells[i] = player.spells[i - 1];
       }
     }
   },
-  BRAVERY: function() {
+  BRAVERY: function () {
     player.shield = 2;
     for (let i = 0; i < monsters.length; i++) {
       monsters[i].stunned = true;
     }
   },
-  BOLT: function() {
+  BOLT: function () {
     boltTravel(player.lastMove, 'bolt', 4);
     //boltTravel(player.lastMove, 15 + Math.abs(player.lastMove[1]), 4);
   },
@@ -112,7 +112,7 @@ spells = {
       boltTravel(directions[k], 'bolt', 2);
     }
   },
-  EX: function() {
+  EX: function () {
     let directions = [
       [-1, -1],
       [-1, 1],

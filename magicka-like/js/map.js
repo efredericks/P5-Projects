@@ -254,7 +254,7 @@ function randomPassableTile() {
     let x = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
     let y = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
     tile = getTile(x, y);
-    while (!tile.passable && !tile.monster && !tile.stairs) {
+    while (!tile.passable || tile.monster || tile.stairs) {
       x = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
       y = getRandomInteger(0, numTiles); //randomRange(0,numTiles-1);
       tile = getTile(x, y);
@@ -279,13 +279,14 @@ function generateMonsters() {
 
     let numMonsters = level + 1;
     for (let i = 0; i < numMonsters; i++) {
-      spawnMonster();
+      spawnMonster(level);
     }
   }
 }
 
-function spawnMonster() {
+function spawnMonster(level) {
   let monsterType = shuffle([BlueCrab, Goblin, Mage, Ghost])[0];
-  let monster = new monsterType(randomPassableTile());
+  let monster = new monsterType(randomPassableTile(), chunk);
   monsters.push(monster);
+  console.log(monsters);
 }
