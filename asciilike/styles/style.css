@@ -1,0 +1,48 @@
+/* https://css-tricks.com/old-timey-terminal-styling/ */
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@500&display=swap');
+
+body {
+  background-color: black;
+  background-image: radial-gradient(
+    rgba(4, 87, 104, 0.75), black 120%
+    /*rgba(0, 150, 0, 0.75), black 120%*/
+  );
+  height: 100vh;
+
+  color: white;
+  font: 1.3rem 'Ubuntu', sans-serif;
+  text-shadow: 0 0 12px #c8c8c88a;
+}
+
+/*
+body::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(black, 0.15),
+    rgba(black, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+}
+*/
+
+::selection {
+  background: #0080FF;
+  text-shadow: none;
+}
+
+.red {
+  color: #5b2325;
+  text-shadow: none;
+}
+.green {
+  color: #29592d;
+  text-shadow: none;
+}

@@ -197,7 +197,7 @@ class NPC extends Monster {
 
 class Player extends Monster {
   constructor(tile) {
-    super(tile, 'player', 5, 10);
+    super(tile, 'player', 10, 10);
     this.isPlayer = true;
     this.teleportCounter = 0;
     this.spells = shuffle(Object.keys(spells)).splice(0, numSpells);

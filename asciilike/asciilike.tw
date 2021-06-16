@@ -1,0 +1,121 @@
+:: StoryTitle
+ASCIILike
+
+:: StoryData
+{
+	"ifid": "F891172E-6C06-4CAC-AD88-C267809FEFD2",
+	"format": "SugarCube",
+	"format-version": "2.31.1",
+	"start": "Begin",
+	"zoom": 1
+}
+
+:: Story Stylesheet [stylesheet]
+/* $ tweego -o index.html SugarCaves.twee styles scripts */
+
+:: Story JavaScript [script]
+/* js/constants.js, js/room.js, js/traceryGen.js, js/person.js, js/macroWhen.js */
+
+:: StoryInit 
+/* 
+  * Many thanks to {G𝖜𝖊𝖓[♡].T𝖆𝖘𝖙𝖎𝖈} and Akjosch in the Twine Discord for all the coding help and finesse! 
+  * Backgrounds c/o Unsplash images
+  * Pixelation handled by: https://www.cssscript.com/demo/pixelate-images-canvas-pixasso/
+
+<<when setup.traceryImport>> -- promise handling
+*/
+/* Globals */\
+<<nobr>>
+<<set $player to new Character("Erik", 1, 10, 1, 0, 0)>>
+<<set $player.isPlayer to true>>
+<<set $monster to null>>
+<<set $game to new GameManager()>>
+<</nobr>>
+
+:: Begin [noinventory] 
+Welcome to asciiLike <<=$player.name>>!  You begin your story in a cave.
+<<=$game.map>>
+
+:: PassageFooter
+<<nobr>>
+<<script>>
+if (!variables().game.fightActive) {
+	if (Math.random() > 0.75)
+	{
+		console.log("FIGHT");
+		variables().game.fightActive = true;
+	}
+}
+<</script>>
+<hr size="1" />
+<<if $game.fightActive is true>>
+  <<if $monster is null>>
+    <<set $monster to new Character("MONSTAR", 1, 5, 1, 0, 0)>>
+	<</if>>
+  <<set _nextPassage to "fight">>
+<<else>>
+  <<set _nextPassage to either(setup.prefabs)>>
+<</if>>
+Your next spot is <<link [[over here|_nextPassage]]>><</link>>
+<hr size="1" />
+XP: <<=$player.level>> | HP: <<=$player.getHP()>> | AC: <<=$player.ac>>
+<</nobr>>
+
+/* FIGHT */
+:: fight
+A wild <<=$monster.name>> <<=$monster.getHP()>> is blocking your path.  
+
+[[hit|hit]] | [[run away| run_away]]
+
+:: hit
+<<set _mhit to $monster.hit($player.level)>>
+The <<=$monster.name>> was hit for <<=_mhit>> damage!  <<=$monster.getHP()>>
+<<nobr>>
+<<if $monster.hp lte 0>>
+  The <<=$monster.name>> dies!
+	<<set $monster to null>>
+	<<set $game.fightActive to false>>
+	Your level increases to <<=$player.incLevel()>>!
+<<else>>
+  <<set _phit to $player.hit($monster.level)>>
+  You were hit by <<=$monster.name>> for <<=_phit>> damage!
+<</if>>
+<</nobr>>
+
+<<nobr>>
+<<if $player.hp lte 0>>
+  You died!  The monster chuckles before dragging you away for a midnight snack.
+	<<set $game.fightActive to false>>
+<</if>>
+<</nobr>>
+
+<<if $game.fightActive is true>>
+  [[hit|hit]] | [[run away| run_away]]
+<</if>>
+
+
+:: run_away
+<<set _r to randomFloat(1.0)>>
+<<if _r > 0.8>>
+  You successfully escape the <<=$monster.name>>'s clutches.
+  <<set $game.fightActive to false>>
+<<else>>
+  You can't run away!
+  [[hit|hit]] | [[run away| run_away]]
+<</if>>
+
+/* PREFABS */
+:: empty [prefab]
+Nothingness.  
+
+:: cavern [prefab]
+A wide open cavern.
+
+:: tight [prefab]
+You squeeze through a tight opening, concerned you'll get stuck before it widens.  Claustrophobia settles in.
+
+:: stream [prefab]
+A burbling brook meanders through the center of the passage, cool to the touch.
+
+:: void [prefab]
+You run blindly into the cavern and quickly catch yourself before you fall off the precipice into an abyss.  You kick a rock and lean down, listening for it to hit the bottom.  No sound returns.

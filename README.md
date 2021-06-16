@@ -6,6 +6,10 @@ Aggregation of various playthings in P5JS
 
 [Calvin and Hobbes - Starfield](ch-starfield)
 
+### Color Bands
+
+[Particle-based color bands](color-bands)
+
 ### Platformer
  
 [Infinite(ish) Runner with P5.Play](platformer)

@@ -1,8 +1,29 @@
+
 function generateGame() {
   // iterate overall possible chunks
   generateLevel();
 
 }
+// function generateLevel() {
+//   npcs = [];
+
+//   tryTo('generate map', function () {
+//     return generateTiles() == randomPassableTile().getConnectedTiles().length;
+//   });
+//   if (level > 1) {
+//     generateMonsters();
+//   } else {
+//     monsters = [];
+//     generateNPCs();
+//   }
+
+//   // abstract this to be *any* item
+//   for (let i = 0; i < 3; i++) {
+//     randomPassableTile().treasure = true;
+//     if (Math.random() > 0.5)
+//       randomPassableTile().potion = true;
+//   }
+// }
 
 function generateLevel() {
   npcs = [];

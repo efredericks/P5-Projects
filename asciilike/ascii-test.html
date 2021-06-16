@@ -1,0 +1,44 @@
+<html>
+<head>
+<script type="text/javascript" src="scripts/aalib.js"></script>
+<script>
+  function draw() {
+    aalib.read.image.fromURL(spriteSheet)
+    .map(aalib.filter.contrast(0.9))
+    .map(aalib.aa({ width: 530, height: 160 }))
+    .map(aalib.filter.brightness(10))
+    .map(aalib.render.html({ el: document.querySelector(".aa-image") }))
+    .subscribe();
+
+  ctx.drawImage(
+    spriteSheet,
+    35*16,//offset['dx'],
+    14*16,//offset['dy'],
+    16,
+    16,
+    50,//x * tileSize + shakeX,
+    50,//y * tileSize + shakeY,
+    16*8,//tileSize,
+    16*8//tileSize
+  );
+  }
+window.onload = function() {
+  canvas = document.querySelector("canvas");
+  ctx = canvas.getContext("2d");
+  canvas.width = 800;
+  canvas.height = 600;
+  canvas.style.width = canvas.width + "px";
+  canvas.style.height = canvas.height + "px";
+  ctx.imageSmoothingEnabled = false;
+
+  spriteSheet = new Image();
+  spriteSheet.src = "colored_packed_modified.png";
+  //spriteSheet.src = "colored_transparent_packed.png";
+  spriteSheet.onload = draw;
+}
+</script>
+</head>
+<body>
+  <canvas></canvas>
+</body>
+</html>

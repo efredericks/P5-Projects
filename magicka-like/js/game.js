@@ -30,7 +30,15 @@ let chunksHeight = 100;
 
 let noiseGen;
 
-let gameMap = {};
+let gameMap;
+let gameController = {
+  /// https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
+  //this.seed = 1;  // TBD - replace javascript RNG with one that can be seeded
+
+  //this.map = {};
+
+  /// TODO: move all globals into this class
+};
 
 const keyboardConfig = {
 };
@@ -247,11 +255,11 @@ function startGame() {
   //generateGame(); // TBD
   player = new Player(getTile(2, 2));//randomPassableTile());
 
-  startLevel(startingHP);
+  startLevel();
   gameState = 'running';
 }
 
-function startLevel(playerHP, playerSpells) {
+function startLevel() {
   spawnRate = 15;
   spawnCounter = spawnRate;
 
@@ -260,13 +268,12 @@ function startLevel(playerHP, playerSpells) {
 
 
   //player = new Player(getTile(2, 2));//randomPassableTile());
-  player.hp = playerHP;
+  player.heal(5);
   player.tile = randomPassableTile();
-  //player.tile.x = 2;
-  //player.tile.y = 2;
 
-  if (playerSpells)
-    player.spells = playerSpells;
+  // tbd - just add to inventory
+  //if (playerSpells)
+    //player.spells = playerSpells;
 
   if (level != "overworld") {
     randomPassableTile().replace(StairsDown);
