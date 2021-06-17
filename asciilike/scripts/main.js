@@ -1,5 +1,12 @@
 ///globals
 ///helper functions
+
+setup.STATES = {
+  GAME: 0,
+  WIN: 1,
+  GAMEOVER: 2,
+}
+
 function getSpriteOffset(row, col) {
   let dx = col * TILE_WIDTH;
   let dy = row * TILE_HEIGHT;
@@ -32,6 +39,7 @@ class GameManager {
     this.activeMonster = null;
 
     this.friends = this.generateFriends();
+    this.totalFriends = this.friends.length;
     this.friendsRescued = 0;
 
     this.player = new Character("Erik", 1, 10, 1, 0, 0);
@@ -139,7 +147,8 @@ class GameManager {
       } while (_indx.indexOf(_friendLocations) >= 0);
       _friendLocations[_indx] = i;
 
-      let _friend = new Character(_name, -1, -1, -1, _row, _col);
+      // let _friend = new Character(_name, -1, -1, -1, _row, _col);
+      let _friend = new Character(_name, -1, -1, -1, 2, 2);
       _friends.push(_friend);
     }
 

@@ -28,29 +28,89 @@ ASCIILike
 <<nobr>>
 <<set $game to new GameManager()>>
 <<set $currentPassage to "Begin2">>
+<<set $gameState to setup.STATES.GAME>>
 <</nobr>>
 
 :: Begin
 <<nobr>>
+<<if $gameState == setup.STATES.GAME>>
 <div class="container">
   <div class="main">
-    <<=Story.get($currentPassage).text>>
+    /* <h2><<=Story.get($currentPassage).title>></h2> */
+    <<=Story.get($currentPassage).text>>/*description()>>*/
+
+    <<set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col)>>
+    <<if _friendsHere.length gt 0>>
+      /* one friend */
+      <<if _friendsHere.length eq 1>>
+      You see <<=_friendsHere[0].name>>.
+      <<elseif _friendsHere.length eq 2>>
+      You see <<=_friendsHere[0].name>> and <<=_friendsHere[1].name>>.
+      <<else>>
+        You see
+        <<for _i to 0; _i lt _friendsHere.length; _i++>>
+          <<if _i eq _friendsHere.length-1>>
+          and <<=_friendsHere[_i].name>>.
+          <<else>>
+          <<=_friendsHere[_i].name>>,
+          <</if>>
+        <</for>>
+      <</if>>
+
+      /* "save" your friend(s) */
+      <<for _i to 0; _i lt _friendsHere.length; _i++>>
+        <<run $game.rescueFriend(_friendsHere[_i])>>
+      <</for>>
+    <</if>>
+
     <hr size="1" />
 
     /* Get available passaages */
     <<set _nextPassages to $game.getPassages()>>
+    You see passages to the: 
     <<for _i to 0; _i lt _nextPassages.length; _i++>>
       <<set _nextRow = $game.player.row + _nextPassages[_i].row>>
       <<set _nextCol = $game.player.col + _nextPassages[_i].col>>
       <<set _nextPassage to $game.getPassage(_nextRow, _nextCol)>>
-      <<set _txt to _nextPassage + ":" + _nextPassages[_i].row + ":" + _nextPassages[_i].col>>
-      <<capture $game, _i, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
+      <<set _txt = "">>
+      <<if _nextPassages[_i].row is -1>>
+        <<set _txt to "North">>
+      <<elseif _nextPassages[_i].row is 1>>
+        <<set _txt to "South">>
+      <<elseif _nextPassages[_i].col is -1>>
+        <<set _txt to "West">>
+      <<elseif _nextPassages[_i].col is 1>>
+        <<set _txt to "East">>
+      <<else>>
+        <<set _txt to "Error: passage lookup">>
+      <</if>>
+
+      <<capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
       <<link [[_txt|Begin]]>>
         <<set $game.player.row to _nextRow>>
         <<set $game.player.col to _nextCol>>
         <<run $game.setPassageVisited(_nextRow, _nextCol)>>
         <<set $currentPassage = _nextPassage>>
-      <</link>><br />
+        <<if $game.totalFriends == $game.friendsRescued>>
+          <<set $gameState to setup.STATES.WIN>>
+        <</if>>
+
+      <</link>>
+      <<if _nextPassages.length == 1>>
+        .
+      <<elseif _nextPassages.length == 2>>
+        <<if _i == _nextPassages.length-1>>
+          .
+        <<else>>
+          ,
+        <</if>>
+      <<else>>
+        <<if _i == _nextPassages.length-1>>
+          .
+        <<else>>
+          ,
+        <</if>>
+      <</if>>
       <</capture>>
     <</for>>
 
@@ -61,6 +121,7 @@ ASCIILike
     HP: <<=$game.player.getHP()>><br />
     AC: <<=$game.player.ac>><br />
     Friends found: <<=$game.friendsRescued>><br />
+    /* debug */
     Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br />
     </div>
   </div>
@@ -68,8 +129,11 @@ ASCIILike
   <div class="map">
     <<=$game.vizMap()>>
   </div>
-  <div class="messages bordered-grid-item">i am messages</div>
+  /* <div class="messages bordered-grid-item">i am messages</div> */
 </div>
+<<elseif $gameState == setup.STATES.WIN>>
+  <h1>YOU WON</h1>
+<</if>>
 <</nobr>>
 
 :: Begin2 [noinventory] 
@@ -105,10 +169,15 @@ Welcome to asciiLike <<=$game.player.name>>!  You begin your story in a cave.  Y
  */
 
 :: PassageFooter
-<br />
 <<nobr>>
+<<for _i to 0; _i lt $game.friends.length; _i++>>
+  <<print $game.friends[_i].name>>: [<<=$game.friends[_i].row>>:<<=$game.friends[_i].col>>] 
+<</for>>
+<</nobr>>
+/* <br />
+<<nobr>> */
 /* Get available passaages */
-<<set _nextPassages to $game.getPassages()>>
+/* <<set _nextPassages to $game.getPassages()>>
 <<for _i to 0; _i lt _nextPassages.length; _i++>>
   <<set _nextRow = $game.player.row + _nextPassages[_i].row>>
   <<set _nextCol = $game.player.col + _nextPassages[_i].col>>
@@ -132,7 +201,7 @@ Friends found: <<=$game.friendsRescued>><br />
 <<for _i to 0; _i lt $game.friends.length; _i++>>
   <<print $game.friends[_i].name>>: [<<=$game.friends[_i].row>>:<<=$game.friends[_i].col>>]<br />
 <</for>>
-<</nobr>>
+<</nobr>> */
 
 /* <<set _nextPassage to either(setup.prefabs)>> */
 /* 

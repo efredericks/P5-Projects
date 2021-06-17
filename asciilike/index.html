@@ -177,16 +177,18 @@ tr {
 .container {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
   gap: 5px 5px;
   grid-auto-flow: row;
   grid-template-areas:
     "main main stats"
-    "main main map"
-    "messages messages messages";
+    "main main map";
+    /* "messages messages messages"; */
 }
 
-.container div {
+.container .main,
+.container .stats,
+.container .map {
   border: 1px black solid;
   padding: 5px;
 }
@@ -788,6 +790,13 @@ Macro.add("when", {
 /* twine-user-script #5: "main.js" */
 ///globals
 ///helper functions
+
+setup.STATES = {
+  GAME: 0,
+  WIN: 1,
+  GAMEOVER: 2,
+}
+
 function getSpriteOffset(row, col) {
   let dx = col * TILE_WIDTH;
   let dy = row * TILE_HEIGHT;
@@ -820,6 +829,7 @@ class GameManager {
     this.activeMonster = null;
 
     this.friends = this.generateFriends();
+    this.totalFriends = this.friends.length;
     this.friendsRescued = 0;
 
     this.player = new Character("Erik", 1, 10, 1, 0, 0);
@@ -927,7 +937,8 @@ class GameManager {
       } while (_indx.indexOf(_friendLocations) >= 0);
       _friendLocations[_indx] = i;
 
-      let _friend = new Character(_name, -1, -1, -1, _row, _col);
+      // let _friend = new Character(_name, -1, -1, -1, _row, _col);
+      let _friend = new Character(_name, -1, -1, -1, 2, 2);
       _friends.push(_friend);
     }
 
@@ -984,26 +995,86 @@ window.Character = Character;
 &lt;&lt;nobr&gt;&gt;
 &lt;&lt;set $game to new GameManager()&gt;&gt;
 &lt;&lt;set $currentPassage to &quot;Begin2&quot;&gt;&gt;
+&lt;&lt;set $gameState to setup.STATES.GAME&gt;&gt;
 &lt;&lt;/nobr&gt;&gt;</tw-passagedata><tw-passagedata pid="2" name="Begin" tags="" position="225,100" size="100,100">&lt;&lt;nobr&gt;&gt;
+&lt;&lt;if $gameState == setup.STATES.GAME&gt;&gt;
 &lt;div class=&quot;container&quot;&gt;
   &lt;div class=&quot;main&quot;&gt;
-    &lt;&lt;=Story.get($currentPassage).text&gt;&gt;
+    /* &lt;h2&gt;&lt;&lt;=Story.get($currentPassage).title&gt;&gt;&lt;/h2&gt; */
+    &lt;&lt;=Story.get($currentPassage).text&gt;&gt;/*description()&gt;&gt;*/
+
+    &lt;&lt;set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col)&gt;&gt;
+    &lt;&lt;if _friendsHere.length gt 0&gt;&gt;
+      /* one friend */
+      &lt;&lt;if _friendsHere.length eq 1&gt;&gt;
+      You see &lt;&lt;=_friendsHere[0].name&gt;&gt;.
+      &lt;&lt;elseif _friendsHere.length eq 2&gt;&gt;
+      You see &lt;&lt;=_friendsHere[0].name&gt;&gt; and &lt;&lt;=_friendsHere[1].name&gt;&gt;.
+      &lt;&lt;else&gt;&gt;
+        You see
+        &lt;&lt;for _i to 0; _i lt _friendsHere.length; _i++&gt;&gt;
+          &lt;&lt;if _i eq _friendsHere.length-1&gt;&gt;
+          and &lt;&lt;=_friendsHere[_i].name&gt;&gt;.
+          &lt;&lt;else&gt;&gt;
+          &lt;&lt;=_friendsHere[_i].name&gt;&gt;,
+          &lt;&lt;/if&gt;&gt;
+        &lt;&lt;/for&gt;&gt;
+      &lt;&lt;/if&gt;&gt;
+
+      /* &quot;save&quot; your friend(s) */
+      &lt;&lt;for _i to 0; _i lt _friendsHere.length; _i++&gt;&gt;
+        &lt;&lt;run $game.rescueFriend(_friendsHere[_i])&gt;&gt;
+      &lt;&lt;/for&gt;&gt;
+    &lt;&lt;/if&gt;&gt;
+
     &lt;hr size=&quot;1&quot; /&gt;
 
     /* Get available passaages */
     &lt;&lt;set _nextPassages to $game.getPassages()&gt;&gt;
+    You see passages to the: 
     &lt;&lt;for _i to 0; _i lt _nextPassages.length; _i++&gt;&gt;
       &lt;&lt;set _nextRow = $game.player.row + _nextPassages[_i].row&gt;&gt;
       &lt;&lt;set _nextCol = $game.player.col + _nextPassages[_i].col&gt;&gt;
       &lt;&lt;set _nextPassage to $game.getPassage(_nextRow, _nextCol)&gt;&gt;
-      &lt;&lt;set _txt to _nextPassage + &quot;:&quot; + _nextPassages[_i].row + &quot;:&quot; + _nextPassages[_i].col&gt;&gt;
-      &lt;&lt;capture $game, _i, _nextPassages[_i], _nextRow, _nextCol, _nextPassage&gt;&gt;
+      &lt;&lt;set _txt = &quot;&quot;&gt;&gt;
+      &lt;&lt;if _nextPassages[_i].row is -1&gt;&gt;
+        &lt;&lt;set _txt to &quot;North&quot;&gt;&gt;
+      &lt;&lt;elseif _nextPassages[_i].row is 1&gt;&gt;
+        &lt;&lt;set _txt to &quot;South&quot;&gt;&gt;
+      &lt;&lt;elseif _nextPassages[_i].col is -1&gt;&gt;
+        &lt;&lt;set _txt to &quot;West&quot;&gt;&gt;
+      &lt;&lt;elseif _nextPassages[_i].col is 1&gt;&gt;
+        &lt;&lt;set _txt to &quot;East&quot;&gt;&gt;
+      &lt;&lt;else&gt;&gt;
+        &lt;&lt;set _txt to &quot;Error: passage lookup&quot;&gt;&gt;
+      &lt;&lt;/if&gt;&gt;
+
+      &lt;&lt;capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage&gt;&gt;
       &lt;&lt;link [[_txt|Begin]]&gt;&gt;
         &lt;&lt;set $game.player.row to _nextRow&gt;&gt;
         &lt;&lt;set $game.player.col to _nextCol&gt;&gt;
         &lt;&lt;run $game.setPassageVisited(_nextRow, _nextCol)&gt;&gt;
         &lt;&lt;set $currentPassage = _nextPassage&gt;&gt;
-      &lt;&lt;/link&gt;&gt;&lt;br /&gt;
+        &lt;&lt;if $game.totalFriends == $game.friendsRescued&gt;&gt;
+          &lt;&lt;set $gameState to setup.STATES.WIN&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
+
+      &lt;&lt;/link&gt;&gt;
+      &lt;&lt;if _nextPassages.length == 1&gt;&gt;
+        .
+      &lt;&lt;elseif _nextPassages.length == 2&gt;&gt;
+        &lt;&lt;if _i == _nextPassages.length-1&gt;&gt;
+          .
+        &lt;&lt;else&gt;&gt;
+          ,
+        &lt;&lt;/if&gt;&gt;
+      &lt;&lt;else&gt;&gt;
+        &lt;&lt;if _i == _nextPassages.length-1&gt;&gt;
+          .
+        &lt;&lt;else&gt;&gt;
+          ,
+        &lt;&lt;/if&gt;&gt;
+      &lt;&lt;/if&gt;&gt;
       &lt;&lt;/capture&gt;&gt;
     &lt;&lt;/for&gt;&gt;
 
@@ -1014,6 +1085,7 @@ window.Character = Character;
     HP: &lt;&lt;=$game.player.getHP()&gt;&gt;&lt;br /&gt;
     AC: &lt;&lt;=$game.player.ac&gt;&gt;&lt;br /&gt;
     Friends found: &lt;&lt;=$game.friendsRescued&gt;&gt;&lt;br /&gt;
+    /* debug */
     Row: &lt;&lt;=$game.player.row&gt;&gt; | Col: &lt;&lt;=$game.player.col&gt;&gt;&lt;br /&gt;
     &lt;/div&gt;
   &lt;/div&gt;
@@ -1021,8 +1093,11 @@ window.Character = Character;
   &lt;div class=&quot;map&quot;&gt;
     &lt;&lt;=$game.vizMap()&gt;&gt;
   &lt;/div&gt;
-  &lt;div class=&quot;messages bordered-grid-item&quot;&gt;i am messages&lt;/div&gt;
+  /* &lt;div class=&quot;messages bordered-grid-item&quot;&gt;i am messages&lt;/div&gt; */
 &lt;/div&gt;
+&lt;&lt;elseif $gameState == setup.STATES.WIN&gt;&gt;
+  &lt;h1&gt;YOU WON&lt;/h1&gt;
+&lt;&lt;/if&gt;&gt;
 &lt;&lt;/nobr&gt;&gt;</tw-passagedata><tw-passagedata pid="3" name="Begin2" tags="noinventory" position="350,100" size="100,100">Welcome to asciiLike &lt;&lt;=$game.player.name&gt;&gt;!  You begin your story in a cave.  You have &lt;&lt;=$game.friends.length&gt;&gt; missing friends!
 
 /* :: PassageHeader
@@ -1052,10 +1127,15 @@ window.Character = Character;
 &lt;&lt;/if&gt;&gt;
 &lt;&lt;/nobr&gt;&gt;
 &lt;hr size=&quot;1&quot; /&gt; 
- */</tw-passagedata><tw-passagedata pid="4" name="PassageFooter" tags="" position="475,100" size="100,100">&lt;br /&gt;
-&lt;&lt;nobr&gt;&gt;
+ */</tw-passagedata><tw-passagedata pid="4" name="PassageFooter" tags="" position="475,100" size="100,100">&lt;&lt;nobr&gt;&gt;
+&lt;&lt;for _i to 0; _i lt $game.friends.length; _i++&gt;&gt;
+  &lt;&lt;print $game.friends[_i].name&gt;&gt;: [&lt;&lt;=$game.friends[_i].row&gt;&gt;:&lt;&lt;=$game.friends[_i].col&gt;&gt;] 
+&lt;&lt;/for&gt;&gt;
+&lt;&lt;/nobr&gt;&gt;
+/* &lt;br /&gt;
+&lt;&lt;nobr&gt;&gt; */
 /* Get available passaages */
-&lt;&lt;set _nextPassages to $game.getPassages()&gt;&gt;
+/* &lt;&lt;set _nextPassages to $game.getPassages()&gt;&gt;
 &lt;&lt;for _i to 0; _i lt _nextPassages.length; _i++&gt;&gt;
   &lt;&lt;set _nextRow = $game.player.row + _nextPassages[_i].row&gt;&gt;
   &lt;&lt;set _nextCol = $game.player.col + _nextPassages[_i].col&gt;&gt;
@@ -1079,7 +1159,7 @@ Friends found: &lt;&lt;=$game.friendsRescued&gt;&gt;&lt;br /&gt;
 &lt;&lt;for _i to 0; _i lt $game.friends.length; _i++&gt;&gt;
   &lt;&lt;print $game.friends[_i].name&gt;&gt;: [&lt;&lt;=$game.friends[_i].row&gt;&gt;:&lt;&lt;=$game.friends[_i].col&gt;&gt;]&lt;br /&gt;
 &lt;&lt;/for&gt;&gt;
-&lt;&lt;/nobr&gt;&gt;
+&lt;&lt;/nobr&gt;&gt; */
 
 /* &lt;&lt;set _nextPassage to either(setup.prefabs)&gt;&gt; */
 /* 
