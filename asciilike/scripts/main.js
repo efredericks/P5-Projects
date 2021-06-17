@@ -167,7 +167,7 @@ class Character {
     let cls = "red";
     if (this.isPlayer) // || this.friendly?
       cls = "green";
-    return "<span class='" + cls + "'>" + this.hp + "/" + this.max_hp + "</span>";
+    return "<font class='" + cls + "'>" + this.hp + "/" + this.max_hp + "</font>";
   }
 
   hit(dmg) {

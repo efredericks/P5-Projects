@@ -27,17 +27,60 @@ ASCIILike
 /* Globals */\
 <<nobr>>
 <<set $game to new GameManager()>>
+<<set $currentPassage to "Begin2">>
 <</nobr>>
 
-:: Begin [noinventory] 
+:: Begin
+<<nobr>>
+<div class="container">
+  <div class="main">
+    <<=Story.get($currentPassage).text>>
+    <hr size="1" />
+
+    /* Get available passaages */
+    <<set _nextPassages to $game.getPassages()>>
+    <<for _i to 0; _i lt _nextPassages.length; _i++>>
+      <<set _nextRow = $game.player.row + _nextPassages[_i].row>>
+      <<set _nextCol = $game.player.col + _nextPassages[_i].col>>
+      <<set _nextPassage to $game.getPassage(_nextRow, _nextCol)>>
+      <<set _txt to _nextPassage + ":" + _nextPassages[_i].row + ":" + _nextPassages[_i].col>>
+      <<capture $game, _i, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
+      <<link [[_txt|Begin]]>>
+        <<set $game.player.row to _nextRow>>
+        <<set $game.player.col to _nextCol>>
+        <<run $game.setPassageVisited(_nextRow, _nextCol)>>
+        <<set $currentPassage = _nextPassage>>
+      <</link>><br />
+      <</capture>>
+    <</for>>
+
+  </div>
+  <div class="stats">
+    <div>
+    XP: <<=$game.player.level>><br />
+    HP: <<=$game.player.getHP()>><br />
+    AC: <<=$game.player.ac>><br />
+    Friends found: <<=$game.friendsRescued>><br />
+    Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br />
+    </div>
+  </div>
+
+  <div class="map">
+    <<=$game.vizMap()>>
+  </div>
+  <div class="messages bordered-grid-item">i am messages</div>
+</div>
+<</nobr>>
+
+:: Begin2 [noinventory] 
 Welcome to asciiLike <<=$game.player.name>>!  You begin your story in a cave.  You have <<=$game.friends.length>> missing friends!
 
-:: PassageHeader
+/* :: PassageHeader
 <<nobr>>
 <<set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col)>>
-<<if _friendsHere.length gt 0>>
+<<if _friendsHere.length gt 0>> */
   /* one friend */
-  <<if _friendsHere.length eq 1>>
+  /* <<if _friendsHere.length eq 1>>
   You see <<=_friendsHere[0].name>>.
   <<elseif _friendsHere.length eq 2>>
   You see <<=_friendsHere[0].name>> and <<=_friendsHere[1].name>>.
@@ -50,16 +93,16 @@ Welcome to asciiLike <<=$game.player.name>>!  You begin your story in a cave.  Y
       <<=_friendsHere[_i].name>>,
       <</if>>
     <</for>>
-  <</if>>
+  <</if>> */
 
   /* "save" your friend(s) */
-  <<for _i to 0; _i lt _friendsHere.length; _i++>>
+  /* <<for _i to 0; _i lt _friendsHere.length; _i++>>
     <<run $game.rescueFriend(_friendsHere[_i])>>
   <</for>>
 <</if>>
 <</nobr>>
-<hr size="1" />
-
+<hr size="1" /> 
+ */
 
 :: PassageFooter
 <br />
