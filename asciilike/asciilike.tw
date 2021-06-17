@@ -26,17 +26,32 @@ ASCIILike
 */
 /* Globals */\
 <<nobr>>
-<<set $player to new Character("Erik", 1, 10, 1, 0, 0)>>
-<<set $player.isPlayer to true>>
-<<set $monster to null>>
 <<set $game to new GameManager()>>
 <</nobr>>
 
 :: Begin [noinventory] 
-Welcome to asciiLike <<=$player.name>>!  You begin your story in a cave.
-<<=$game.map>>
+Welcome to asciiLike <<=$game.player.name>>!  You begin your story in a cave.
 
 :: PassageFooter
+<<nobr>>
+<<set _nextPassages to $game.getPassages()>>
+<<for _i to 0; _i lt _nextPassages.length; _i++>>
+  <<set _nextRow = $game.player.row + _nextPassages[_i].row>>
+  <<set _nextCol = $game.player.col + _nextPassages[_i].col>>
+  <<set _nextPassage to $game.getPassage(_nextRow, _nextCol)>>
+  <<set _txt to _nextPassage + ":" + _nextPassages[_i].row + ":" + _nextPassages[_i].col>>
+  <<capture $game, _i, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
+  <<link [[_txt|_nextPassage]]>>
+    <<set $game.player.row to _nextRow>>
+    <<set $game.player.col to _nextCol>>
+  <</link>><br />
+  <</capture>>
+<</for>>
+<</nobr>>
+
+
+/* <<set _nextPassage to either(setup.prefabs)>> */
+/* 
 <<nobr>>
 <<script>>
 if (!variables().game.fightActive) {
@@ -56,34 +71,40 @@ if (!variables().game.fightActive) {
 <<else>>
   <<set _nextPassage to either(setup.prefabs)>>
 <</if>>
+*/
+<<nobr>>
 Your next spot is <<link [[over here|_nextPassage]]>><</link>>
 <hr size="1" />
-XP: <<=$player.level>> | HP: <<=$player.getHP()>> | AC: <<=$player.ac>>
+XP: <<=$game.player.level>> | HP: <<=$game.player.getHP()>> | AC: <<=$game.player.ac>><br />
+Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br />
+<<for _i to 0; _i lt $game.friends.length; _i++>>
+  <<print $game.friends[_i].name>>: [<<=$game.friends[_i].row>>:<<=$game.friends[_i].col>>]<br />
+<</for>>
 <</nobr>>
 
 /* FIGHT */
 :: fight
-A wild <<=$monster.name>> <<=$monster.getHP()>> is blocking your path.  
+A wild <<=$game.monster.name>> <<=$game.monster.getHP()>> is blocking your path.  
 
 [[hit|hit]] | [[run away| run_away]]
 
 :: hit
-<<set _mhit to $monster.hit($player.level)>>
-The <<=$monster.name>> was hit for <<=_mhit>> damage!  <<=$monster.getHP()>>
+<<set _mhit to $game.monster.hit($game.player.level)>>
+The <<=$game.monster.name>> was hit for <<=_mhit>> damage!  <<=$game.monster.getHP()>>
 <<nobr>>
-<<if $monster.hp lte 0>>
-  The <<=$monster.name>> dies!
-	<<set $monster to null>>
+<<if $game.monster.hp lte 0>>
+  The <<=$game.monster.name>> dies!
+	<<set $game.monster to null>>
 	<<set $game.fightActive to false>>
-	Your level increases to <<=$player.incLevel()>>!
+	Your level increases to <<=$game.player.incLevel()>>!
 <<else>>
-  <<set _phit to $player.hit($monster.level)>>
-  You were hit by <<=$monster.name>> for <<=_phit>> damage!
+  <<set _phit to $game.player.hit($game.monster.level)>>
+  You were hit by <<=$game.monster.name>> for <<=_phit>> damage!
 <</if>>
 <</nobr>>
 
 <<nobr>>
-<<if $player.hp lte 0>>
+<<if $game.player.hp lte 0>>
   You died!  The monster chuckles before dragging you away for a midnight snack.
 	<<set $game.fightActive to false>>
 <</if>>
@@ -97,7 +118,7 @@ The <<=$monster.name>> was hit for <<=_mhit>> damage!  <<=$monster.getHP()>>
 :: run_away
 <<set _r to randomFloat(1.0)>>
 <<if _r > 0.8>>
-  You successfully escape the <<=$monster.name>>'s clutches.
+  You successfully escape the <<=$game.monster.name>>'s clutches.
   <<set $game.fightActive to false>>
 <<else>>
   You can't run away!
@@ -105,6 +126,9 @@ The <<=$monster.name>> was hit for <<=_mhit>> damage!  <<=$monster.getHP()>>
 <</if>>
 
 /* PREFABS */
+:: start [prefab]
+The beginning, it seems.
+
 :: empty [prefab]
 Nothingness.  
 

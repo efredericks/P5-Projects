@@ -30,6 +30,12 @@ class GameManager {
 
     this.fightActive = false;
     this.activeMonster = null;
+
+    this.friends = this.generateFriends();
+
+    this.player = new Character("Erik", 1, 10, 1, 0, 0);
+    this.player.isPlayer = true;
+    this.monster = null;
   }
   init() {
     for (let r = 0; r < this.mapHeight; r++) {
@@ -42,6 +48,52 @@ class GameManager {
         }
       }
     }
+  }
+
+  getPassage(row, col) {
+    return this.map[row][col];
+  }
+
+  // cardinal directions only
+  getPassages() {
+    let _passages = [];
+
+    // north
+    if (this.player.row > 0)
+      _passages.push({row:-1, col:0});
+    // south
+    if (this.player.row < this.map.length - 1)
+      _passages.push({row:1, col:0});
+    // east
+    if (this.player.col > 0)
+      _passages.push({row:0, col:-1});
+    // west
+    if (this.player.col < this.map[0].length - 1)
+      _passages.push({row:0, col:1});
+
+    return _passages;
+  }
+
+  generateFriends() {
+    let _friendLocations = {};
+    let _friends = [];
+
+    for (let i = 0; i < 4; i++) {
+      let _name = `Friend${i}`;
+
+      let _row, _col, _indx;
+      do {
+        _row = getRandomInteger(2, this.map.length);
+        _col = getRandomInteger(2, this.map[_row].length);
+        _indx = `${_row}:${_col}`;
+      } while (_indx.indexOf(_friendLocations) >= 0);
+      _friendLocations[_indx] = i;
+
+      let _friend = new Character(_name, -1, -1, -1, _row, _col);
+      _friends.push(_friend);
+    }
+
+    return _friends;
   }
 };
 window.GameManager = GameManager;
@@ -69,7 +121,7 @@ class Character {
   }
 
   hit(dmg) {
-    let hit_val = window.getRandomInteger(0, dmg+1);
+    let hit_val = window.getRandomInteger(0, dmg + 1);
     this.hp -= hit_val;
     if (this.hp < 0)
       this.hp = 0;
