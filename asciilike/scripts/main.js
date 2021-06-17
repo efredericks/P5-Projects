@@ -32,6 +32,7 @@ class GameManager {
     this.activeMonster = null;
 
     this.friends = this.generateFriends();
+    this.friendsRescued = 0;
 
     this.player = new Character("Erik", 1, 10, 1, 0, 0);
     this.player.isPlayer = true;
@@ -42,16 +43,65 @@ class GameManager {
       this.map[r] = [];
       for (let c = 0; c < this.mapWidth; c++) {
         if (r == 0 && c == 0) // always start at 0,0
-          this.map[r][c] = 'start';
+          this.map[r][c] = { 'passage': 'start', 'visited': true };
         else {
-          this.map[r][c] = setup.prefabs[getRandomInteger(0, setup.prefabs.length)];
+          this.map[r][c] = { 'passage': setup.prefabs[getRandomInteger(0, setup.prefabs.length)], 'visited': false };
         }
       }
     }
   }
 
+  vizMap() {
+    let ret = "<table>";
+
+    for (let r = 0; r < this.mapHeight; r++) {
+      ret += "<tr>";
+      for (let c = 0; c < this.mapWidth; c++) {
+        if (this.player.row == r && this.player.col == c)
+          ret += "<td class='active'></td>";
+        else if (this.getPassageVisited(r, c))
+          ret += "<td class='visited'></td>";
+        else
+          ret += "<td></td>";
+      }
+      ret += "</tr>";
+    }
+    ret += "</table>";
+    return ret;
+  }
+
+  setPassageVisited(row, col) {
+    this.map[row][col].visited = true;
+  }
+  getPassageVisited(row, col) {
+    return this.map[row][col].visited;
+  }
   getPassage(row, col) {
-    return this.map[row][col];
+    return this.map[row][col].passage;
+  }
+
+  getFriendsHere(row, col) {
+    let _friends = [];
+    // debugging
+    // if (row == 1 && col == 1 && this.friendsRescued == 0) {
+    //   _friends.push(this.friends[0]);
+    //   _friends.push(this.friends[1]);
+    //   _friends.push(this.friends[2]);
+    // }
+    for (let i = 0; i < this.friends.length; i++) {
+      if (this.friends[i].row == row && this.friends[i].col == col)
+        _friends.push(this.friends[i]);
+    }
+    return _friends;
+  }
+
+  rescueFriend(friend) {
+    for (let i = this.friends.length - 1; i >= 0; i--) {
+      if (this.friends[i] == friend) {
+        this.friends.splice(i, 1);
+        this.friendsRescued++;
+      }
+    }
   }
 
   // cardinal directions only
@@ -60,16 +110,16 @@ class GameManager {
 
     // north
     if (this.player.row > 0)
-      _passages.push({row:-1, col:0});
+      _passages.push({ row: -1, col: 0 });
     // south
     if (this.player.row < this.map.length - 1)
-      _passages.push({row:1, col:0});
+      _passages.push({ row: 1, col: 0 });
     // east
     if (this.player.col > 0)
-      _passages.push({row:0, col:-1});
+      _passages.push({ row: 0, col: -1 });
     // west
     if (this.player.col < this.map[0].length - 1)
-      _passages.push({row:0, col:1});
+      _passages.push({ row: 0, col: 1 });
 
     return _passages;
   }

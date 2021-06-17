@@ -30,10 +30,41 @@ ASCIILike
 <</nobr>>
 
 :: Begin [noinventory] 
-Welcome to asciiLike <<=$game.player.name>>!  You begin your story in a cave.
+Welcome to asciiLike <<=$game.player.name>>!  You begin your story in a cave.  You have <<=$game.friends.length>> missing friends!
+
+:: PassageHeader
+<<nobr>>
+<<set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col)>>
+<<if _friendsHere.length gt 0>>
+  /* one friend */
+  <<if _friendsHere.length eq 1>>
+  You see <<=_friendsHere[0].name>>.
+  <<elseif _friendsHere.length eq 2>>
+  You see <<=_friendsHere[0].name>> and <<=_friendsHere[1].name>>.
+  <<else>>
+    You see
+    <<for _i to 0; _i lt _friendsHere.length; _i++>>
+      <<if _i eq _friendsHere.length-1>>
+      and <<=_friendsHere[_i].name>>.
+      <<else>>
+      <<=_friendsHere[_i].name>>,
+      <</if>>
+    <</for>>
+  <</if>>
+
+  /* "save" your friend(s) */
+  <<for _i to 0; _i lt _friendsHere.length; _i++>>
+    <<run $game.rescueFriend(_friendsHere[_i])>>
+  <</for>>
+<</if>>
+<</nobr>>
+<hr size="1" />
+
 
 :: PassageFooter
+<br />
 <<nobr>>
+/* Get available passaages */
 <<set _nextPassages to $game.getPassages()>>
 <<for _i to 0; _i lt _nextPassages.length; _i++>>
   <<set _nextRow = $game.player.row + _nextPassages[_i].row>>
@@ -44,11 +75,21 @@ Welcome to asciiLike <<=$game.player.name>>!  You begin your story in a cave.
   <<link [[_txt|_nextPassage]]>>
     <<set $game.player.row to _nextRow>>
     <<set $game.player.col to _nextCol>>
+    <<run $game.setPassageVisited(_nextRow, _nextCol)>>
   <</link>><br />
   <</capture>>
 <</for>>
-<</nobr>>
+<<=$game.vizMap()>>
 
+Your next spot is <<link [[over here|_nextPassage]]>><</link>>
+<hr size="1" />
+XP: <<=$game.player.level>> | HP: <<=$game.player.getHP()>> | AC: <<=$game.player.ac>><br />
+Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br />
+Friends found: <<=$game.friendsRescued>><br />
+<<for _i to 0; _i lt $game.friends.length; _i++>>
+  <<print $game.friends[_i].name>>: [<<=$game.friends[_i].row>>:<<=$game.friends[_i].col>>]<br />
+<</for>>
+<</nobr>>
 
 /* <<set _nextPassage to either(setup.prefabs)>> */
 /* 
@@ -72,15 +113,6 @@ if (!variables().game.fightActive) {
   <<set _nextPassage to either(setup.prefabs)>>
 <</if>>
 */
-<<nobr>>
-Your next spot is <<link [[over here|_nextPassage]]>><</link>>
-<hr size="1" />
-XP: <<=$game.player.level>> | HP: <<=$game.player.getHP()>> | AC: <<=$game.player.ac>><br />
-Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br />
-<<for _i to 0; _i lt $game.friends.length; _i++>>
-  <<print $game.friends[_i].name>>: [<<=$game.friends[_i].row>>:<<=$game.friends[_i].col>>]<br />
-<</for>>
-<</nobr>>
 
 /* FIGHT */
 :: fight

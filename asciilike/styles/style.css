@@ -46,3 +46,26 @@ body::after {
   color: #29592d;
   text-shadow: none;
 }
+
+table {
+  background: #000;
+  padding: 0px;
+  margin: 0px;
+}
+td {
+  padding: 0px;
+  margin: 0px;
+  background:rgba(4, 87, 104, 0.75);
+  width: 20px;
+  height: 20px;
+}
+td.active {
+  background: #fff;
+}
+td.visited {
+  background:rgba(7, 52, 61, 0.75);
+}
+tr {
+  padding: 0px;
+  margin: 0px;
+}
