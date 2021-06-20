@@ -1,16 +1,13 @@
 ///globals
 ///helper functions
 
+
 setup.STATES = {
   GAME: 0,
   WIN: 1,
   GAMEOVER: 2,
-}
-
-function getSpriteOffset(row, col) {
-  let dx = col * TILE_WIDTH;
-  let dy = row * TILE_HEIGHT;
-  return { 'dx': dx, 'dy': dy };
+  DIALOGUE: 3,
+  LOST_SANITY: 4,
 }
 
 let getRandomInteger = function (min, max) {
@@ -23,7 +20,8 @@ setup.prefabs = [
   'cavern',
   'tight',
   'stream',
-  'void'
+  'pool',
+  'void',
 ];
 
 class GameManager {
@@ -33,6 +31,7 @@ class GameManager {
     this.npcs = [];
     this.mapWidth = 10;
     this.mapHeight = 10;
+    this.noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });
     this.init();
 
     this.fightActive = false;
@@ -51,9 +50,34 @@ class GameManager {
       this.map[r] = [];
       for (let c = 0; c < this.mapWidth; c++) {
         if (r == 0 && c == 0) // always start at 0,0
-          this.map[r][c] = { 'passage': 'start', 'visited': true };
+          this.map[r][c] = { 'passage': 'start', 'visited': true, 'sanity': 10 };
         else {
-          this.map[r][c] = { 'passage': setup.prefabs[getRandomInteger(0, setup.prefabs.length)], 'visited': false };
+          let randomOffset = getRandomInteger(0, 100000);
+          let _noise = this.noiseGen.get2DNoise(c + randomOffset, r + randomOffset);
+
+          let _room = setup.prefabs[0];
+          let _sanity = -1;
+          if (_noise < 0.0) {
+            _room = setup.prefabs[0];
+          } else if (_noise < 0.4) {
+            _room = setup.prefabs[1];
+          } else if (_noise < 0.5) { 
+            _room = setup.prefabs[2]; // tight squeeze
+            _sanity = -5;
+          } else if (_noise < 0.6) { // stream
+            _room = setup.prefabs[3];
+            _sanity = 5;
+          } else if (_noise < 0.7) { // pool 
+            _room = setup.prefabs[4];
+            _sanity = 5;
+          } else if (_noise < 0.8) { // void
+            _room = setup.prefabs[5];
+            _sanity = -10;
+          } else { // empty
+            _room = setup.prefabs[0];
+          }
+
+          this.map[r][c] = { 'passage': _room, 'visited': false, 'sanity': _sanity };
         }
       }
     }
@@ -61,16 +85,33 @@ class GameManager {
 
   vizMap() {
     let ret = "<table>";
-
     for (let r = 0; r < this.mapHeight; r++) {
       ret += "<tr>";
       for (let c = 0; c < this.mapWidth; c++) {
+        let _cls;
         if (this.player.row == r && this.player.col == c)
-          ret += "<td class='active'></td>";
+          _cls = 'active';
         else if (this.getPassageVisited(r, c))
-          ret += "<td class='visited'></td>";
-        else
-          ret += "<td></td>";
+          _cls = 'visited';
+        else {
+          _cls = '';
+
+          // tbd - temp viz
+          if (this.getPassage(r,c) == setup.prefabs[0])
+            _cls += ' empty';
+          else if (this.getPassage(r,c) == setup.prefabs[1])
+            _cls += ' cavern';
+          else if (this.getPassage(r,c) == setup.prefabs[2])
+            _cls += ' tight';
+          else if (this.getPassage(r,c) == setup.prefabs[3])
+            _cls += ' stream';
+          else if (this.getPassage(r,c) == setup.prefabs[4])
+            _cls += ' pool';
+          else
+            _cls += ' void';
+        }
+
+        ret += "<td class='" + _cls + "'></td>";
       }
       ret += "</tr>";
     }
@@ -86,6 +127,10 @@ class GameManager {
   }
   getPassage(row, col) {
     return this.map[row][col].passage;
+  }
+
+  getMapSanity(row, col) {
+    return this.map[row][col].sanity;
   }
 
   getFriendsHere(row, col) {
@@ -170,6 +215,21 @@ class Character {
     this.ac = ac;
     this.row = row;
     this.col = col;
+    this.sanity = 100;
+  }
+
+  // pass negative normally to decrement
+  updateSanity(amt) {
+    this.sanity += amt;
+    if (this.sanity <= 0) {
+      this.sanity = 0;
+      return false;
+    }
+    return true;
+  }
+
+  getSanity() {
+    return this.sanity;
   }
 
   getHP() {
@@ -194,3 +254,4 @@ class Character {
   }
 };
 window.Character = Character;
+// module.exports = Character;

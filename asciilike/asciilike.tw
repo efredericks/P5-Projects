@@ -1,5 +1,5 @@
 :: StoryTitle
-ASCIILike
+SugarCaves
 
 :: StoryData
 {
@@ -89,6 +89,12 @@ ASCIILike
       <<link [[_txt|Begin]]>>
         <<set $game.player.row to _nextRow>>
         <<set $game.player.col to _nextCol>>
+        /* Update sanity based on +/- of the room you're going to */
+        <<set _sanity to $game.player.updateSanity($game.getMapSanity(_nextRow, _nextCol))>>
+        <<if _sanity == 0>>
+          <<set $gameState to setup.STATES.LOST_SANITY>>
+        <</if>>
+
         <<run $game.setPassageVisited(_nextRow, _nextCol)>>
         <<set $currentPassage = _nextPassage>>
         <<if $game.totalFriends == $game.friendsRescued>>
@@ -120,6 +126,7 @@ ASCIILike
     XP: <<=$game.player.level>><br />
     HP: <<=$game.player.getHP()>><br />
     AC: <<=$game.player.ac>><br />
+    Sanity: <<=$game.player.getSanity()>><br />
     Friends found: <<=$game.friendsRescued>><br />
     /* debug */
     Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br />
@@ -133,11 +140,13 @@ ASCIILike
 </div>
 <<elseif $gameState == setup.STATES.WIN>>
   <h1>YOU WON</h1>
+<<elseif $gameState == setup.STATES.LOST_SANITY>>
+  <h1>YOU DED FROM MADNESS</h1>
 <</if>>
 <</nobr>>
 
 :: Begin2 [noinventory] 
-Welcome to asciiLike <<=$game.player.name>>!  You begin your story in a cave.  You have <<=$game.friends.length>> missing friends!
+Welcome to the SugarCaves <<=$game.player.name>>!  You begin your story in the cave.  You have <<=$game.friends.length>> missing friends!
 
 /* :: PassageHeader
 <<nobr>>
@@ -276,7 +285,7 @@ The beginning, it seems.
 :: empty [prefab]
 Nothingness.  
 
-:: cavern [prefab]
+:: cavern [prefab cavern]
 A wide open cavern.
 
 :: tight [prefab]
@@ -284,6 +293,9 @@ You squeeze through a tight opening, concerned you'll get stuck before it widens
 
 :: stream [prefab]
 A burbling brook meanders through the center of the passage, cool to the touch.
+
+:: pool [prefab]
+A massive pool placidly sits in the middle of the cavern.  A splash?  A ripple...
 
 :: void [prefab]
 You run blindly into the cavern and quickly catch yourself before you fall off the precipice into an abyss.  You kick a rock and lean down, listening for it to hit the bottom.  No sound returns.

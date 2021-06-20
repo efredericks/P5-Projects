@@ -98,3 +98,10 @@ tr {
   align-items: center;
 }
 .messages { grid-area: messages; }
+
+.empty { background: #000; }
+.cavern { background: rgb(97, 86, 24); }
+.tight { background: rgb(240, 99, 17); }
+.stream { background: rgb(57, 167, 218); }
+.pool { background: rgb(9, 59, 116); }
+.void { background: rgb(209, 25, 255); }
