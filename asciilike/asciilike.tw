@@ -92,14 +92,25 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
 <div class="container">
   <div class="main">
     /* <h2><<=Story.get($currentPassage).title>></h2> */
-    <<if $game.randomEvent()>>
-      <div class="drunk">
-        <p class='event'>You trip over a skinny odd mushroom and release its spores.</p><br />  
-        <<=Story.get($currentPassage).text>>/*description()>>*/
-      </div>
+    <<set _event to $game.randomEvent()>>
+    <<if _event.return>>
+      /* Spores event -- drunk text */
+      <<if _event.event == 'spores'>>
+        <div class="drunk">
+          <p class='event'>You trip over a skinny odd mushroom and release its spores.</p><br />  
+          <<=Story.get($currentPassage).text>>
+        </div>
+      /* Monster event! */
+      <<else>>
+        <div>
+        event [<<=_event.event>>] tbd<br />
+        <<=Story.get($currentPassage).text>>
+        </div>
+      <</if>>
+    /* Normal passage */
     <<else>>
       <div>
-        <<=Story.get($currentPassage).text>>/*description()>>*/
+        <<=Story.get($currentPassage).text>>
       </div>
     <</if>>
 
@@ -252,6 +263,8 @@ Debug:<br />
 <hr size="1" />
 [[Skip | Begin]]
 <</if>>
+<div id="back"></div>
+<div id="front"></div>
 <</nobr>>
 /* <br />
 <<nobr>> */
@@ -350,10 +363,19 @@ The <<=$game.monster.name>> was hit for <<=_mhit>> damage!  <<=$game.monster.get
 
 /* PREFABS */
 :: start [prefab]
-The beginning, it seems.
+<<nobr>>
+The beginning, it seems.  
+<</nobr>>
+<<if $game.friends.length gt 0>>
+You would feel awful leaving any friend behind (specifically, <<=$game.friends.length>>!).
+<</if>>
 
 :: empty [prefab]
 Nothingness.  
+
+:: empty2 [prefab empty]
+You see nothing.  
+
 
 :: cavern1 [prefab cavern]
 A wide open cavern.

@@ -46,7 +46,7 @@ class GameManager {
 
     this.player = new Character("Erik", 1, 10, 1, 0, 0);
     this.player.isPlayer = true;
-    this.monster = null;
+    this.eventCharacters = {}; // don't generate until random event triggers
 
     this.flashlight = {
       'status': 'off',
@@ -68,8 +68,8 @@ class GameManager {
           if (_noise < 0.0) { // empty
             _room = setup.prefabs[0];
           } else if (_noise < 0.4) { // cavern
-            _room = setup.prefabs[getRandomInteger(1,4)];
-          } else if (_noise < 0.5) { 
+            _room = setup.prefabs[getRandomInteger(1, 4)];
+          } else if (_noise < 0.5) {
             _room = setup.prefabs[4]; // tight squeeze
             _sanity = -5;
           } else if (_noise < 0.6) { // stream
@@ -92,11 +92,25 @@ class GameManager {
     console.log(this.map);
   }
 
+  // return a random event
   randomEvent() {
-    if (Math.random() > 0.98)
-      return true; 
-    else
-      return false; 
+    if (Math.random() > 0.75) {
+      let _r = Math.random();
+
+      // spores
+      // npc
+      // monster
+      // item
+      if (_r < 0.25)
+        return { 'event': 'spores', 'return': true };
+      else if (_r < 0.5)
+        return { 'event': 'npc', 'return': true };
+      else if (_r < 0.75)
+        return { 'event': 'monster', 'return': true };
+      else 
+        return { 'event': 'tbd', 'return': true };
+    } else
+      return { 'event': null, 'return': false };
   }
 
   vizMap() {
@@ -113,16 +127,16 @@ class GameManager {
           _cls = '';
 
           // tbd - temp viz
-          if (this.getPassage(r,c) == setup.prefabs[0])
+          if (this.getPassage(r, c) == setup.prefabs[0])
             _cls += ' empty';
           // else if (this.getPassage(r,c) == setup.prefabs[1])
-          else if ([setup.prefabs[1],setup.prefabs[2],setup.prefabs[3]].indexOf(this.getPassage(r,c)) >= 0)
+          else if ([setup.prefabs[1], setup.prefabs[2], setup.prefabs[3]].indexOf(this.getPassage(r, c)) >= 0)
             _cls += ' cavern';
-          else if (this.getPassage(r,c) == setup.prefabs[4])
+          else if (this.getPassage(r, c) == setup.prefabs[4])
             _cls += ' tight';
-          else if (this.getPassage(r,c) == setup.prefabs[5])
+          else if (this.getPassage(r, c) == setup.prefabs[5])
             _cls += ' stream';
-          else if (this.getPassage(r,c) == setup.prefabs[6])
+          else if (this.getPassage(r, c) == setup.prefabs[6])
             _cls += ' pool';
           else
             _cls += ' void';
@@ -216,6 +230,10 @@ class GameManager {
 
     return _friends;
   }
+
+  generateCharacter(row, col) {
+  }
+
 };
 window.GameManager = GameManager;
 
