@@ -106,15 +106,19 @@ var LZString={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234
 
 body {
   background-color: black;
-  background-image: radial-gradient(
-    rgba(4, 87, 104, 0.75), black 120%
+  /* background-image: radial-gradient( */
+    /* rgba(4, 87, 104, 0.75), black 120% */
     /*rgba(0, 150, 0, 0.75), black 120%*/
-  );
+  /* ); */
   height: 100vh;
 
   color: white;
   font: 1.3rem 'Ubuntu', sans-serif;
   text-shadow: 0 0 12px #c8c8c88a;
+
+  background-image: [img[assets/img/pixel/cave-with-pool-mfbehrens99.png]];
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 p {
@@ -194,8 +198,14 @@ tr {
 .container .main,
 .container .stats,
 .container .map {
-  border: 1px black solid;
+  border: 1px #333 solid;
   padding: 5px;
+  background-image: radial-gradient(
+    rgba(4, 87, 104, 0.75), black 120%
+    /*rgba(0, 150, 0, 0.75), black 120%*/
+  );
+  border-radius: 5px;
+  /* height: 100vh; */
 }
 .main { grid-area: main; }
 .stats { grid-area: stats; }
