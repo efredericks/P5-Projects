@@ -117,6 +117,11 @@ body {
   text-shadow: 0 0 12px #c8c8c88a;
 }
 
+p {
+  margin: 0px;
+  padding: 0px;
+}
+
 /*
 body::after {
   content: "";
@@ -208,7 +213,35 @@ tr {
 .stream { background: rgb(57, 167, 218); }
 .pool { background: rgb(9, 59, 116); }
 .void { background: rgb(209, 25, 255); }
-</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
+
+/* Drunk Text - Start 
+c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
+*/
+.drunk {
+	animation: drunkCam 10s infinite alternate;
+	color: white;
+}
+@keyframes drunkCam {
+	0%  { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	20% { filter: blur(1px); text-shadow: 8px 0 0 grey; }
+	24% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	26% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	28% { filter: blur(1px); text-shadow: 10px 0 0 grey; }
+	30% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	60% { filter: blur(1px); text-shadow: 5px 0 0 grey; }
+	62% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	65% { filter: blur(2px); text-shadow: 8px 0 0 grey; }
+	67% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+	80% { filter: blur(0px); text-shadow: 8px 0 0 grey; }
+	85% { filter: blur(2px); text-shadow: 10px 0 0 grey; }
+	88% { filter: blur(1px); text-shadow: 5px 0 0 grey; }
+	90% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+}
+
+.event {
+  color: #ff00ff;
+}
+/* Drunk Text - End */</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
 /* js/constants.js, js/room.js, js/traceryGen.js, js/person.js, js/macroWhen.js */
 /* twine-user-script #2: "fast-simplex-noise.js" */
 /*
@@ -890,6 +923,13 @@ class GameManager {
     console.log(this.map);
   }
 
+  randomEvent() {
+    if (Math.random() > 0.98)
+      return true; 
+    else
+      return false; 
+  }
+
   vizMap() {
     let ret = "<table>";
     for (let r = 0; r < this.mapHeight; r++) {
@@ -1099,7 +1139,7 @@ The four of you venture deeper into the cave. The [[flashlight]] beam winks out 
 
 [[Silence]].</tw-passagedata><tw-passagedata pid="10" name="Silence" tags="nofooter" position="1225,100" size="100,100">&lt;&lt;set $game.flashlight[&quot;status&quot;] = &quot;on&quot;&gt;&gt;\
 \
-In the distance you hear a shrill scream, fluttering, silence. You look down and notice the glint of the [[flashlight]]. You pick it up and add it to your [[inventory]].
+In the distance you hear a shrill scream, fluttering, silence. You look down and notice the glint of the [[flashlight]]. You pick it up and add it to your backpack.
 
 You click the [[flashlight]] on and are relieved to see the beam at full strength, illuminating the [[empty cavern]].</tw-passagedata><tw-passagedata pid="11" name="empty cavern" tags="nofooter" position="100,225" size="100,100">Your friends are gone. You stand in an empty cavern studded with ancient stalagtites and stalagmites. A drip-drip-drip of water hitting a puddle can be heard off in the distance. No indication of violence can be seen. All you can do is search to [[find your friends | Begin]].
 
@@ -1108,7 +1148,16 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
 &lt;div class=&quot;container&quot;&gt;
   &lt;div class=&quot;main&quot;&gt;
     /* &lt;h2&gt;&lt;&lt;=Story.get($currentPassage).title&gt;&gt;&lt;/h2&gt; */
-    &lt;&lt;=Story.get($currentPassage).text&gt;&gt;/*description()&gt;&gt;*/
+    &lt;&lt;if $game.randomEvent()&gt;&gt;
+      &lt;div class=&quot;drunk&quot;&gt;
+        &lt;p class=&#39;event&#39;&gt;You trip over a skinny odd mushroom and release its spores.&lt;/p&gt;&lt;br /&gt;  
+        &lt;&lt;=Story.get($currentPassage).text&gt;&gt;/*description()&gt;&gt;*/
+      &lt;/div&gt;
+    &lt;&lt;else&gt;&gt;
+      &lt;div&gt;
+        &lt;&lt;=Story.get($currentPassage).text&gt;&gt;/*description()&gt;&gt;*/
+      &lt;/div&gt;
+    &lt;&lt;/if&gt;&gt;
 
     &lt;&lt;set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col)&gt;&gt;
     &lt;&lt;if _friendsHere.length gt 0&gt;&gt;

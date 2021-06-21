@@ -92,6 +92,13 @@ class GameManager {
     console.log(this.map);
   }
 
+  randomEvent() {
+    if (Math.random() > 0.98)
+      return true; 
+    else
+      return false; 
+  }
+
   vizMap() {
     let ret = "<table>";
     for (let r = 0; r < this.mapHeight; r++) {

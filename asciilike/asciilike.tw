@@ -78,7 +78,7 @@ The four of you venture deeper into the cave. The [[flashlight]] beam winks out 
 :: Silence [nofooter]
 <<set $game.flashlight["status"] = "on">>\
 \
-In the distance you hear a shrill scream, fluttering, silence. You look down and notice the glint of the [[flashlight]]. You pick it up and add it to your [[inventory]].
+In the distance you hear a shrill scream, fluttering, silence. You look down and notice the glint of the [[flashlight]]. You pick it up and add it to your backpack.
 
 You click the [[flashlight]] on and are relieved to see the beam at full strength, illuminating the [[empty cavern]].
 
@@ -92,7 +92,16 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
 <div class="container">
   <div class="main">
     /* <h2><<=Story.get($currentPassage).title>></h2> */
-    <<=Story.get($currentPassage).text>>/*description()>>*/
+    <<if $game.randomEvent()>>
+      <div class="drunk">
+        <p class='event'>You trip over a skinny odd mushroom and release its spores.</p><br />  
+        <<=Story.get($currentPassage).text>>/*description()>>*/
+      </div>
+    <<else>>
+      <div>
+        <<=Story.get($currentPassage).text>>/*description()>>*/
+      </div>
+    <</if>>
 
     <<set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col)>>
     <<if _friendsHere.length gt 0>>
