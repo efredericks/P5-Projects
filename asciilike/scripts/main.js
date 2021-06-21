@@ -27,9 +27,9 @@ setup.prefabs = [
 ];
 
 class GameManager {
-  constructor() {
+  constructor(rooms) {
+    console.log(rooms);
     this.map = [];
-    this.monsters = [];
     this.npcs = [];
     this.mapWidth = 10;
     this.mapHeight = 10;
@@ -46,7 +46,11 @@ class GameManager {
 
     this.player = new Character("Erik", 1, 10, 1, 0, 0);
     this.player.isPlayer = true;
+
     this.eventCharacters = {}; // don't generate until random event triggers
+    for (let row = 0; row < this.mapHeight; row++)
+      for (let col = 0; col < this.mapWidth; col++)
+        this.eventCharacters[`${row}:${col}`] = null;
 
     this.flashlight = {
       'status': 'off',
@@ -92,9 +96,22 @@ class GameManager {
     console.log(this.map);
   }
 
+  hasCharacter(row, col) {
+    if (this.eventCharacters[`${row}:${col}`])
+      return true;
+    return false;
+  }
+  getCharacter(row, col) {
+    return this.eventCharacters[`${row}:${col}`];
+  }
+  createCharacter(row, col, type) {
+    this.eventCharacters[`${row}:${col}`] = type;
+    return this.eventCharacters[`${row}:${col}`];
+  }
+
   // return a random event
   randomEvent() {
-    if (Math.random() > 0.75) {
+    if (Math.random() > 0.25) {
       let _r = Math.random();
 
       // spores
