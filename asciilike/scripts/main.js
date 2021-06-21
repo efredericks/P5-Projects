@@ -42,10 +42,16 @@ class GameManager {
     this.friends = this.generateFriends();
     this.totalFriends = this.friends.length;
     this.friendsRescued = 0;
+    this.flashlightFriend = getRandomInteger(0, this.totalFriends);
 
     this.player = new Character("Erik", 1, 10, 1, 0, 0);
     this.player.isPlayer = true;
     this.monster = null;
+
+    this.flashlight = {
+      'status': 'off',
+      'battery': 100
+    };
   }
   init() {
     for (let r = 0; r < this.mapHeight; r++) {
@@ -220,6 +226,8 @@ class Character {
     this.row = row;
     this.col = col;
     this.sanity = 100;
+    this.description = "I am a description";
+    this.age = 14;
   }
 
   // pass negative normally to decrement

@@ -6,7 +6,7 @@ SugarCaves
 	"ifid": "F891172E-6C06-4CAC-AD88-C267809FEFD2",
 	"format": "SugarCube",
 	"format-version": "2.31.1",
-	"start": "Begin",
+	"start": "StoryBegin",
 	"zoom": 1
 }
 
@@ -31,6 +31,61 @@ SugarCaves
 <<set $gameState to setup.STATES.GAME>>
 <</nobr>>
 
+:: StoryBegin [nofooter]
+You (<<= $game.player.name>>) and your <<= $game.friends.length>> closest friends (<<link [[$game.friends[0].name|CharacterInfo]]>><<set $game.currentChar to 0>><</link>>, <<link [[$game.friends[1].name|CharacterInfo]]>><<set $game.currentChar to 1>><</link>>, <<link [[$game.friends[2].name|CharacterInfo]]>><<set $game.currentChar to 2>><</link>>, and <<link [[$game.friends[3].name|CharacterInfo]]>><<set $game.currentChar to 3>><</link>>) are out adventuring in the woods. <<= $game.friends[0].name>> yells, "hey, look [[over there|over there]]!"
+
+:: CharacterInfo [nofooter]
+<h3><<=$game.friends[$game.currentChar].name>></h3>
+<<=$game.friends[$game.currentChar].description>>
+
+<<if $game.player.age gt $game.friends[$game.currentChar].age>>
+<<=$game.friends[$game.currentChar].name>> is <<=$game.friends[$game.currentChar].age>> years old, a friend you met on the (playground/tracery hook).
+<<elseif $game.player.age eq $game.friends[$game.currentChar].age>>
+<<=$game.friends[$game.currentChar].name>> is <<=$game.friends[$game.currentChar].age>> years old, the same age as you.  You hang out together at (recess/math/etc.).
+<<else>>
+<<=$game.friends[$game.currentChar].name>> is <<=$game.friends[$game.currentChar].age>> years old.  A bit older than you, but still fun to hang with at (place).
+<</if>>
+<<back>>
+
+:: over there [nofooter]
+You see the base of the mountain rising gently in the distance, its granite face gently reflecting the afternoon sun. A recent [[storm]] caused a small rockslide, revealing an [[opening]].
+
+:: storm [nofooter]
+A wild thunderstorm that produced high winds, golf-ball sized hail, and pounding rain. Your house, fortunately, was unaffected.  You end your musings and get [[back to playing|over there]].
+
+:: opening [nofooter]
+You approach the mountainside to get a better look at the newly-opened cave. In all the years that you played at the foot of the mountain, you never noticed that there might be more hiding in plain sight.
+
+The cave opening is irregularly-shaped, rocky outcroppings studding its edges. It is dark but [[passable]].
+
+:: passable [nofooter]
+You and your friends pierce the darkness and adventure in. <<link [[$game.friends[$game.flashlightFriend].name|CharacterInfo]]>><<set $game.currentChar to $game.flashlightFriend>><</link>> clicks on the [[flashlight]] and sweeps the beam across. The light shines down a dark tunnel, illuminating dust that has been disturbed by your entry.
+
+Nothing crosses your beam, however the tunnel appears to go on and on [[and on]].
+
+:: flashlight [nofooter]
+A standard Maglite with a fancy battery level indicator.  It is currently <<print $game.flashlight["status"]>> with <<print $game.flashlight["battery"]>>% power remaining.  
+
+<<back>>
+
+:: and on [nofooter]
+<<set $game.flashlight["status"] = "off">>\
+\
+The four of you venture deeper into the cave. The [[flashlight]] beam winks out as <<link [[$game.friends[$game.flashlightFriend].name|CharacterInfo]]>><<set $game.currentChar to $game.flashlightFriend>><</link>> stumbles and utters a sharp curse.
+
+[[Silence]].
+
+:: Silence [nofooter]
+<<set $game.flashlight["status"] = "on">>\
+\
+In the distance you hear a shrill scream, fluttering, silence. You look down and notice the glint of the [[flashlight]]. You pick it up and add it to your [[inventory]].
+
+You click the [[flashlight]] on and are relieved to see the beam at full strength, illuminating the [[empty cavern]].
+
+:: empty cavern [nofooter]
+Your friends are gone. You stand in an empty cavern studded with ancient stalagtites and stalagmites. A drip-drip-drip of water hitting a puddle can be heard off in the distance. No indication of violence can be seen. All you can do is search to [[find your friends | Begin]].
+
+/* BEGIN PROCGEN */
 :: Begin
 <<nobr>>
 <<if $gameState == setup.STATES.GAME>>
@@ -179,9 +234,15 @@ Welcome to the SugarCaves <<=$game.player.name>>!  You begin your story in the c
 
 :: PassageFooter
 <<nobr>>
+<<if tags().includes("nofooter") isnot true>>
+Debug:<br />
 <<for _i to 0; _i lt $game.friends.length; _i++>>
-  <<print $game.friends[_i].name>>: [<<=$game.friends[_i].row>>:<<=$game.friends[_i].col>>] 
+  <<print $game.friends[_i].name>>: [<<=$game.friends[_i].row>>:<<=$game.friends[_i].col>>] <br />
 <</for>>
+<<else>>
+<hr size="1" />
+[[Skip | Begin]]
+<</if>>
 <</nobr>>
 /* <br />
 <<nobr>> */
