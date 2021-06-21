@@ -17,7 +17,9 @@ window.getRandomInteger = getRandomInteger;
 
 setup.prefabs = [
   'empty',
-  'cavern',
+  'cavern1',
+  'cavern2',
+  'cavern3',
   'tight',
   'stream',
   'pool',
@@ -57,21 +59,21 @@ class GameManager {
 
           let _room = setup.prefabs[0];
           let _sanity = -1;
-          if (_noise < 0.0) {
+          if (_noise < 0.0) { // empty
             _room = setup.prefabs[0];
-          } else if (_noise < 0.4) {
-            _room = setup.prefabs[1];
+          } else if (_noise < 0.4) { // cavern
+            _room = setup.prefabs[getRandomInteger(1,4)];
           } else if (_noise < 0.5) { 
-            _room = setup.prefabs[2]; // tight squeeze
+            _room = setup.prefabs[4]; // tight squeeze
             _sanity = -5;
           } else if (_noise < 0.6) { // stream
-            _room = setup.prefabs[3];
+            _room = setup.prefabs[5];
             _sanity = 5;
           } else if (_noise < 0.7) { // pool 
-            _room = setup.prefabs[4];
+            _room = setup.prefabs[6];
             _sanity = 5;
           } else if (_noise < 0.8) { // void
-            _room = setup.prefabs[5];
+            _room = setup.prefabs[7];
             _sanity = -10;
           } else { // empty
             _room = setup.prefabs[0];
@@ -81,6 +83,7 @@ class GameManager {
         }
       }
     }
+    console.log(this.map);
   }
 
   vizMap() {
@@ -99,13 +102,14 @@ class GameManager {
           // tbd - temp viz
           if (this.getPassage(r,c) == setup.prefabs[0])
             _cls += ' empty';
-          else if (this.getPassage(r,c) == setup.prefabs[1])
+          // else if (this.getPassage(r,c) == setup.prefabs[1])
+          else if ([setup.prefabs[1],setup.prefabs[2],setup.prefabs[3]].indexOf(this.getPassage(r,c)) >= 0)
             _cls += ' cavern';
-          else if (this.getPassage(r,c) == setup.prefabs[2])
-            _cls += ' tight';
-          else if (this.getPassage(r,c) == setup.prefabs[3])
-            _cls += ' stream';
           else if (this.getPassage(r,c) == setup.prefabs[4])
+            _cls += ' tight';
+          else if (this.getPassage(r,c) == setup.prefabs[5])
+            _cls += ' stream';
+          else if (this.getPassage(r,c) == setup.prefabs[6])
             _cls += ' pool';
           else
             _cls += ' void';

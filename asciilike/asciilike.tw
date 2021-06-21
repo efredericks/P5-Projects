@@ -285,8 +285,14 @@ The beginning, it seems.
 :: empty [prefab]
 Nothingness.  
 
-:: cavern [prefab cavern]
+:: cavern1 [prefab cavern]
 A wide open cavern.
+
+:: cavern2 [prefab cavern]
+Rocky stalactites stud the ceiling.  Oddly, the stalagmites are missing.
+
+:: cavern3 [prefab cavern]
+You hear water plinking into an unseen puddle in the corner.  Your path, fortunately, is clear.
 
 :: tight [prefab]
 You squeeze through a tight opening, concerned you'll get stuck before it widens.  Claustrophobia settles in.
