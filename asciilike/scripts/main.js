@@ -124,7 +124,7 @@ class GameManager {
         return { 'event': 'npc', 'return': true };
       else if (_r < 0.75)
         return { 'event': 'monster', 'return': true };
-      else 
+      else
         return { 'event': 'tbd', 'return': true };
     } else
       return { 'event': null, 'return': false };
@@ -206,21 +206,95 @@ class GameManager {
   }
 
   // cardinal directions only
-  getPassages() {
+  getPassages(player) {
     let _passages = [];
 
     // north
-    if (this.player.row > 0)
-      _passages.push({ row: -1, col: 0 });
-    // south
-    if (this.player.row < this.map.length - 1)
-      _passages.push({ row: 1, col: 0 });
+    let _n = { header: "north", text: "n" };
+    if (player.row > 0) {
+      _n.row = player.row - 1;
+      _n.col = player.col;
+      _n.valid = true;
+    } else
+      _n.valid = false;
+    _passages.push(_n);
+
+    // northeast
+    let _ne = { header: "northeast", text: "ne" };
+    if (player.row > 0 && player.col < this.mapWidth - 1) {
+      _ne.row = player.row - 1;
+      _ne.col = player.col + 1;
+      _ne.valid = true;
+    } else
+      _ne.valid = false;
+    _passages.push(_ne);
+
     // east
-    if (this.player.col > 0)
-      _passages.push({ row: 0, col: -1 });
+    let _e = { header: "east", text: "e" };
+    if (player.col < this.mapWidth - 1) {
+      _e.row = player.row;
+      _e.col = player.col + 1;
+      _e.valid = true;
+    } else
+      _e.valid = false;
+    _passages.push(_e);
+
+    // southeast
+    let _se = { header: "southeast", text: "se" };
+    if (player.row < this.mapHeight - 1 && player.col < this.mapWidth - 1) {
+      _se.row = player.row + 1;
+      _se.col = player.col + 1;
+      _se.valid = true;
+    } else
+      _se.valid = false;
+    _passages.push(_se);
+
+    // south
+    let _s = { header: "south", text: "s" };
+    if (player.row < this.mapHeight - 1) {
+      _s.row = player.row + 1;
+      _s.col = player.col;
+      _s.valid = true;
+    } else
+      _s.valid = false;
+    _passages.push(_s);
+
+    // southwest
+    let _sw = { header: "southwest", text: "sw" };
+    if (player.row < this.mapHeight - 1 && player.col > 0) {
+      _sw.row = player.row + 1;
+      _sw.col = player.col - 1;
+      _sw.valid = true;
+    } else
+      _sw.valid = false;
+    _passages.push(_sw);
+
     // west
-    if (this.player.col < this.map[0].length - 1)
-      _passages.push({ row: 0, col: 1 });
+    let _w = { header: "west", text: "w" };
+    if (player.col > 0) {
+      _w.row = player.row;
+      _w.col = player.col - 1;
+      _w.valid = true;
+    } else
+      _w.valid = false;
+    _passages.push(_w);
+
+    // northwest
+    let _nw = { header: "northwest", text: "nw" };
+    if (player.row > 0 && player.col > 0) {
+      _nw.row = player.row - 1;
+      _nw.col = player.col - 1;
+      _nw.valid = true;
+    } else
+      _nw.valid = false;
+    _passages.push(_nw);
+
+    // wait
+    let _wait = { header: "wait", text: "." };
+    _wait.row = player.row;
+    _wait.col = player.col;
+    _wait.valid = true;
+    _passages.push(_wait);
 
     return _passages;
   }

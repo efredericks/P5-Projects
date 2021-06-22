@@ -160,8 +160,47 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
     <hr size="1" />
 
     /* Get available passaages */
-    <<set _nextPassages to $game.getPassages()>>
-    You see passages to the: 
+    <div>
+      XP: <<=$game.player.level>><br />
+      HP: <<=$game.player.getHP()>><br />
+      AC: <<=$game.player.ac>><br />
+      Sanity: <<=$game.player.getSanity()>><br />
+      Friends found: <<=$game.friendsRescued>><br />
+      /* debug */
+      Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br />
+    </div>
+  </div>
+  <div class="stats">
+
+    <div class="nav-container">
+      <div class="nav">
+        <<set _nextPassages to $game.getPassages($game.player)>>
+        <<for _i to 0; _i lt _nextPassages.length; _i++>>
+          <<capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
+          <div @class="_nextPassages[_i].header">
+            <<link [[_nextPassages[_i].text|Begin]]>>
+              <<set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col)>>
+              <<set $game.player.row to _nextPassages[_i].row>>
+              <<set $game.player.col to _nextPassages[_i].col>>
+
+              /* Update sanity based on +/- of the room you're going to */
+              <<set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col))>>
+              <<if _sanity == 0>>
+                <<set $gameState to setup.STATES.LOST_SANITY>>
+              <</if>>
+  
+              <<run $game.setPassageVisited(_nextPassages[_i].row, _nextPassages[_i].col)>>
+              <<set $currentPassage = _nextPassage>>
+              <<if $game.totalFriends == $game.friendsRescued>>
+                <<set $gameState to setup.STATES.WIN>>
+              <</if>>
+            <</link>>
+          </div>
+          <</capture>>
+        <</for>>
+
+
+/*    You see passages to the: 
     <<for _i to 0; _i lt _nextPassages.length; _i++>>
       <<set _nextRow = $game.player.row + _nextPassages[_i].row>>
       <<set _nextCol = $game.player.col + _nextPassages[_i].col>>
@@ -182,9 +221,9 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
       <<capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
       <<link [[_txt|Begin]]>>
         <<set $game.player.row to _nextRow>>
-        <<set $game.player.col to _nextCol>>
+        <<set $game.player.col to _nextCol>> */
         /* Update sanity based on +/- of the room you're going to */
-        <<set _sanity to $game.player.updateSanity($game.getMapSanity(_nextRow, _nextCol))>>
+        /* <<set _sanity to $game.player.updateSanity($game.getMapSanity(_nextRow, _nextCol))>>
         <<if _sanity == 0>>
           <<set $gameState to setup.STATES.LOST_SANITY>>
         <</if>>
@@ -212,19 +251,70 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
         <</if>>
       <</if>>
       <</capture>>
-    <</for>>
+    <</for>> */
 
-  </div>
-  <div class="stats">
-    <div>
-    XP: <<=$game.player.level>><br />
-    HP: <<=$game.player.getHP()>><br />
-    AC: <<=$game.player.ac>><br />
-    Sanity: <<=$game.player.getSanity()>><br />
-    Friends found: <<=$game.friendsRescued>><br />
-    /* debug */
-    Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
+        <div class="west">
+        w
+        </div>
+        <div class="southwest">
+        sw
+        </div>
+        <div class="north">
+        n
+        </div>
+        <div class="wait">
+        .
+        </div>
+        <div class="south">
+        s
+        </div>
+        <div class="northeast">
+        ne
+        </div>
+        <div class="east">
+        e
+        </div>
+        <div class="southeast">
+        sw
+        </div>
+        <div class="northwest">
+        nw
+        </div> */
     </div>
+
+</div>
+
+
+
+
+    /* <div> */
+    /* XP: <<=$game.player.level>><br /> */
+    /* HP: <<=$game.player.getHP()>><br /> */
+    /* AC: <<=$game.player.ac>><br /> */
+    /* Sanity: <<=$game.player.getSanity()>><br /> */
+    /* Friends found: <<=$game.friendsRescued>><br /> */
+    /* debug */
+    /* Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br /> */
+    /* </div> */
   </div>
 
   <div class="map">

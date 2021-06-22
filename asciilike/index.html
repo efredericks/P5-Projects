@@ -353,7 +353,41 @@ c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
   animation-iteration-count: infinite;
 }
 
-</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
+/* NAV */
+.nav-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "nav . ."
+    ". . ."
+    ". . .";
+}
+
+.nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "northwest north northeast"
+    "west wait east"
+    "southwest south southeast";
+  grid-area: nav;
+}
+
+.west { grid-area: west; }
+.southwest { grid-area: southwest; }
+.north { grid-area: north; }
+.wait { grid-area: wait; }
+.south { grid-area: south; }
+.northeast { grid-area: northeast; }
+.east { grid-area: east; }
+.southeast { grid-area: southeast; }
+.northwest { grid-area: northwest; }</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
 /* js/constants.js, js/room.js, js/traceryGen.js, js/person.js, js/macroWhen.js */
 /* twine-user-script #2: "fast-simplex-noise.js" */
 /*
@@ -1067,7 +1101,7 @@ class GameManager {
         return { 'event': 'npc', 'return': true };
       else if (_r < 0.75)
         return { 'event': 'monster', 'return': true };
-      else 
+      else
         return { 'event': 'tbd', 'return': true };
     } else
       return { 'event': null, 'return': false };
@@ -1149,21 +1183,95 @@ class GameManager {
   }
 
   // cardinal directions only
-  getPassages() {
+  getPassages(player) {
     let _passages = [];
 
     // north
-    if (this.player.row > 0)
-      _passages.push({ row: -1, col: 0 });
-    // south
-    if (this.player.row < this.map.length - 1)
-      _passages.push({ row: 1, col: 0 });
+    let _n = { header: "north", text: "n" };
+    if (player.row > 0) {
+      _n.row = player.row - 1;
+      _n.col = player.col;
+      _n.valid = true;
+    } else
+      _n.valid = false;
+    _passages.push(_n);
+
+    // northeast
+    let _ne = { header: "northeast", text: "ne" };
+    if (player.row > 0 && player.col < this.mapWidth - 1) {
+      _ne.row = player.row - 1;
+      _ne.col = player.col + 1;
+      _ne.valid = true;
+    } else
+      _ne.valid = false;
+    _passages.push(_ne);
+
     // east
-    if (this.player.col > 0)
-      _passages.push({ row: 0, col: -1 });
+    let _e = { header: "east", text: "e" };
+    if (player.col < this.mapWidth - 1) {
+      _e.row = player.row;
+      _e.col = player.col + 1;
+      _e.valid = true;
+    } else
+      _e.valid = false;
+    _passages.push(_e);
+
+    // southeast
+    let _se = { header: "southeast", text: "se" };
+    if (player.row < this.mapHeight - 1 && player.col < this.mapWidth - 1) {
+      _se.row = player.row + 1;
+      _se.col = player.col + 1;
+      _se.valid = true;
+    } else
+      _se.valid = false;
+    _passages.push(_se);
+
+    // south
+    let _s = { header: "south", text: "s" };
+    if (player.row < this.mapHeight - 1) {
+      _s.row = player.row + 1;
+      _s.col = player.col;
+      _s.valid = true;
+    } else
+      _s.valid = false;
+    _passages.push(_s);
+
+    // southwest
+    let _sw = { header: "southwest", text: "sw" };
+    if (player.row < this.mapHeight - 1 && player.col > 0) {
+      _sw.row = player.row + 1;
+      _sw.col = player.col - 1;
+      _sw.valid = true;
+    } else
+      _sw.valid = false;
+    _passages.push(_sw);
+
     // west
-    if (this.player.col < this.map[0].length - 1)
-      _passages.push({ row: 0, col: 1 });
+    let _w = { header: "west", text: "w" };
+    if (player.col > 0) {
+      _w.row = player.row;
+      _w.col = player.col - 1;
+      _w.valid = true;
+    } else
+      _w.valid = false;
+    _passages.push(_w);
+
+    // northwest
+    let _nw = { header: "northwest", text: "nw" };
+    if (player.row > 0 && player.col > 0) {
+      _nw.row = player.row - 1;
+      _nw.col = player.col - 1;
+      _nw.valid = true;
+    } else
+      _nw.valid = false;
+    _passages.push(_nw);
+
+    // wait
+    let _wait = { header: "wait", text: "." };
+    _wait.row = player.row;
+    _wait.col = player.col;
+    _wait.valid = true;
+    _passages.push(_wait);
 
     return _passages;
   }
@@ -1363,8 +1471,47 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
     &lt;hr size=&quot;1&quot; /&gt;
 
     /* Get available passaages */
-    &lt;&lt;set _nextPassages to $game.getPassages()&gt;&gt;
-    You see passages to the: 
+    &lt;div&gt;
+      XP: &lt;&lt;=$game.player.level&gt;&gt;&lt;br /&gt;
+      HP: &lt;&lt;=$game.player.getHP()&gt;&gt;&lt;br /&gt;
+      AC: &lt;&lt;=$game.player.ac&gt;&gt;&lt;br /&gt;
+      Sanity: &lt;&lt;=$game.player.getSanity()&gt;&gt;&lt;br /&gt;
+      Friends found: &lt;&lt;=$game.friendsRescued&gt;&gt;&lt;br /&gt;
+      /* debug */
+      Row: &lt;&lt;=$game.player.row&gt;&gt; | Col: &lt;&lt;=$game.player.col&gt;&gt;&lt;br /&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;stats&quot;&gt;
+
+    &lt;div class=&quot;nav-container&quot;&gt;
+      &lt;div class=&quot;nav&quot;&gt;
+        &lt;&lt;set _nextPassages to $game.getPassages($game.player)&gt;&gt;
+        &lt;&lt;for _i to 0; _i lt _nextPassages.length; _i++&gt;&gt;
+          &lt;&lt;capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage&gt;&gt;
+          &lt;div @class=&quot;_nextPassages[_i].header&quot;&gt;
+            &lt;&lt;link [[_nextPassages[_i].text|Begin]]&gt;&gt;
+              &lt;&lt;set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col)&gt;&gt;
+              &lt;&lt;set $game.player.row to _nextPassages[_i].row&gt;&gt;
+              &lt;&lt;set $game.player.col to _nextPassages[_i].col&gt;&gt;
+
+              /* Update sanity based on +/- of the room you&#39;re going to */
+              &lt;&lt;set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col))&gt;&gt;
+              &lt;&lt;if _sanity == 0&gt;&gt;
+                &lt;&lt;set $gameState to setup.STATES.LOST_SANITY&gt;&gt;
+              &lt;&lt;/if&gt;&gt;
+  
+              &lt;&lt;run $game.setPassageVisited(_nextPassages[_i].row, _nextPassages[_i].col)&gt;&gt;
+              &lt;&lt;set $currentPassage = _nextPassage&gt;&gt;
+              &lt;&lt;if $game.totalFriends == $game.friendsRescued&gt;&gt;
+                &lt;&lt;set $gameState to setup.STATES.WIN&gt;&gt;
+              &lt;&lt;/if&gt;&gt;
+            &lt;&lt;/link&gt;&gt;
+          &lt;/div&gt;
+          &lt;&lt;/capture&gt;&gt;
+        &lt;&lt;/for&gt;&gt;
+
+
+/*    You see passages to the: 
     &lt;&lt;for _i to 0; _i lt _nextPassages.length; _i++&gt;&gt;
       &lt;&lt;set _nextRow = $game.player.row + _nextPassages[_i].row&gt;&gt;
       &lt;&lt;set _nextCol = $game.player.col + _nextPassages[_i].col&gt;&gt;
@@ -1385,9 +1532,9 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
       &lt;&lt;capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage&gt;&gt;
       &lt;&lt;link [[_txt|Begin]]&gt;&gt;
         &lt;&lt;set $game.player.row to _nextRow&gt;&gt;
-        &lt;&lt;set $game.player.col to _nextCol&gt;&gt;
+        &lt;&lt;set $game.player.col to _nextCol&gt;&gt; */
         /* Update sanity based on +/- of the room you&#39;re going to */
-        &lt;&lt;set _sanity to $game.player.updateSanity($game.getMapSanity(_nextRow, _nextCol))&gt;&gt;
+        /* &lt;&lt;set _sanity to $game.player.updateSanity($game.getMapSanity(_nextRow, _nextCol))&gt;&gt;
         &lt;&lt;if _sanity == 0&gt;&gt;
           &lt;&lt;set $gameState to setup.STATES.LOST_SANITY&gt;&gt;
         &lt;&lt;/if&gt;&gt;
@@ -1415,19 +1562,70 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
         &lt;&lt;/if&gt;&gt;
       &lt;&lt;/if&gt;&gt;
       &lt;&lt;/capture&gt;&gt;
-    &lt;&lt;/for&gt;&gt;
+    &lt;&lt;/for&gt;&gt; */
 
-  &lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;
-    &lt;div&gt;
-    XP: &lt;&lt;=$game.player.level&gt;&gt;&lt;br /&gt;
-    HP: &lt;&lt;=$game.player.getHP()&gt;&gt;&lt;br /&gt;
-    AC: &lt;&lt;=$game.player.ac&gt;&gt;&lt;br /&gt;
-    Sanity: &lt;&lt;=$game.player.getSanity()&gt;&gt;&lt;br /&gt;
-    Friends found: &lt;&lt;=$game.friendsRescued&gt;&gt;&lt;br /&gt;
-    /* debug */
-    Row: &lt;&lt;=$game.player.row&gt;&gt; | Col: &lt;&lt;=$game.player.col&gt;&gt;&lt;br /&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
+        &lt;div class=&quot;west&quot;&gt;
+        w
+        &lt;/div&gt;
+        &lt;div class=&quot;southwest&quot;&gt;
+        sw
+        &lt;/div&gt;
+        &lt;div class=&quot;north&quot;&gt;
+        n
+        &lt;/div&gt;
+        &lt;div class=&quot;wait&quot;&gt;
+        .
+        &lt;/div&gt;
+        &lt;div class=&quot;south&quot;&gt;
+        s
+        &lt;/div&gt;
+        &lt;div class=&quot;northeast&quot;&gt;
+        ne
+        &lt;/div&gt;
+        &lt;div class=&quot;east&quot;&gt;
+        e
+        &lt;/div&gt;
+        &lt;div class=&quot;southeast&quot;&gt;
+        sw
+        &lt;/div&gt;
+        &lt;div class=&quot;northwest&quot;&gt;
+        nw
+        &lt;/div&gt; */
     &lt;/div&gt;
+
+&lt;/div&gt;
+
+
+
+
+    /* &lt;div&gt; */
+    /* XP: &lt;&lt;=$game.player.level&gt;&gt;&lt;br /&gt; */
+    /* HP: &lt;&lt;=$game.player.getHP()&gt;&gt;&lt;br /&gt; */
+    /* AC: &lt;&lt;=$game.player.ac&gt;&gt;&lt;br /&gt; */
+    /* Sanity: &lt;&lt;=$game.player.getSanity()&gt;&gt;&lt;br /&gt; */
+    /* Friends found: &lt;&lt;=$game.friendsRescued&gt;&gt;&lt;br /&gt; */
+    /* debug */
+    /* Row: &lt;&lt;=$game.player.row&gt;&gt; | Col: &lt;&lt;=$game.player.col&gt;&gt;&lt;br /&gt; */
+    /* &lt;/div&gt; */
   &lt;/div&gt;
 
   &lt;div class=&quot;map&quot;&gt;

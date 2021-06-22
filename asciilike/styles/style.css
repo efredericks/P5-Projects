@@ -250,3 +250,38 @@ c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
   animation-iteration-count: infinite;
 }
 
+/* NAV */
+.nav-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "nav . ."
+    ". . ."
+    ". . .";
+}
+
+.nav {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "northwest north northeast"
+    "west wait east"
+    "southwest south southeast";
+  grid-area: nav;
+}
+
+.west { grid-area: west; }
+.southwest { grid-area: southwest; }
+.north { grid-area: north; }
+.wait { grid-area: wait; }
+.south { grid-area: south; }
+.northeast { grid-area: northeast; }
+.east { grid-area: east; }
+.southeast { grid-area: southeast; }
+.northwest { grid-area: northwest; }
