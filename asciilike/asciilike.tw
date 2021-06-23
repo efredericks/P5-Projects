@@ -1,3 +1,8 @@
+/*
+Assets: 
+* UI: kenny.nl - Cartography pack: https://www.kenney.nl/assets/cartography-pack
+*/
+
 :: StoryTitle
 SugarCaves
 
@@ -90,99 +95,108 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
 :: Begin
 <<nobr>>
 <<if $gameState == setup.STATES.GAME>>
+
 <div class="container">
-  <div class="main">
-    /* <h2><<=Story.get($currentPassage).title>></h2> */
-
-
-    /* deal with a monster if one is here! */
-    <<if $game.hasCharacter($game.player.row, $game.player.col)>>
-      <<set _monster to $game.getCharacter($game.player.row, $game.player.col)>>
-        Monster is: <<=_monster>>
-
-    /* no pre-existing event in this room */
-    <<else>>
-      <<set _event to $game.randomEvent()>>
-      <<if _event.return>>
-      /* Spores event -- drunk text */
-        <<if _event.event == 'spores'>>
-          <div class="drunk">
-            <p class='event'>You trip over a skinny odd mushroom and release its spores.</p><br />  
-            <<=Story.get($currentPassage).text>>
-          </div>
-        /* Monster event! */
-        <<elseif _event.event == "monster">>
-          <<if $game.hasCharacter($game.player.row, $game.player.col)>>
-            <<set _monster to $game.getCharacter($game.player.row, $game.player.col)>>
-          <<else>>
-            <<set _monster to $game.createCharacter($game.player.row, $game.player.col, 'monster')>>
-          <</if>>
+  <div class="game-area">
+    <div class="main">
+      /* deal with a monster if one is here! */
+      <<if $game.hasCharacter($game.player.row, $game.player.col)>>
+        <<set _monster to $game.getCharacter($game.player.row, $game.player.col)>>
           Monster is: <<=_monster>>
+
+      /* no pre-existing event in this room */
+      <<else>>
+        <<set _event to $game.randomEvent()>>
+        <<if _event.return>>
+          /* Spores event -- drunk text */
+          <<if _event.event == 'spores'>>
+            <div class="drunk">
+              <p class='event'>You trip over a skinny odd mushroom and release its spores.</p><br />  
+              <<=Story.get($currentPassage).text>>
+            </div>
+          /* Monster event! */
+          <<elseif _event.event == "monster">>
+            <<if $game.hasCharacter($game.player.row, $game.player.col)>>
+              <<set _monster to $game.getCharacter($game.player.row, $game.player.col)>>
+            <<else>>
+              <<set _monster to $game.createCharacter($game.player.row, $game.player.col, 'monster')>>
+            <</if>>
+            Monster is: <<=_monster>>
   
+          <<else>>
+            <div>
+              event [<<=_event.event>>] tbd<br />
+              <<=Story.get($currentPassage).text>>
+            </div>
+          <</if>>
+        /* Normal passage */
         <<else>>
           <div>
-          event [<<=_event.event>>] tbd<br />
-          <<=Story.get($currentPassage).text>>
+            <<=Story.get($currentPassage).text>>
           </div>
         <</if>>
-      /* Normal passage */
-      <<else>>
-        <div>
-          <<=Story.get($currentPassage).text>>
-        </div>
       <</if>>
-    <</if>>
 
-    <<set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col)>>
-    <<if _friendsHere.length gt 0>>
-      /* one friend */
-      <<if _friendsHere.length eq 1>>
-      You see <<=_friendsHere[0].name>>.
-      <<elseif _friendsHere.length eq 2>>
-      You see <<=_friendsHere[0].name>> and <<=_friendsHere[1].name>>.
-      <<else>>
-        You see
+      <<set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col)>>
+      <<if _friendsHere.length gt 0>>
+        /* one friend */
+        <<if _friendsHere.length eq 1>>
+        You see <<=_friendsHere[0].name>>.
+        <<elseif _friendsHere.length eq 2>>
+        You see <<=_friendsHere[0].name>> and <<=_friendsHere[1].name>>.
+        <<else>>
+          You see
+          <<for _i to 0; _i lt _friendsHere.length; _i++>>
+            <<if _i eq _friendsHere.length-1>>
+            and <<=_friendsHere[_i].name>>.
+            <<else>>
+            <<=_friendsHere[_i].name>>,
+            <</if>>
+          <</for>>
+        <</if>>
+
+        /* "save" your friend(s) */
         <<for _i to 0; _i lt _friendsHere.length; _i++>>
-          <<if _i eq _friendsHere.length-1>>
-          and <<=_friendsHere[_i].name>>.
-          <<else>>
-          <<=_friendsHere[_i].name>>,
-          <</if>>
+          <<run $game.rescueFriend(_friendsHere[_i])>>
         <</for>>
       <</if>>
-
-      /* "save" your friend(s) */
-      <<for _i to 0; _i lt _friendsHere.length; _i++>>
-        <<run $game.rescueFriend(_friendsHere[_i])>>
-      <</for>>
-    <</if>>
-
-    <hr size="1" />
-
-    /* Get available passaages */
-    <div>
-      XP: <<=$game.player.level>><br />
-      HP: <<=$game.player.getHP()>><br />
-      AC: <<=$game.player.ac>><br />
-      Sanity: <<=$game.player.getSanity()>><br />
-      Friends found: <<=$game.friendsRescued>><br />
-      /* debug */
-      Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br />
     </div>
-  </div>
-  <div class="stats">
+    <div class="nav">
+      <<set _nextPassages to $game.getPassages($game.player)>>
+      <<for _i to 0; _i lt _nextPassages.length; _i++>>
+        <<capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
+        <div @class="_nextPassages[_i].header">
+          /* <<link [[_nextPassages[_i].text|Begin]]>> */
 
-    <div class="nav-container">
-      <div class="nav">
-        <<set _nextPassages to $game.getPassages($game.player)>>
-        <<for _i to 0; _i lt _nextPassages.length; _i++>>
-          <<capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
-          <div @class="_nextPassages[_i].header">
-            <<link [[_nextPassages[_i].text|Begin]]>>
+          <<if _nextPassages[_i].text == ".">>
+            <<set _imgPath to "assets/elementCircle.png">>
+          <<else>>
+            <<if _nextPassages[_i].text == "n">>
+              <<set _imgPath to "assets/arrowSmall-north.png">>
+            <<elseif _nextPassages[_i].text == "ne">>
+              <<set _imgPath to "assets/arrowSmall-northeast.png">>
+            <<elseif _nextPassages[_i].text == "nw">>
+              <<set _imgPath to "assets/arrowSmall-northwest.png">>
+            <<elseif _nextPassages[_i].text == "sw">>
+              <<set _imgPath to "assets/arrowSmall-southwest.png">>
+            <<elseif _nextPassages[_i].text == "se">>
+              <<set _imgPath to "assets/arrowSmall-southeast.png">>
+            <<elseif _nextPassages[_i].text == "e">>
+              <<set _imgPath to "assets/arrowSmall-east.png">>
+            <<elseif _nextPassages[_i].text == "w">>
+              <<set _imgPath to "assets/arrowSmall-west.png">>
+            <<else>>
+              <<set _imgPath to "assets/arrowSmall-south.png">>
+            <</if>>
+          <</if>>
+
+          /* can travel this way */
+          <<if _nextPassages[_i].valid>>
+            <<button [img[_imgPath][Begin]]>>
               <<set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col)>>
               <<set $game.player.row to _nextPassages[_i].row>>
               <<set $game.player.col to _nextPassages[_i].col>>
-
+  
               /* Update sanity based on +/- of the room you're going to */
               <<set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col))>>
               <<if _sanity == 0>>
@@ -194,133 +208,30 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
               <<if $game.totalFriends == $game.friendsRescued>>
                 <<set $gameState to setup.STATES.WIN>>
               <</if>>
-            <</link>>
-          </div>
-          <</capture>>
-        <</for>>
-
-
-/*    You see passages to the: 
-    <<for _i to 0; _i lt _nextPassages.length; _i++>>
-      <<set _nextRow = $game.player.row + _nextPassages[_i].row>>
-      <<set _nextCol = $game.player.col + _nextPassages[_i].col>>
-      <<set _nextPassage to $game.getPassage(_nextRow, _nextCol)>>
-      <<set _txt = "">>
-      <<if _nextPassages[_i].row is -1>>
-        <<set _txt to "North">>
-      <<elseif _nextPassages[_i].row is 1>>
-        <<set _txt to "South">>
-      <<elseif _nextPassages[_i].col is -1>>
-        <<set _txt to "West">>
-      <<elseif _nextPassages[_i].col is 1>>
-        <<set _txt to "East">>
-      <<else>>
-        <<set _txt to "Error: passage lookup">>
-      <</if>>
-
-      <<capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
-      <<link [[_txt|Begin]]>>
-        <<set $game.player.row to _nextRow>>
-        <<set $game.player.col to _nextCol>> */
-        /* Update sanity based on +/- of the room you're going to */
-        /* <<set _sanity to $game.player.updateSanity($game.getMapSanity(_nextRow, _nextCol))>>
-        <<if _sanity == 0>>
-          <<set $gameState to setup.STATES.LOST_SANITY>>
-        <</if>>
-
-        <<run $game.setPassageVisited(_nextRow, _nextCol)>>
-        <<set $currentPassage = _nextPassage>>
-        <<if $game.totalFriends == $game.friendsRescued>>
-          <<set $gameState to setup.STATES.WIN>>
-        <</if>>
-
-      <</link>>
-      <<if _nextPassages.length == 1>>
-        .
-      <<elseif _nextPassages.length == 2>>
-        <<if _i == _nextPassages.length-1>>
-          .
-        <<else>>
-          ,
-        <</if>>
-      <<else>>
-        <<if _i == _nextPassages.length-1>>
-          .
-        <<else>>
-          ,
-        <</if>>
-      <</if>>
-      <</capture>>
-    <</for>> */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 
-        <div class="west">
-        w
+            <</button>>
+          <<else>>
+            /* can't travel in this direction */
+            [img[_imgPath]]
+          <</if>>
         </div>
-        <div class="southwest">
-        sw
-        </div>
-        <div class="north">
-        n
-        </div>
-        <div class="wait">
-        .
-        </div>
-        <div class="south">
-        s
-        </div>
-        <div class="northeast">
-        ne
-        </div>
-        <div class="east">
-        e
-        </div>
-        <div class="southeast">
-        sw
-        </div>
-        <div class="northwest">
-        nw
-        </div> */
+        <</capture>>
+      <</for>>
     </div>
-
-</div>
-
-
-
-
-    /* <div> */
-    /* XP: <<=$game.player.level>><br /> */
-    /* HP: <<=$game.player.getHP()>><br /> */
-    /* AC: <<=$game.player.ac>><br /> */
-    /* Sanity: <<=$game.player.getSanity()>><br /> */
-    /* Friends found: <<=$game.friendsRescued>><br /> */
-    /* debug */
-    /* Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br /> */
-    /* </div> */
+    <div class="map">
+      <<=$game.vizMap()>>
+    </div>
+    <div class="messages">
+      <div>
+        XP: <<=$game.player.level>><br />
+        HP: <<=$game.player.getHP()>><br />
+        AC: <<=$game.player.ac>><br />
+        Sanity: <<=$game.player.getSanity()>><br />
+        Friends found: <<=$game.friendsRescued>><br />
+        /* debug */
+        Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br />
+      </div>
+    </div>
   </div>
-
-  <div class="map">
-    <<=$game.vizMap()>>
-  </div>
-  /* <div class="messages bordered-grid-item">i am messages</div> */
 </div>
 <<elseif $gameState == setup.STATES.WIN>>
   <h1>YOU WON</h1>

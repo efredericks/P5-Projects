@@ -102,18 +102,18 @@ var LZString={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234
 /* $ tweego -o index.html SugarCaves.twee styles scripts */
 /* twine-user-stylesheet #2: "style.css" */
 /* https://css-tricks.com/old-timey-terminal-styling/ */
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@500&display=swap");
 
 body {
   background-color: black;
   /* background-image: radial-gradient( */
-    /* rgba(4, 87, 104, 0.75), black 120% */
-    /*rgba(0, 150, 0, 0.75), black 120%*/
+  /* rgba(4, 87, 104, 0.75), black 120% */
+  /*rgba(0, 150, 0, 0.75), black 120%*/
   /* ); */
   height: 100vh;
 
   color: white;
-  font: 1.3rem 'Ubuntu', sans-serif;
+  font: 1.3rem "Ubuntu", sans-serif;
   text-shadow: 0 0 12px #c8c8c88a;
 
   background-image: [img[assets/img/pixel/cave-with-pool-mfbehrens99.png]];
@@ -146,7 +146,7 @@ body::after {
 */
 
 ::selection {
-  background: #0080FF;
+  background: #0080ff;
   text-shadow: none;
 }
 
@@ -167,7 +167,7 @@ table {
 td {
   padding: 0px;
   margin: 0px;
-  background:rgba(4, 87, 104, 0.75);
+  background: rgba(4, 87, 104, 0.75);
   width: 20px;
   height: 20px;
 }
@@ -175,7 +175,7 @@ td.active {
   background: #fff;
 }
 td.visited {
-  background:rgba(7, 52, 61, 0.75);
+  background: rgba(7, 52, 61, 0.75);
 }
 tr {
   padding: 0px;
@@ -183,7 +183,7 @@ tr {
 }
 
 /* grid layout */
-.container {
+/* .container {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -191,9 +191,9 @@ tr {
   grid-auto-flow: row;
   grid-template-areas:
     "main main stats"
-    "main main map";
-    /* "messages messages messages"; */
-}
+    "main main map"; */
+  /* "messages messages messages"; */
+/* }
 
 .container .main,
 .container .stats,
@@ -201,51 +201,195 @@ tr {
   border: 1px #333 solid;
   padding: 5px;
   background-image: radial-gradient(
-    rgba(4, 87, 104, 0.75), black 120%
+    rgba(4, 87, 104, 0.75), */
+    /* black 120%  */
     /*rgba(0, 150, 0, 0.75), black 120%*/
-  );
+  /* );
   border-radius: 5px;
   /* height: 100vh; */
+/*}
+.main {
+  grid-area: main;
 }
-.main { grid-area: main; }
-.stats { grid-area: stats; }
-.map { 
-  grid-area: map; 
+.stats {
+  grid-area: stats;
+}
+.map {
+  grid-area: map;
   display: grid;
   justify-content: center;
   align-items: center;
 }
+.messages {
+  grid-area: messages;
+} */
+
+.container {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-auto-columns: 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+}
+
+.game-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 15px 15px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "main main nav"
+    "main main map"
+    "messages messages messages";
+  grid-area: 1 / 1 / 2 / 2;
+
+}
+
+.main { grid-area: main; }
+
+.nav {
+  background-image: [img[assets/light-paper-fibers.png]];
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "northwest north northeast"
+    "west wait east"
+    "southwest south southeast";
+  grid-area: nav;
+
+  align-items: center;
+  justify-items: center;
+}
+
+.main, .map, .messages {
+  background-image: radial-gradient(
+  rgba(4, 87, 104, 0.75), black 120%
+  );
+}
+
+.main, .map, .nav, .messages {
+  border: 1px #333 solid;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.map {
+  grid-area: map;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+}
+
+.northwest { grid-area: northwest; }
+.north { grid-area: north; }
+.northeast { grid-area: northeast; }
+.east { grid-area: east; }
+.southeast { grid-area: southeast; }
+.south { grid-area: south; }
+.southwest { grid-area: southwest; }
+.west { grid-area: west; }
+.wait { grid-area: wait; }
+.map { grid-area: map; }
 .messages { grid-area: messages; }
 
-.empty { background: #000; }
-.cavern { background: rgb(97, 86, 24); }
-.tight { background: rgb(240, 99, 17); }
-.stream { background: rgb(57, 167, 218); }
-.pool { background: rgb(9, 59, 116); }
-.void { background: rgb(209, 25, 255); }
+.nav .macro-button {
+  /* background-color: transparent !important; */
+  background: rgba(157, 235, 69, 0.2) !important;
+  border: 1px #333 solid;
+  padding: 5px;
+  border-radius: 10px;
+}
+.nav .macro-button:hover {
+  background: rgba(9, 59, 116, 0.6) !important;
+}
+
+.empty {
+  background: #000;
+}
+.cavern {
+  background: rgb(97, 86, 24);
+}
+.tight {
+  background: rgb(240, 99, 17);
+}
+.stream {
+  background: rgb(57, 167, 218);
+}
+.pool {
+  background: rgb(9, 59, 116);
+}
+.void {
+  background: rgb(209, 25, 255);
+}
 
 /* Drunk Text - Start 
 c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
 */
 .drunk {
-	animation: drunkCam 10s infinite alternate;
-	color: white;
+  animation: drunkCam 10s infinite alternate;
+  color: white;
 }
 @keyframes drunkCam {
-	0%  { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	20% { filter: blur(1px); text-shadow: 8px 0 0 grey; }
-	24% { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	26% { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	28% { filter: blur(1px); text-shadow: 10px 0 0 grey; }
-	30% { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	60% { filter: blur(1px); text-shadow: 5px 0 0 grey; }
-	62% { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	65% { filter: blur(2px); text-shadow: 8px 0 0 grey; }
-	67% { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	80% { filter: blur(0px); text-shadow: 8px 0 0 grey; }
-	85% { filter: blur(2px); text-shadow: 10px 0 0 grey; }
-	88% { filter: blur(1px); text-shadow: 5px 0 0 grey; }
-	90% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+  0% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  20% {
+    filter: blur(1px);
+    text-shadow: 8px 0 0 grey;
+  }
+  24% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  26% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  28% {
+    filter: blur(1px);
+    text-shadow: 10px 0 0 grey;
+  }
+  30% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  60% {
+    filter: blur(1px);
+    text-shadow: 5px 0 0 grey;
+  }
+  62% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  65% {
+    filter: blur(2px);
+    text-shadow: 8px 0 0 grey;
+  }
+  67% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  80% {
+    filter: blur(0px);
+    text-shadow: 8px 0 0 grey;
+  }
+  85% {
+    filter: blur(2px);
+    text-shadow: 10px 0 0 grey;
+  }
+  88% {
+    filter: blur(1px);
+    text-shadow: 5px 0 0 grey;
+  }
+  90% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
 }
 
 .event {
@@ -352,42 +496,7 @@ c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
-
-/* NAV */
-.nav-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 0px 0px;
-  grid-auto-flow: row;
-  grid-template-areas:
-    "nav . ."
-    ". . ."
-    ". . .";
-}
-
-.nav {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 0px 0px;
-  grid-auto-flow: row;
-  grid-template-areas:
-    "northwest north northeast"
-    "west wait east"
-    "southwest south southeast";
-  grid-area: nav;
-}
-
-.west { grid-area: west; }
-.southwest { grid-area: southwest; }
-.north { grid-area: north; }
-.wait { grid-area: wait; }
-.south { grid-area: south; }
-.northeast { grid-area: northeast; }
-.east { grid-area: east; }
-.southeast { grid-area: southeast; }
-.northwest { grid-area: northwest; }</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
+</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
 /* js/constants.js, js/room.js, js/traceryGen.js, js/person.js, js/macroWhen.js */
 /* twine-user-script #2: "fast-simplex-noise.js" */
 /*
@@ -1182,12 +1291,13 @@ class GameManager {
     }
   }
 
+
   // cardinal directions only
   getPassages(player) {
     let _passages = [];
 
     // north
-    let _n = { header: "north", text: "n" };
+    let _n = { header: "north", text: "n" }; 
     if (player.row > 0) {
       _n.row = player.row - 1;
       _n.col = player.col;
@@ -1401,99 +1511,108 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
 
 /* BEGIN PROCGEN */</tw-passagedata><tw-passagedata pid="12" name="Begin" tags="" position="225,225" size="100,100">&lt;&lt;nobr&gt;&gt;
 &lt;&lt;if $gameState == setup.STATES.GAME&gt;&gt;
+
 &lt;div class=&quot;container&quot;&gt;
-  &lt;div class=&quot;main&quot;&gt;
-    /* &lt;h2&gt;&lt;&lt;=Story.get($currentPassage).title&gt;&gt;&lt;/h2&gt; */
-
-
-    /* deal with a monster if one is here! */
-    &lt;&lt;if $game.hasCharacter($game.player.row, $game.player.col)&gt;&gt;
-      &lt;&lt;set _monster to $game.getCharacter($game.player.row, $game.player.col)&gt;&gt;
-        Monster is: &lt;&lt;=_monster&gt;&gt;
-
-    /* no pre-existing event in this room */
-    &lt;&lt;else&gt;&gt;
-      &lt;&lt;set _event to $game.randomEvent()&gt;&gt;
-      &lt;&lt;if _event.return&gt;&gt;
-      /* Spores event -- drunk text */
-        &lt;&lt;if _event.event == &#39;spores&#39;&gt;&gt;
-          &lt;div class=&quot;drunk&quot;&gt;
-            &lt;p class=&#39;event&#39;&gt;You trip over a skinny odd mushroom and release its spores.&lt;/p&gt;&lt;br /&gt;  
-            &lt;&lt;=Story.get($currentPassage).text&gt;&gt;
-          &lt;/div&gt;
-        /* Monster event! */
-        &lt;&lt;elseif _event.event == &quot;monster&quot;&gt;&gt;
-          &lt;&lt;if $game.hasCharacter($game.player.row, $game.player.col)&gt;&gt;
-            &lt;&lt;set _monster to $game.getCharacter($game.player.row, $game.player.col)&gt;&gt;
-          &lt;&lt;else&gt;&gt;
-            &lt;&lt;set _monster to $game.createCharacter($game.player.row, $game.player.col, &#39;monster&#39;)&gt;&gt;
-          &lt;&lt;/if&gt;&gt;
+  &lt;div class=&quot;game-area&quot;&gt;
+    &lt;div class=&quot;main&quot;&gt;
+      /* deal with a monster if one is here! */
+      &lt;&lt;if $game.hasCharacter($game.player.row, $game.player.col)&gt;&gt;
+        &lt;&lt;set _monster to $game.getCharacter($game.player.row, $game.player.col)&gt;&gt;
           Monster is: &lt;&lt;=_monster&gt;&gt;
+
+      /* no pre-existing event in this room */
+      &lt;&lt;else&gt;&gt;
+        &lt;&lt;set _event to $game.randomEvent()&gt;&gt;
+        &lt;&lt;if _event.return&gt;&gt;
+          /* Spores event -- drunk text */
+          &lt;&lt;if _event.event == &#39;spores&#39;&gt;&gt;
+            &lt;div class=&quot;drunk&quot;&gt;
+              &lt;p class=&#39;event&#39;&gt;You trip over a skinny odd mushroom and release its spores.&lt;/p&gt;&lt;br /&gt;  
+              &lt;&lt;=Story.get($currentPassage).text&gt;&gt;
+            &lt;/div&gt;
+          /* Monster event! */
+          &lt;&lt;elseif _event.event == &quot;monster&quot;&gt;&gt;
+            &lt;&lt;if $game.hasCharacter($game.player.row, $game.player.col)&gt;&gt;
+              &lt;&lt;set _monster to $game.getCharacter($game.player.row, $game.player.col)&gt;&gt;
+            &lt;&lt;else&gt;&gt;
+              &lt;&lt;set _monster to $game.createCharacter($game.player.row, $game.player.col, &#39;monster&#39;)&gt;&gt;
+            &lt;&lt;/if&gt;&gt;
+            Monster is: &lt;&lt;=_monster&gt;&gt;
   
+          &lt;&lt;else&gt;&gt;
+            &lt;div&gt;
+              event [&lt;&lt;=_event.event&gt;&gt;] tbd&lt;br /&gt;
+              &lt;&lt;=Story.get($currentPassage).text&gt;&gt;
+            &lt;/div&gt;
+          &lt;&lt;/if&gt;&gt;
+        /* Normal passage */
         &lt;&lt;else&gt;&gt;
           &lt;div&gt;
-          event [&lt;&lt;=_event.event&gt;&gt;] tbd&lt;br /&gt;
-          &lt;&lt;=Story.get($currentPassage).text&gt;&gt;
+            &lt;&lt;=Story.get($currentPassage).text&gt;&gt;
           &lt;/div&gt;
         &lt;&lt;/if&gt;&gt;
-      /* Normal passage */
-      &lt;&lt;else&gt;&gt;
-        &lt;div&gt;
-          &lt;&lt;=Story.get($currentPassage).text&gt;&gt;
-        &lt;/div&gt;
       &lt;&lt;/if&gt;&gt;
-    &lt;&lt;/if&gt;&gt;
 
-    &lt;&lt;set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col)&gt;&gt;
-    &lt;&lt;if _friendsHere.length gt 0&gt;&gt;
-      /* one friend */
-      &lt;&lt;if _friendsHere.length eq 1&gt;&gt;
-      You see &lt;&lt;=_friendsHere[0].name&gt;&gt;.
-      &lt;&lt;elseif _friendsHere.length eq 2&gt;&gt;
-      You see &lt;&lt;=_friendsHere[0].name&gt;&gt; and &lt;&lt;=_friendsHere[1].name&gt;&gt;.
-      &lt;&lt;else&gt;&gt;
-        You see
+      &lt;&lt;set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col)&gt;&gt;
+      &lt;&lt;if _friendsHere.length gt 0&gt;&gt;
+        /* one friend */
+        &lt;&lt;if _friendsHere.length eq 1&gt;&gt;
+        You see &lt;&lt;=_friendsHere[0].name&gt;&gt;.
+        &lt;&lt;elseif _friendsHere.length eq 2&gt;&gt;
+        You see &lt;&lt;=_friendsHere[0].name&gt;&gt; and &lt;&lt;=_friendsHere[1].name&gt;&gt;.
+        &lt;&lt;else&gt;&gt;
+          You see
+          &lt;&lt;for _i to 0; _i lt _friendsHere.length; _i++&gt;&gt;
+            &lt;&lt;if _i eq _friendsHere.length-1&gt;&gt;
+            and &lt;&lt;=_friendsHere[_i].name&gt;&gt;.
+            &lt;&lt;else&gt;&gt;
+            &lt;&lt;=_friendsHere[_i].name&gt;&gt;,
+            &lt;&lt;/if&gt;&gt;
+          &lt;&lt;/for&gt;&gt;
+        &lt;&lt;/if&gt;&gt;
+
+        /* &quot;save&quot; your friend(s) */
         &lt;&lt;for _i to 0; _i lt _friendsHere.length; _i++&gt;&gt;
-          &lt;&lt;if _i eq _friendsHere.length-1&gt;&gt;
-          and &lt;&lt;=_friendsHere[_i].name&gt;&gt;.
-          &lt;&lt;else&gt;&gt;
-          &lt;&lt;=_friendsHere[_i].name&gt;&gt;,
-          &lt;&lt;/if&gt;&gt;
+          &lt;&lt;run $game.rescueFriend(_friendsHere[_i])&gt;&gt;
         &lt;&lt;/for&gt;&gt;
       &lt;&lt;/if&gt;&gt;
-
-      /* &quot;save&quot; your friend(s) */
-      &lt;&lt;for _i to 0; _i lt _friendsHere.length; _i++&gt;&gt;
-        &lt;&lt;run $game.rescueFriend(_friendsHere[_i])&gt;&gt;
-      &lt;&lt;/for&gt;&gt;
-    &lt;&lt;/if&gt;&gt;
-
-    &lt;hr size=&quot;1&quot; /&gt;
-
-    /* Get available passaages */
-    &lt;div&gt;
-      XP: &lt;&lt;=$game.player.level&gt;&gt;&lt;br /&gt;
-      HP: &lt;&lt;=$game.player.getHP()&gt;&gt;&lt;br /&gt;
-      AC: &lt;&lt;=$game.player.ac&gt;&gt;&lt;br /&gt;
-      Sanity: &lt;&lt;=$game.player.getSanity()&gt;&gt;&lt;br /&gt;
-      Friends found: &lt;&lt;=$game.friendsRescued&gt;&gt;&lt;br /&gt;
-      /* debug */
-      Row: &lt;&lt;=$game.player.row&gt;&gt; | Col: &lt;&lt;=$game.player.col&gt;&gt;&lt;br /&gt;
     &lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;stats&quot;&gt;
+    &lt;div class=&quot;nav&quot;&gt;
+      &lt;&lt;set _nextPassages to $game.getPassages($game.player)&gt;&gt;
+      &lt;&lt;for _i to 0; _i lt _nextPassages.length; _i++&gt;&gt;
+        &lt;&lt;capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage&gt;&gt;
+        &lt;div @class=&quot;_nextPassages[_i].header&quot;&gt;
+          /* &lt;&lt;link [[_nextPassages[_i].text|Begin]]&gt;&gt; */
 
-    &lt;div class=&quot;nav-container&quot;&gt;
-      &lt;div class=&quot;nav&quot;&gt;
-        &lt;&lt;set _nextPassages to $game.getPassages($game.player)&gt;&gt;
-        &lt;&lt;for _i to 0; _i lt _nextPassages.length; _i++&gt;&gt;
-          &lt;&lt;capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage&gt;&gt;
-          &lt;div @class=&quot;_nextPassages[_i].header&quot;&gt;
-            &lt;&lt;link [[_nextPassages[_i].text|Begin]]&gt;&gt;
+          &lt;&lt;if _nextPassages[_i].text == &quot;.&quot;&gt;&gt;
+            &lt;&lt;set _imgPath to &quot;assets/elementCircle.png&quot;&gt;&gt;
+          &lt;&lt;else&gt;&gt;
+            &lt;&lt;if _nextPassages[_i].text == &quot;n&quot;&gt;&gt;
+              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-north.png&quot;&gt;&gt;
+            &lt;&lt;elseif _nextPassages[_i].text == &quot;ne&quot;&gt;&gt;
+              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-northeast.png&quot;&gt;&gt;
+            &lt;&lt;elseif _nextPassages[_i].text == &quot;nw&quot;&gt;&gt;
+              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-northwest.png&quot;&gt;&gt;
+            &lt;&lt;elseif _nextPassages[_i].text == &quot;sw&quot;&gt;&gt;
+              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-southwest.png&quot;&gt;&gt;
+            &lt;&lt;elseif _nextPassages[_i].text == &quot;se&quot;&gt;&gt;
+              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-southeast.png&quot;&gt;&gt;
+            &lt;&lt;elseif _nextPassages[_i].text == &quot;e&quot;&gt;&gt;
+              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-east.png&quot;&gt;&gt;
+            &lt;&lt;elseif _nextPassages[_i].text == &quot;w&quot;&gt;&gt;
+              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-west.png&quot;&gt;&gt;
+            &lt;&lt;else&gt;&gt;
+              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-south.png&quot;&gt;&gt;
+            &lt;&lt;/if&gt;&gt;
+          &lt;&lt;/if&gt;&gt;
+
+          /* can travel this way */
+          &lt;&lt;if _nextPassages[_i].valid&gt;&gt;
+            &lt;&lt;button [img[_imgPath][Begin]]&gt;&gt;
               &lt;&lt;set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col)&gt;&gt;
               &lt;&lt;set $game.player.row to _nextPassages[_i].row&gt;&gt;
               &lt;&lt;set $game.player.col to _nextPassages[_i].col&gt;&gt;
-
+  
               /* Update sanity based on +/- of the room you&#39;re going to */
               &lt;&lt;set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col))&gt;&gt;
               &lt;&lt;if _sanity == 0&gt;&gt;
@@ -1505,133 +1624,30 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
               &lt;&lt;if $game.totalFriends == $game.friendsRescued&gt;&gt;
                 &lt;&lt;set $gameState to setup.STATES.WIN&gt;&gt;
               &lt;&lt;/if&gt;&gt;
-            &lt;&lt;/link&gt;&gt;
-          &lt;/div&gt;
-          &lt;&lt;/capture&gt;&gt;
-        &lt;&lt;/for&gt;&gt;
-
-
-/*    You see passages to the: 
-    &lt;&lt;for _i to 0; _i lt _nextPassages.length; _i++&gt;&gt;
-      &lt;&lt;set _nextRow = $game.player.row + _nextPassages[_i].row&gt;&gt;
-      &lt;&lt;set _nextCol = $game.player.col + _nextPassages[_i].col&gt;&gt;
-      &lt;&lt;set _nextPassage to $game.getPassage(_nextRow, _nextCol)&gt;&gt;
-      &lt;&lt;set _txt = &quot;&quot;&gt;&gt;
-      &lt;&lt;if _nextPassages[_i].row is -1&gt;&gt;
-        &lt;&lt;set _txt to &quot;North&quot;&gt;&gt;
-      &lt;&lt;elseif _nextPassages[_i].row is 1&gt;&gt;
-        &lt;&lt;set _txt to &quot;South&quot;&gt;&gt;
-      &lt;&lt;elseif _nextPassages[_i].col is -1&gt;&gt;
-        &lt;&lt;set _txt to &quot;West&quot;&gt;&gt;
-      &lt;&lt;elseif _nextPassages[_i].col is 1&gt;&gt;
-        &lt;&lt;set _txt to &quot;East&quot;&gt;&gt;
-      &lt;&lt;else&gt;&gt;
-        &lt;&lt;set _txt to &quot;Error: passage lookup&quot;&gt;&gt;
-      &lt;&lt;/if&gt;&gt;
-
-      &lt;&lt;capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage&gt;&gt;
-      &lt;&lt;link [[_txt|Begin]]&gt;&gt;
-        &lt;&lt;set $game.player.row to _nextRow&gt;&gt;
-        &lt;&lt;set $game.player.col to _nextCol&gt;&gt; */
-        /* Update sanity based on +/- of the room you&#39;re going to */
-        /* &lt;&lt;set _sanity to $game.player.updateSanity($game.getMapSanity(_nextRow, _nextCol))&gt;&gt;
-        &lt;&lt;if _sanity == 0&gt;&gt;
-          &lt;&lt;set $gameState to setup.STATES.LOST_SANITY&gt;&gt;
-        &lt;&lt;/if&gt;&gt;
-
-        &lt;&lt;run $game.setPassageVisited(_nextRow, _nextCol)&gt;&gt;
-        &lt;&lt;set $currentPassage = _nextPassage&gt;&gt;
-        &lt;&lt;if $game.totalFriends == $game.friendsRescued&gt;&gt;
-          &lt;&lt;set $gameState to setup.STATES.WIN&gt;&gt;
-        &lt;&lt;/if&gt;&gt;
-
-      &lt;&lt;/link&gt;&gt;
-      &lt;&lt;if _nextPassages.length == 1&gt;&gt;
-        .
-      &lt;&lt;elseif _nextPassages.length == 2&gt;&gt;
-        &lt;&lt;if _i == _nextPassages.length-1&gt;&gt;
-          .
-        &lt;&lt;else&gt;&gt;
-          ,
-        &lt;&lt;/if&gt;&gt;
-      &lt;&lt;else&gt;&gt;
-        &lt;&lt;if _i == _nextPassages.length-1&gt;&gt;
-          .
-        &lt;&lt;else&gt;&gt;
-          ,
-        &lt;&lt;/if&gt;&gt;
-      &lt;&lt;/if&gt;&gt;
-      &lt;&lt;/capture&gt;&gt;
-    &lt;&lt;/for&gt;&gt; */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* 
-        &lt;div class=&quot;west&quot;&gt;
-        w
+            &lt;&lt;/button&gt;&gt;
+          &lt;&lt;else&gt;&gt;
+            /* can&#39;t travel in this direction */
+            [img[_imgPath]]
+          &lt;&lt;/if&gt;&gt;
         &lt;/div&gt;
-        &lt;div class=&quot;southwest&quot;&gt;
-        sw
-        &lt;/div&gt;
-        &lt;div class=&quot;north&quot;&gt;
-        n
-        &lt;/div&gt;
-        &lt;div class=&quot;wait&quot;&gt;
-        .
-        &lt;/div&gt;
-        &lt;div class=&quot;south&quot;&gt;
-        s
-        &lt;/div&gt;
-        &lt;div class=&quot;northeast&quot;&gt;
-        ne
-        &lt;/div&gt;
-        &lt;div class=&quot;east&quot;&gt;
-        e
-        &lt;/div&gt;
-        &lt;div class=&quot;southeast&quot;&gt;
-        sw
-        &lt;/div&gt;
-        &lt;div class=&quot;northwest&quot;&gt;
-        nw
-        &lt;/div&gt; */
+        &lt;&lt;/capture&gt;&gt;
+      &lt;&lt;/for&gt;&gt;
     &lt;/div&gt;
-
-&lt;/div&gt;
-
-
-
-
-    /* &lt;div&gt; */
-    /* XP: &lt;&lt;=$game.player.level&gt;&gt;&lt;br /&gt; */
-    /* HP: &lt;&lt;=$game.player.getHP()&gt;&gt;&lt;br /&gt; */
-    /* AC: &lt;&lt;=$game.player.ac&gt;&gt;&lt;br /&gt; */
-    /* Sanity: &lt;&lt;=$game.player.getSanity()&gt;&gt;&lt;br /&gt; */
-    /* Friends found: &lt;&lt;=$game.friendsRescued&gt;&gt;&lt;br /&gt; */
-    /* debug */
-    /* Row: &lt;&lt;=$game.player.row&gt;&gt; | Col: &lt;&lt;=$game.player.col&gt;&gt;&lt;br /&gt; */
-    /* &lt;/div&gt; */
+    &lt;div class=&quot;map&quot;&gt;
+      &lt;&lt;=$game.vizMap()&gt;&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;messages&quot;&gt;
+      &lt;div&gt;
+        XP: &lt;&lt;=$game.player.level&gt;&gt;&lt;br /&gt;
+        HP: &lt;&lt;=$game.player.getHP()&gt;&gt;&lt;br /&gt;
+        AC: &lt;&lt;=$game.player.ac&gt;&gt;&lt;br /&gt;
+        Sanity: &lt;&lt;=$game.player.getSanity()&gt;&gt;&lt;br /&gt;
+        Friends found: &lt;&lt;=$game.friendsRescued&gt;&gt;&lt;br /&gt;
+        /* debug */
+        Row: &lt;&lt;=$game.player.row&gt;&gt; | Col: &lt;&lt;=$game.player.col&gt;&gt;&lt;br /&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
   &lt;/div&gt;
-
-  &lt;div class=&quot;map&quot;&gt;
-    &lt;&lt;=$game.vizMap()&gt;&gt;
-  &lt;/div&gt;
-  /* &lt;div class=&quot;messages bordered-grid-item&quot;&gt;i am messages&lt;/div&gt; */
 &lt;/div&gt;
 &lt;&lt;elseif $gameState == setup.STATES.WIN&gt;&gt;
   &lt;h1&gt;YOU WON&lt;/h1&gt;

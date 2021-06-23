@@ -205,12 +205,13 @@ class GameManager {
     }
   }
 
+
   // cardinal directions only
   getPassages(player) {
     let _passages = [];
 
     // north
-    let _n = { header: "north", text: "n" };
+    let _n = { header: "north", text: "n" }; 
     if (player.row > 0) {
       _n.row = player.row - 1;
       _n.col = player.col;

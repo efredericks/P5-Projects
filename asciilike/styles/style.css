@@ -1,16 +1,16 @@
 /* https://css-tricks.com/old-timey-terminal-styling/ */
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@500&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Ubuntu:wght@500&display=swap");
 
 body {
   background-color: black;
   /* background-image: radial-gradient( */
-    /* rgba(4, 87, 104, 0.75), black 120% */
-    /*rgba(0, 150, 0, 0.75), black 120%*/
+  /* rgba(4, 87, 104, 0.75), black 120% */
+  /*rgba(0, 150, 0, 0.75), black 120%*/
   /* ); */
   height: 100vh;
 
   color: white;
-  font: 1.3rem 'Ubuntu', sans-serif;
+  font: 1.3rem "Ubuntu", sans-serif;
   text-shadow: 0 0 12px #c8c8c88a;
 
   background-image: [img[assets/img/pixel/cave-with-pool-mfbehrens99.png]];
@@ -43,7 +43,7 @@ body::after {
 */
 
 ::selection {
-  background: #0080FF;
+  background: #0080ff;
   text-shadow: none;
 }
 
@@ -64,7 +64,7 @@ table {
 td {
   padding: 0px;
   margin: 0px;
-  background:rgba(4, 87, 104, 0.75);
+  background: rgba(4, 87, 104, 0.75);
   width: 20px;
   height: 20px;
 }
@@ -72,7 +72,7 @@ td.active {
   background: #fff;
 }
 td.visited {
-  background:rgba(7, 52, 61, 0.75);
+  background: rgba(7, 52, 61, 0.75);
 }
 tr {
   padding: 0px;
@@ -80,7 +80,7 @@ tr {
 }
 
 /* grid layout */
-.container {
+/* .container {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -88,9 +88,9 @@ tr {
   grid-auto-flow: row;
   grid-template-areas:
     "main main stats"
-    "main main map";
-    /* "messages messages messages"; */
-}
+    "main main map"; */
+  /* "messages messages messages"; */
+/* }
 
 .container .main,
 .container .stats,
@@ -98,51 +98,195 @@ tr {
   border: 1px #333 solid;
   padding: 5px;
   background-image: radial-gradient(
-    rgba(4, 87, 104, 0.75), black 120%
+    rgba(4, 87, 104, 0.75), */
+    /* black 120%  */
     /*rgba(0, 150, 0, 0.75), black 120%*/
-  );
+  /* );
   border-radius: 5px;
   /* height: 100vh; */
+/*}
+.main {
+  grid-area: main;
 }
-.main { grid-area: main; }
-.stats { grid-area: stats; }
-.map { 
-  grid-area: map; 
+.stats {
+  grid-area: stats;
+}
+.map {
+  grid-area: map;
   display: grid;
   justify-content: center;
   align-items: center;
 }
+.messages {
+  grid-area: messages;
+} */
+
+.container {
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-auto-columns: 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+}
+
+.game-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 15px 15px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "main main nav"
+    "main main map"
+    "messages messages messages";
+  grid-area: 1 / 1 / 2 / 2;
+
+}
+
+.main { grid-area: main; }
+
+.nav {
+  background-image: [img[assets/light-paper-fibers.png]];
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "northwest north northeast"
+    "west wait east"
+    "southwest south southeast";
+  grid-area: nav;
+
+  align-items: center;
+  justify-items: center;
+}
+
+.main, .map, .messages {
+  background-image: radial-gradient(
+  rgba(4, 87, 104, 0.75), black 120%
+  );
+}
+
+.main, .map, .nav, .messages {
+  border: 1px #333 solid;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.map {
+  grid-area: map;
+  display: grid;
+  justify-content: center;
+  align-items: center;
+}
+
+.northwest { grid-area: northwest; }
+.north { grid-area: north; }
+.northeast { grid-area: northeast; }
+.east { grid-area: east; }
+.southeast { grid-area: southeast; }
+.south { grid-area: south; }
+.southwest { grid-area: southwest; }
+.west { grid-area: west; }
+.wait { grid-area: wait; }
+.map { grid-area: map; }
 .messages { grid-area: messages; }
 
-.empty { background: #000; }
-.cavern { background: rgb(97, 86, 24); }
-.tight { background: rgb(240, 99, 17); }
-.stream { background: rgb(57, 167, 218); }
-.pool { background: rgb(9, 59, 116); }
-.void { background: rgb(209, 25, 255); }
+.nav .macro-button {
+  /* background-color: transparent !important; */
+  background: rgba(157, 235, 69, 0.2) !important;
+  border: 1px #333 solid;
+  padding: 5px;
+  border-radius: 10px;
+}
+.nav .macro-button:hover {
+  background: rgba(9, 59, 116, 0.6) !important;
+}
+
+.empty {
+  background: #000;
+}
+.cavern {
+  background: rgb(97, 86, 24);
+}
+.tight {
+  background: rgb(240, 99, 17);
+}
+.stream {
+  background: rgb(57, 167, 218);
+}
+.pool {
+  background: rgb(9, 59, 116);
+}
+.void {
+  background: rgb(209, 25, 255);
+}
 
 /* Drunk Text - Start 
 c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
 */
 .drunk {
-	animation: drunkCam 10s infinite alternate;
-	color: white;
+  animation: drunkCam 10s infinite alternate;
+  color: white;
 }
 @keyframes drunkCam {
-	0%  { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	20% { filter: blur(1px); text-shadow: 8px 0 0 grey; }
-	24% { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	26% { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	28% { filter: blur(1px); text-shadow: 10px 0 0 grey; }
-	30% { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	60% { filter: blur(1px); text-shadow: 5px 0 0 grey; }
-	62% { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	65% { filter: blur(2px); text-shadow: 8px 0 0 grey; }
-	67% { filter: blur(0px); text-shadow: 0 0 0 grey; }
-	80% { filter: blur(0px); text-shadow: 8px 0 0 grey; }
-	85% { filter: blur(2px); text-shadow: 10px 0 0 grey; }
-	88% { filter: blur(1px); text-shadow: 5px 0 0 grey; }
-	90% { filter: blur(0px); text-shadow: 0 0 0 grey; }
+  0% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  20% {
+    filter: blur(1px);
+    text-shadow: 8px 0 0 grey;
+  }
+  24% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  26% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  28% {
+    filter: blur(1px);
+    text-shadow: 10px 0 0 grey;
+  }
+  30% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  60% {
+    filter: blur(1px);
+    text-shadow: 5px 0 0 grey;
+  }
+  62% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  65% {
+    filter: blur(2px);
+    text-shadow: 8px 0 0 grey;
+  }
+  67% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
+  80% {
+    filter: blur(0px);
+    text-shadow: 8px 0 0 grey;
+  }
+  85% {
+    filter: blur(2px);
+    text-shadow: 10px 0 0 grey;
+  }
+  88% {
+    filter: blur(1px);
+    text-shadow: 5px 0 0 grey;
+  }
+  90% {
+    filter: blur(0px);
+    text-shadow: 0 0 0 grey;
+  }
 }
 
 .event {
@@ -249,39 +393,3 @@ c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
-
-/* NAV */
-.nav-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 0px 0px;
-  grid-auto-flow: row;
-  grid-template-areas:
-    "nav . ."
-    ". . ."
-    ". . .";
-}
-
-.nav {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap: 0px 0px;
-  grid-auto-flow: row;
-  grid-template-areas:
-    "northwest north northeast"
-    "west wait east"
-    "southwest south southeast";
-  grid-area: nav;
-}
-
-.west { grid-area: west; }
-.southwest { grid-area: southwest; }
-.north { grid-area: north; }
-.wait { grid-area: wait; }
-.south { grid-area: south; }
-.northeast { grid-area: northeast; }
-.east { grid-area: east; }
-.southeast { grid-area: southeast; }
-.northwest { grid-area: northwest; }
