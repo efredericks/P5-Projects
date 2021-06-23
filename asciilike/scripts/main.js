@@ -10,6 +10,210 @@ setup.STATES = {
   LOST_SANITY: 4,
 }
 
+let _monsters = [
+  {
+    'name': 'Black Ancient',
+    'img': 'Black Ancient.png'
+  },
+  {
+    'name': 'Black Birdi',
+    'img': 'Black Birdi.png'
+  },
+  {
+    'name': 'Black Bot',
+    'img': 'Black Bot.png'
+  },
+  {
+    'name': 'Black Bug',
+    'img': 'Black Bug.png'
+  },
+  {
+    'name': 'Black Chomp Plant',
+    'img': 'Black Chomp Plant.png'
+  },
+  {
+    'name': 'Black Crab',
+    'img': 'Black Crab.png'
+  },
+  {
+    'name': 'Black Dancer',
+    'img': 'Black Dancer.png'
+  },
+  {
+    'name': 'Black Demon Skele',
+    'img': 'Black Demon Skele.png'
+  },
+  {
+    'name': 'Black Demoness',
+    'img': 'Black Demoness.png'
+  },
+  {
+    'name': 'Black Doll Dancing',
+    'img': 'Black Doll Dancing.png'
+  },
+  {
+    'name': 'Black Eyes',
+    'img': 'Black Eyes.png'
+  },
+  {
+    'name': 'Black Fighter',
+    'img': 'Black Fighter.png'
+  },
+  {
+    'name': 'Black Genie',
+    'img': 'Black Genie.png'
+  },
+  {
+    'name': 'Black Hand',
+    'img': 'Black Hand.png'
+  },
+  {
+    'name': 'Black Holler',
+    'img': 'Black Holler.png'
+  },
+  {
+    'name': 'Black Hulking',
+    'img': 'Black Hulking.png'
+  },
+  {
+    'name': 'Black Inquisition',
+    'img': 'Black Inquisition.png'
+  },
+  {
+    'name': 'Black Intimidator',
+    'img': 'Black Intimidator.png'
+  },
+  {
+    'name': 'Black Jelly',
+    'img': 'Black Jelly.png'
+  },
+  {
+    'name': 'Black Joy',
+    'img': 'Black Joy.png'
+  },
+  {
+    'name': 'Black Jump',
+    'img': 'Black Jump.png'
+  },
+  {
+    'name': 'Black Kablam',
+    'img': 'Black Kablam.png'
+  },
+  {
+    'name': 'Black Menace',
+    'img': 'Black Menace.png'
+  },
+  {
+    'name': 'Black Mini-Bot',
+    'img': 'Black Mini-Bot.png'
+  },
+  {
+    'name': 'Black Mouth',
+    'img': 'Black Mouth.png'
+  },
+  {
+    'name': 'Black One-Eye',
+    'img': 'Black One-Eye.png'
+  },
+  {
+    'name': 'Black Peeper',
+    'img': 'Black Peeper.png'
+  },
+  {
+    'name': 'Black Pixie',
+    'img': 'Black Pixie.png'
+  },
+  {
+    'name': 'Black Reaper',
+    'img': 'Black Reaper.png'
+  },
+  {
+    'name': 'Black Revel',
+    'img': 'Black Revel.png'
+  },
+  {
+    'name': 'Black Salesman',
+    'img': 'Black Salesman.png'
+  },
+  {
+    'name': 'Black Scare',
+    'img': 'Black Scare.png'
+  },
+  {
+    'name': 'Black Scratchy',
+    'img': 'Black Scratchy.png'
+  },
+  {
+    'name': 'Black Scream.png',
+    'img': 'Black Scream.png'
+  },
+  {
+    'name': 'Black Sea Crawler',
+    'img': 'Black Sea Crawler.png'
+  },
+  {
+    'name': 'Black Skele-heart',
+    'img': 'Black Skele-heart.png'
+  },
+  {
+    'name': 'Black Skull',
+    'img': 'Black Skull.png'
+  },
+  {
+    'name': 'Black Sleek',
+    'img': 'Black Sleek.png'
+  },
+  {
+    'name': 'Black Slime',
+    'img': 'Black Slime.png'
+  },
+  {
+    'name': 'Black Slither',
+    'img': 'Black Slither.png'
+  },
+  {
+    'name': 'Black Spikey',
+    'img': 'Black Spikey.png'
+  },
+  {
+    'name': 'Black Stalker',
+    'img': 'Black Stalker.png'
+  },
+  {
+    'name': 'Black Tortoola',
+    'img': 'Black Tortoola.png'
+  },
+  {
+    'name': 'Black Turtle Creeper',
+    'img': 'Black Turtle Creeper.png'
+  },
+  {
+    'name': 'Black Turtle-man',
+    'img': 'Black Turtle-man.png'
+  },
+  {
+    'name': 'Black Walker',
+    'img': 'Black Walker.png'
+  },
+  {
+    'name': 'Black Wasp-Man',
+    'img': 'Black Wasp-Man.png'
+  },
+  {
+    'name': 'Black Wiggles',
+    'img': 'Black Wiggles.png'
+  },
+  {
+    'name': 'Black Wolf',
+    'img': 'Black Wolf.png'
+  },
+  {
+    'name': 'Blank Emergence',
+    'img': 'Blank Emergence.png'
+  }
+
+]
+
 let getRandomInteger = function (min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
@@ -105,7 +309,11 @@ class GameManager {
     return this.eventCharacters[`${row}:${col}`];
   }
   createCharacter(row, col, type) {
-    this.eventCharacters[`${row}:${col}`] = type;
+    if (type == "monster") {
+      this.eventCharacters[`${row}:${col}`] = {'type': type, 'monster': _monsters[getRandomInteger(0, _monsters.length)]};
+
+    } else
+      this.eventCharacters[`${row}:${col}`] = {'type': type};
     return this.eventCharacters[`${row}:${col}`];
   }
 
@@ -211,7 +419,7 @@ class GameManager {
     let _passages = [];
 
     // north
-    let _n = { header: "north", text: "n" }; 
+    let _n = { header: "north", text: "n" };
     if (player.row > 0) {
       _n.row = player.row - 1;
       _n.col = player.col;

@@ -1,6 +1,18 @@
 /*
 Assets: 
 * UI: kenny.nl - Cartography pack: https://www.kenney.nl/assets/cartography-pack
+* Enemies: Tyler Warren RPG Battlers: https://tylerjwarren.itch.io/tylerwarrenrpg-9th-50
+
+
+* Gameplay thoughts:
+  * 1 friend per level, giving you a level-based hint
+  * # of monsters scale per level
+  * 1 NPC per level
+  * 5 levels deep, fifth level requiring that you acquired all randomly-generated items (e.g., lucasarts-ish puzzle)
+
+
+-- double check that assets fit page (black bug doesn't)
+
 */
 
 :: StoryTitle
@@ -101,8 +113,18 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
     <div class="main">
       /* deal with a monster if one is here! */
       <<if $game.hasCharacter($game.player.row, $game.player.col)>>
-        <<set _monster to $game.getCharacter($game.player.row, $game.player.col)>>
-          Monster is: <<=_monster>>
+        <<set _char to $game.getCharacter($game.player.row, $game.player.col)>>
+        <<if _char.type == "monster">>
+            <div style="text-align:center;">
+              <<set _monsterImgPath to "assets/tyler-rpg-9th-50-more-shades/" + _char.monster.img>>
+              [img[_monsterImgPath]]
+              <p>A terrible <<=_char.monster.name>> blocks your path!</p>
+            </div>
+        <<else>>
+          <<=_char.type>>
+        <</if>>
+        /* <<set _monster to $game.getCharacter($game.player.row, $game.player.col)>>
+          Monster is: <<=_monster>> */
 
       /* no pre-existing event in this room */
       <<else>>
@@ -117,11 +139,17 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
           /* Monster event! */
           <<elseif _event.event == "monster">>
             <<if $game.hasCharacter($game.player.row, $game.player.col)>>
-              <<set _monster to $game.getCharacter($game.player.row, $game.player.col)>>
+              <<set _char to $game.getCharacter($game.player.row, $game.player.col)>>
             <<else>>
-              <<set _monster to $game.createCharacter($game.player.row, $game.player.col, 'monster')>>
+              <<set _char to $game.createCharacter($game.player.row, $game.player.col, 'monster')>>
             <</if>>
-            Monster is: <<=_monster>>
+            /* Monster is: <<=_monster>> */
+
+            <div style="text-align:center;">
+              <<set _monsterImgPath to "assets/tyler-rpg-9th-50-more-shades/" + _char.monster.img>>
+              [img[_monsterImgPath]]
+              <p>A terrible <<=_char.monster.name>> blocks your path!</p>
+            </div>
   
           <<else>>
             <div>
@@ -222,13 +250,13 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
     </div>
     <div class="messages">
       <div>
-        XP: <<=$game.player.level>><br />
-        HP: <<=$game.player.getHP()>><br />
-        AC: <<=$game.player.ac>><br />
-        Sanity: <<=$game.player.getSanity()>><br />
-        Friends found: <<=$game.friendsRescued>><br />
+        XP: <<=$game.player.level>> | 
+        HP: <<=$game.player.getHP()>> |
+        AC: <<=$game.player.ac>> | 
+        Sanity: <<=$game.player.getSanity()>> | 
+        Friends found: <<=$game.friendsRescued>> | 
         /* debug */
-        Row: <<=$game.player.row>> | Col: <<=$game.player.col>><br />
+        Row: <<=$game.player.row>> | Col: <<=$game.player.col>>
       </div>
     </div>
   </div>
