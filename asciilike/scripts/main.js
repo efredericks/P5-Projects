@@ -12,206 +12,205 @@ setup.STATES = {
 
 let _monsters = [
   {
-    'name': 'Black Ancient',
+    'name': 'Ancient',
     'img': 'Black Ancient.png'
   },
   {
-    'name': 'Black Birdi',
+    'name': 'Birdi',
     'img': 'Black Birdi.png'
   },
   {
-    'name': 'Black Bot',
+    'name': 'Bot',
     'img': 'Black Bot.png'
   },
   {
-    'name': 'Black Bug',
+    'name': 'Bug',
     'img': 'Black Bug.png'
   },
   {
-    'name': 'Black Chomp Plant',
+    'name': 'Chomp Plant',
     'img': 'Black Chomp Plant.png'
   },
   {
-    'name': 'Black Crab',
+    'name': 'Kreb',
     'img': 'Black Crab.png'
   },
   {
-    'name': 'Black Dancer',
+    'name': 'Dancer',
     'img': 'Black Dancer.png'
   },
   {
-    'name': 'Black Demon Skele',
+    'name': 'Demon Skele',
     'img': 'Black Demon Skele.png'
   },
   {
-    'name': 'Black Demoness',
+    'name': 'Demoness',
     'img': 'Black Demoness.png'
   },
   {
-    'name': 'Black Doll Dancing',
+    'name': 'Dancer',
     'img': 'Black Doll Dancing.png'
   },
   {
-    'name': 'Black Eyes',
+    'name': 'Eyes',
     'img': 'Black Eyes.png'
   },
   {
-    'name': 'Black Fighter',
+    'name': 'Fighter',
     'img': 'Black Fighter.png'
   },
   {
-    'name': 'Black Genie',
+    'name': 'Genie',
     'img': 'Black Genie.png'
   },
   {
-    'name': 'Black Hand',
+    'name': 'Hand',
     'img': 'Black Hand.png'
   },
   {
-    'name': 'Black Holler',
+    'name': 'Holler',
     'img': 'Black Holler.png'
   },
   {
-    'name': 'Black Hulking',
+    'name': 'Hulking',
     'img': 'Black Hulking.png'
   },
   {
-    'name': 'Black Inquisition',
+    'name': 'Inquisition',
     'img': 'Black Inquisition.png'
   },
   {
-    'name': 'Black Intimidator',
+    'name': 'Intimidator',
     'img': 'Black Intimidator.png'
   },
   {
-    'name': 'Black Jelly',
+    'name': 'Jelly',
     'img': 'Black Jelly.png'
   },
   {
-    'name': 'Black Joy',
+    'name': 'Joy',
     'img': 'Black Joy.png'
   },
   {
-    'name': 'Black Jump',
+    'name': 'Jump',
     'img': 'Black Jump.png'
   },
   {
-    'name': 'Black Kablam',
+    'name': 'Kablam',
     'img': 'Black Kablam.png'
   },
   {
-    'name': 'Black Menace',
+    'name': 'Menace',
     'img': 'Black Menace.png'
   },
   {
-    'name': 'Black Mini-Bot',
+    'name': 'Mini-Bot',
     'img': 'Black Mini-Bot.png'
   },
   {
-    'name': 'Black Mouth',
+    'name': 'Mouth',
     'img': 'Black Mouth.png'
   },
   {
-    'name': 'Black One-Eye',
+    'name': 'One-Eye',
     'img': 'Black One-Eye.png'
   },
   {
-    'name': 'Black Peeper',
+    'name': 'Peeper',
     'img': 'Black Peeper.png'
   },
   {
-    'name': 'Black Pixie',
+    'name': 'Pixie',
     'img': 'Black Pixie.png'
   },
   {
-    'name': 'Black Reaper',
+    'name': 'Reaper',
     'img': 'Black Reaper.png'
   },
   {
-    'name': 'Black Revel',
+    'name': 'Revel',
     'img': 'Black Revel.png'
   },
   {
-    'name': 'Black Salesman',
+    'name': 'Salesman',
     'img': 'Black Salesman.png'
   },
   {
-    'name': 'Black Scare',
+    'name': 'Scare',
     'img': 'Black Scare.png'
   },
   {
-    'name': 'Black Scratchy',
+    'name': 'Scratchy',
     'img': 'Black Scratchy.png'
   },
   {
-    'name': 'Black Scream.png',
+    'name': 'Scream.png',
     'img': 'Black Scream.png'
   },
   {
-    'name': 'Black Sea Crawler',
+    'name': 'Sea Crawler',
     'img': 'Black Sea Crawler.png'
   },
   {
-    'name': 'Black Skele-heart',
+    'name': 'Skele-heart',
     'img': 'Black Skele-heart.png'
   },
   {
-    'name': 'Black Skull',
+    'name': 'Skull',
     'img': 'Black Skull.png'
   },
   {
-    'name': 'Black Sleek',
+    'name': 'Sleek',
     'img': 'Black Sleek.png'
   },
   {
-    'name': 'Black Slime',
+    'name': 'Slime',
     'img': 'Black Slime.png'
   },
   {
-    'name': 'Black Slither',
+    'name': 'Slither',
     'img': 'Black Slither.png'
   },
   {
-    'name': 'Black Spikey',
+    'name': 'Spikey',
     'img': 'Black Spikey.png'
   },
   {
-    'name': 'Black Stalker',
+    'name': 'Stalker',
     'img': 'Black Stalker.png'
   },
   {
-    'name': 'Black Tortoola',
+    'name': 'Tortoola',
     'img': 'Black Tortoola.png'
   },
   {
-    'name': 'Black Turtle Creeper',
+    'name': 'Turtle Creeper',
     'img': 'Black Turtle Creeper.png'
   },
   {
-    'name': 'Black Turtle-man',
+    'name': 'Turtle-man',
     'img': 'Black Turtle-man.png'
   },
   {
-    'name': 'Black Walker',
+    'name': 'Walker',
     'img': 'Black Walker.png'
   },
   {
-    'name': 'Black Wasp-Man',
+    'name': 'Wasp-Man',
     'img': 'Black Wasp-Man.png'
   },
   {
-    'name': 'Black Wiggles',
+    'name': 'Wiggles',
     'img': 'Black Wiggles.png'
   },
   {
-    'name': 'Black Wolf',
+    'name': 'Wolf',
     'img': 'Black Wolf.png'
   },
   {
-    'name': 'Blank Emergence',
+    'name': 'Emergence',
     'img': 'Blank Emergence.png'
   }
-
 ]
 
 let getRandomInteger = function (min, max) {
@@ -237,7 +236,8 @@ class GameManager {
     this.npcs = [];
     this.mapWidth = 10;
     this.mapHeight = 10;
-    this.noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });
+    this.noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 8 });
+    // this.noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });
     this.init();
 
     this.fightActive = false;
@@ -316,6 +316,9 @@ class GameManager {
       this.eventCharacters[`${row}:${col}`] = {'type': type};
     return this.eventCharacters[`${row}:${col}`];
   }
+  destroyCharacter(row, col) {
+    this.eventCharacters[`${row}:${col}`] = null;
+  }
 
   // return a random event
   randomEvent() {
@@ -339,9 +342,10 @@ class GameManager {
   }
 
   vizMap() {
-    let ret = "<table>";
+    // let ret = "<table>";
+    let ret = "<div class='map-container'>"
     for (let r = 0; r < this.mapHeight; r++) {
-      ret += "<tr>";
+      // ret += "<tr>";
       for (let c = 0; c < this.mapWidth; c++) {
         let _cls;
         if (this.player.row == r && this.player.col == c)
@@ -367,11 +371,14 @@ class GameManager {
             _cls += ' void';
         }
 
-        ret += "<td class='" + _cls + "'></td>";
+        ret += "<div class='map-cell " + _cls + "'></div>";
+
+        // ret += "<td class='" + _cls + "'></td>";
       }
-      ret += "</tr>";
+      // ret += "</tr>";
     }
-    ret += "</table>";
+    // ret += "</table>";
+    ret += "</div>";
     return ret;
   }
 

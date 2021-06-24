@@ -10,6 +10,8 @@ Assets:
   * 1 NPC per level
   * 5 levels deep, fifth level requiring that you acquired all randomly-generated items (e.g., lucasarts-ish puzzle)
 
+  * replace moving UI with fighting UI when monster active
+
 
 -- double check that assets fit page (black bug doesn't)
 
@@ -35,7 +37,7 @@ SugarCaves
 
 :: StoryInit 
 /* 
-  * Many thanks to {G𝖜𝖊𝖓[♡].T𝖆𝖘𝖙𝖎𝖈} and Akjosch in the Twine Discord for all the coding help and finesse! 
+  * Many thanks to all in the Twine Discord for all the coding help and finesse! 
   * Backgrounds c/o Unsplash images
   * Pixelation handled by: https://www.cssscript.com/demo/pixelate-images-canvas-pixasso/
 
@@ -113,6 +115,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
     <div class="main">
       /* deal with a monster if one is here! */
       <<if $game.hasCharacter($game.player.row, $game.player.col)>>
+        <<set _roomState to "fight">>
         <<set _char to $game.getCharacter($game.player.row, $game.player.col)>>
         <<if _char.type == "monster">>
             <div style="text-align:center;">
@@ -128,6 +131,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
 
       /* no pre-existing event in this room */
       <<else>>
+        <<set _roomState to "other">>
         <<set _event to $game.randomEvent()>>
         <<if _event.return>>
           /* Spores event -- drunk text */
@@ -138,6 +142,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
             </div>
           /* Monster event! */
           <<elseif _event.event == "monster">>
+            <<set _roomState to "fight">>
             <<if $game.hasCharacter($game.player.row, $game.player.col)>>
               <<set _char to $game.getCharacter($game.player.row, $game.player.col)>>
             <<else>>
@@ -190,66 +195,88 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
       <</if>>
     </div>
     <div class="nav">
-      <<set _nextPassages to $game.getPassages($game.player)>>
-      <<for _i to 0; _i lt _nextPassages.length; _i++>>
-        <<capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
-        <div @class="_nextPassages[_i].header">
-          /* <<link [[_nextPassages[_i].text|Begin]]>> */
-
-          <<if _nextPassages[_i].text == ".">>
-            <<set _imgPath to "assets/elementCircle.png">>
-          <<else>>
-            <<if _nextPassages[_i].text == "n">>
-              <<set _imgPath to "assets/arrowSmall-north.png">>
-            <<elseif _nextPassages[_i].text == "ne">>
-              <<set _imgPath to "assets/arrowSmall-northeast.png">>
-            <<elseif _nextPassages[_i].text == "nw">>
-              <<set _imgPath to "assets/arrowSmall-northwest.png">>
-            <<elseif _nextPassages[_i].text == "sw">>
-              <<set _imgPath to "assets/arrowSmall-southwest.png">>
-            <<elseif _nextPassages[_i].text == "se">>
-              <<set _imgPath to "assets/arrowSmall-southeast.png">>
-            <<elseif _nextPassages[_i].text == "e">>
-              <<set _imgPath to "assets/arrowSmall-east.png">>
-            <<elseif _nextPassages[_i].text == "w">>
-              <<set _imgPath to "assets/arrowSmall-west.png">>
-            <<else>>
-              <<set _imgPath to "assets/arrowSmall-south.png">>
-            <</if>>
-          <</if>>
-
-          /* can travel this way */
-          <<if _nextPassages[_i].valid>>
-            <<button [img[_imgPath][Begin]]>>
-              <<set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col)>>
-              <<set $game.player.row to _nextPassages[_i].row>>
-              <<set $game.player.col to _nextPassages[_i].col>>
-  
-              /* Update sanity based on +/- of the room you're going to */
-              <<set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col))>>
-              <<if _sanity == 0>>
-                <<set $gameState to setup.STATES.LOST_SANITY>>
-              <</if>>
-  
-              <<run $game.setPassageVisited(_nextPassages[_i].row, _nextPassages[_i].col)>>
-              <<set $currentPassage = _nextPassage>>
-              <<if $game.totalFriends == $game.friendsRescued>>
-                <<set $gameState to setup.STATES.WIN>>
-              <</if>>
-            <</button>>
-          <<else>>
-            /* can't travel in this direction */
-            [img[_imgPath]]
-          <</if>>
+      <<if _roomState == "fight">>
+        <div class="northwest"></div>
+        <div class="north"></div>
+        <div class="northeast"></div>
+        <div class="west">
+        <<button [[Attack|Begin]]>><</button>>
         </div>
-        <</capture>>
-      <</for>>
+        <div class="wait">
+        <<button [[Wait|Begin]]>><</button>>
+        </div>
+        <div class="east">
+        <<button [[Run Away|Begin]]>>
+          <<script>>
+            variables().game.destroyCharacter(variables().game.player.row, variables().game.player.col)
+          <</script>>
+        <</button>>
+        </div>
+        <div class="southwest"></div>
+        <div class="south"></div>
+        <div class="southeast"></div>
+      <<else>>
+      <<set _nextPassages to $game.getPassages($game.player)>>
+        <<for _i to 0; _i lt _nextPassages.length; _i++>>
+          <<capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
+          <div @class="_nextPassages[_i].header">
+            /* <<link [[_nextPassages[_i].text|Begin]]>> */
+  
+            <<if _nextPassages[_i].text == ".">>
+              <<set _imgPath to "assets/elementCircle.png">>
+            <<else>>
+              <<if _nextPassages[_i].text == "n">>
+                <<set _imgPath to "assets/arrowSmall-north.png">>
+              <<elseif _nextPassages[_i].text == "ne">>
+                <<set _imgPath to "assets/arrowSmall-northeast.png">>
+              <<elseif _nextPassages[_i].text == "nw">>
+                <<set _imgPath to "assets/arrowSmall-northwest.png">>
+              <<elseif _nextPassages[_i].text == "sw">>
+                <<set _imgPath to "assets/arrowSmall-southwest.png">>
+              <<elseif _nextPassages[_i].text == "se">>
+                <<set _imgPath to "assets/arrowSmall-southeast.png">>
+              <<elseif _nextPassages[_i].text == "e">>
+                <<set _imgPath to "assets/arrowSmall-east.png">>
+              <<elseif _nextPassages[_i].text == "w">>
+                <<set _imgPath to "assets/arrowSmall-west.png">>
+              <<else>>
+                <<set _imgPath to "assets/arrowSmall-south.png">>
+              <</if>>
+            <</if>>
+  
+            /* can travel this way */
+            <<if _nextPassages[_i].valid>>
+              <<button [img[_imgPath][Begin]]>>
+                <<set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col)>>
+                <<set $game.player.row to _nextPassages[_i].row>>
+                <<set $game.player.col to _nextPassages[_i].col>>
+    
+                /* Update sanity based on +/- of the room you're going to */
+                <<set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col))>>
+                <<if _sanity == 0>>
+                  <<set $gameState to setup.STATES.LOST_SANITY>>
+                <</if>>
+  
+                <<run $game.setPassageVisited(_nextPassages[_i].row, _nextPassages[_i].col)>>
+                <<set $currentPassage = _nextPassage>>
+                <<if $game.totalFriends == $game.friendsRescued>>
+                  <<set $gameState to setup.STATES.WIN>>
+                <</if>>
+              <</button>>
+            <<else>>
+              /* can't travel in this direction */
+              [img[_imgPath]]
+            <</if>>
+          </div>
+          <</capture>>
+        <</for>>
+      <</if>>
     </div>
     <div class="map">
       <<=$game.vizMap()>>
     </div>
     <div class="messages">
-      <div>
+      <div style="text-align: center">
         XP: <<=$game.player.level>> | 
         HP: <<=$game.player.getHP()>> |
         AC: <<=$game.player.ac>> | 

@@ -161,12 +161,14 @@ body::after {
 
 table {
   background: #000;
-  padding: 0px;
-  margin: 0px;
+  /* padding: 0px;
+  margin: 0px; */
+  border-collapse: separate;
+  border-spacing: 1em;
 }
 td {
-  padding: 0px;
-  margin: 0px;
+  /* padding: 0px;
+  margin: 0px; */
   background: rgba(4, 87, 104, 0.75);
   width: 20px;
   height: 20px;
@@ -178,8 +180,8 @@ td.visited {
   background: rgba(7, 52, 61, 0.75);
 }
 tr {
-  padding: 0px;
-  margin: 0px;
+  /* padding: 0px;
+  margin: 0px; */
 }
 
 /* grid layout */
@@ -496,7 +498,29 @@ c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
   animation-timing-function: linear;
   animation-iteration-count: infinite;
 }
-</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
+
+/* map viz */
+.map-container {
+  display: grid;
+  grid-template-columns: repeat(10, 20px);
+  grid-template-rows: repeat(10, 20px);
+  grid-gap: 2px;
+}
+.cell {
+   /* center the cell content */
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 20px;
+  height: 20px;
+}
+
+.active {
+  background: #fff;
+}
+.visited {
+  background: rgba(7, 52, 61, 0.75);
+}</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
 /* js/constants.js, js/room.js, js/traceryGen.js, js/person.js, js/macroWhen.js */
 /* twine-user-script #2: "fast-simplex-noise.js" */
 /*
@@ -1098,206 +1122,205 @@ setup.STATES = {
 
 let _monsters = [
   {
-    'name': 'Black Ancient',
+    'name': 'Ancient',
     'img': 'Black Ancient.png'
   },
   {
-    'name': 'Black Birdi',
+    'name': 'Birdi',
     'img': 'Black Birdi.png'
   },
   {
-    'name': 'Black Bot',
+    'name': 'Bot',
     'img': 'Black Bot.png'
   },
   {
-    'name': 'Black Bug',
+    'name': 'Bug',
     'img': 'Black Bug.png'
   },
   {
-    'name': 'Black Chomp Plant',
+    'name': 'Chomp Plant',
     'img': 'Black Chomp Plant.png'
   },
   {
-    'name': 'Black Crab',
+    'name': 'Kreb',
     'img': 'Black Crab.png'
   },
   {
-    'name': 'Black Dancer',
+    'name': 'Dancer',
     'img': 'Black Dancer.png'
   },
   {
-    'name': 'Black Demon Skele',
+    'name': 'Demon Skele',
     'img': 'Black Demon Skele.png'
   },
   {
-    'name': 'Black Demoness',
+    'name': 'Demoness',
     'img': 'Black Demoness.png'
   },
   {
-    'name': 'Black Doll Dancing',
+    'name': 'Dancer',
     'img': 'Black Doll Dancing.png'
   },
   {
-    'name': 'Black Eyes',
+    'name': 'Eyes',
     'img': 'Black Eyes.png'
   },
   {
-    'name': 'Black Fighter',
+    'name': 'Fighter',
     'img': 'Black Fighter.png'
   },
   {
-    'name': 'Black Genie',
+    'name': 'Genie',
     'img': 'Black Genie.png'
   },
   {
-    'name': 'Black Hand',
+    'name': 'Hand',
     'img': 'Black Hand.png'
   },
   {
-    'name': 'Black Holler',
+    'name': 'Holler',
     'img': 'Black Holler.png'
   },
   {
-    'name': 'Black Hulking',
+    'name': 'Hulking',
     'img': 'Black Hulking.png'
   },
   {
-    'name': 'Black Inquisition',
+    'name': 'Inquisition',
     'img': 'Black Inquisition.png'
   },
   {
-    'name': 'Black Intimidator',
+    'name': 'Intimidator',
     'img': 'Black Intimidator.png'
   },
   {
-    'name': 'Black Jelly',
+    'name': 'Jelly',
     'img': 'Black Jelly.png'
   },
   {
-    'name': 'Black Joy',
+    'name': 'Joy',
     'img': 'Black Joy.png'
   },
   {
-    'name': 'Black Jump',
+    'name': 'Jump',
     'img': 'Black Jump.png'
   },
   {
-    'name': 'Black Kablam',
+    'name': 'Kablam',
     'img': 'Black Kablam.png'
   },
   {
-    'name': 'Black Menace',
+    'name': 'Menace',
     'img': 'Black Menace.png'
   },
   {
-    'name': 'Black Mini-Bot',
+    'name': 'Mini-Bot',
     'img': 'Black Mini-Bot.png'
   },
   {
-    'name': 'Black Mouth',
+    'name': 'Mouth',
     'img': 'Black Mouth.png'
   },
   {
-    'name': 'Black One-Eye',
+    'name': 'One-Eye',
     'img': 'Black One-Eye.png'
   },
   {
-    'name': 'Black Peeper',
+    'name': 'Peeper',
     'img': 'Black Peeper.png'
   },
   {
-    'name': 'Black Pixie',
+    'name': 'Pixie',
     'img': 'Black Pixie.png'
   },
   {
-    'name': 'Black Reaper',
+    'name': 'Reaper',
     'img': 'Black Reaper.png'
   },
   {
-    'name': 'Black Revel',
+    'name': 'Revel',
     'img': 'Black Revel.png'
   },
   {
-    'name': 'Black Salesman',
+    'name': 'Salesman',
     'img': 'Black Salesman.png'
   },
   {
-    'name': 'Black Scare',
+    'name': 'Scare',
     'img': 'Black Scare.png'
   },
   {
-    'name': 'Black Scratchy',
+    'name': 'Scratchy',
     'img': 'Black Scratchy.png'
   },
   {
-    'name': 'Black Scream.png',
+    'name': 'Scream.png',
     'img': 'Black Scream.png'
   },
   {
-    'name': 'Black Sea Crawler',
+    'name': 'Sea Crawler',
     'img': 'Black Sea Crawler.png'
   },
   {
-    'name': 'Black Skele-heart',
+    'name': 'Skele-heart',
     'img': 'Black Skele-heart.png'
   },
   {
-    'name': 'Black Skull',
+    'name': 'Skull',
     'img': 'Black Skull.png'
   },
   {
-    'name': 'Black Sleek',
+    'name': 'Sleek',
     'img': 'Black Sleek.png'
   },
   {
-    'name': 'Black Slime',
+    'name': 'Slime',
     'img': 'Black Slime.png'
   },
   {
-    'name': 'Black Slither',
+    'name': 'Slither',
     'img': 'Black Slither.png'
   },
   {
-    'name': 'Black Spikey',
+    'name': 'Spikey',
     'img': 'Black Spikey.png'
   },
   {
-    'name': 'Black Stalker',
+    'name': 'Stalker',
     'img': 'Black Stalker.png'
   },
   {
-    'name': 'Black Tortoola',
+    'name': 'Tortoola',
     'img': 'Black Tortoola.png'
   },
   {
-    'name': 'Black Turtle Creeper',
+    'name': 'Turtle Creeper',
     'img': 'Black Turtle Creeper.png'
   },
   {
-    'name': 'Black Turtle-man',
+    'name': 'Turtle-man',
     'img': 'Black Turtle-man.png'
   },
   {
-    'name': 'Black Walker',
+    'name': 'Walker',
     'img': 'Black Walker.png'
   },
   {
-    'name': 'Black Wasp-Man',
+    'name': 'Wasp-Man',
     'img': 'Black Wasp-Man.png'
   },
   {
-    'name': 'Black Wiggles',
+    'name': 'Wiggles',
     'img': 'Black Wiggles.png'
   },
   {
-    'name': 'Black Wolf',
+    'name': 'Wolf',
     'img': 'Black Wolf.png'
   },
   {
-    'name': 'Blank Emergence',
+    'name': 'Emergence',
     'img': 'Blank Emergence.png'
   }
-
 ]
 
 let getRandomInteger = function (min, max) {
@@ -1323,7 +1346,8 @@ class GameManager {
     this.npcs = [];
     this.mapWidth = 10;
     this.mapHeight = 10;
-    this.noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });
+    this.noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 8 });
+    // this.noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });
     this.init();
 
     this.fightActive = false;
@@ -1402,6 +1426,9 @@ class GameManager {
       this.eventCharacters[`${row}:${col}`] = {'type': type};
     return this.eventCharacters[`${row}:${col}`];
   }
+  destroyCharacter(row, col) {
+    this.eventCharacters[`${row}:${col}`] = null;
+  }
 
   // return a random event
   randomEvent() {
@@ -1425,9 +1452,10 @@ class GameManager {
   }
 
   vizMap() {
-    let ret = "<table>";
+    // let ret = "<table>";
+    let ret = "<div class='map-container'>"
     for (let r = 0; r < this.mapHeight; r++) {
-      ret += "<tr>";
+      // ret += "<tr>";
       for (let c = 0; c < this.mapWidth; c++) {
         let _cls;
         if (this.player.row == r && this.player.col == c)
@@ -1453,11 +1481,14 @@ class GameManager {
             _cls += ' void';
         }
 
-        ret += "<td class='" + _cls + "'></td>";
+        ret += "<div class='map-cell " + _cls + "'></div>";
+
+        // ret += "<td class='" + _cls + "'></td>";
       }
-      ret += "</tr>";
+      // ret += "</tr>";
     }
-    ret += "</table>";
+    // ret += "</table>";
+    ret += "</div>";
     return ret;
   }
 
@@ -1679,7 +1710,7 @@ class Character {
 window.Character = Character;
 // module.exports = Character;
 </script><tw-passagedata pid="1" name="StoryInit" tags="" position="100,100" size="100,100">/* 
-  * Many thanks to {G𝖜𝖊𝖓[♡].T𝖆𝖘𝖙𝖎𝖈} and Akjosch in the Twine Discord for all the coding help and finesse! 
+  * Many thanks to all in the Twine Discord for all the coding help and finesse! 
   * Backgrounds c/o Unsplash images
   * Pixelation handled by: https://www.cssscript.com/demo/pixelate-images-canvas-pixasso/
 
@@ -1725,6 +1756,7 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
     &lt;div class=&quot;main&quot;&gt;
       /* deal with a monster if one is here! */
       &lt;&lt;if $game.hasCharacter($game.player.row, $game.player.col)&gt;&gt;
+        &lt;&lt;set _roomState to &quot;fight&quot;&gt;&gt;
         &lt;&lt;set _char to $game.getCharacter($game.player.row, $game.player.col)&gt;&gt;
         &lt;&lt;if _char.type == &quot;monster&quot;&gt;&gt;
             &lt;div style=&quot;text-align:center;&quot;&gt;
@@ -1740,6 +1772,7 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
 
       /* no pre-existing event in this room */
       &lt;&lt;else&gt;&gt;
+        &lt;&lt;set _roomState to &quot;other&quot;&gt;&gt;
         &lt;&lt;set _event to $game.randomEvent()&gt;&gt;
         &lt;&lt;if _event.return&gt;&gt;
           /* Spores event -- drunk text */
@@ -1750,6 +1783,7 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
             &lt;/div&gt;
           /* Monster event! */
           &lt;&lt;elseif _event.event == &quot;monster&quot;&gt;&gt;
+            &lt;&lt;set _roomState to &quot;fight&quot;&gt;&gt;
             &lt;&lt;if $game.hasCharacter($game.player.row, $game.player.col)&gt;&gt;
               &lt;&lt;set _char to $game.getCharacter($game.player.row, $game.player.col)&gt;&gt;
             &lt;&lt;else&gt;&gt;
@@ -1802,66 +1836,88 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
       &lt;&lt;/if&gt;&gt;
     &lt;/div&gt;
     &lt;div class=&quot;nav&quot;&gt;
-      &lt;&lt;set _nextPassages to $game.getPassages($game.player)&gt;&gt;
-      &lt;&lt;for _i to 0; _i lt _nextPassages.length; _i++&gt;&gt;
-        &lt;&lt;capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage&gt;&gt;
-        &lt;div @class=&quot;_nextPassages[_i].header&quot;&gt;
-          /* &lt;&lt;link [[_nextPassages[_i].text|Begin]]&gt;&gt; */
-
-          &lt;&lt;if _nextPassages[_i].text == &quot;.&quot;&gt;&gt;
-            &lt;&lt;set _imgPath to &quot;assets/elementCircle.png&quot;&gt;&gt;
-          &lt;&lt;else&gt;&gt;
-            &lt;&lt;if _nextPassages[_i].text == &quot;n&quot;&gt;&gt;
-              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-north.png&quot;&gt;&gt;
-            &lt;&lt;elseif _nextPassages[_i].text == &quot;ne&quot;&gt;&gt;
-              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-northeast.png&quot;&gt;&gt;
-            &lt;&lt;elseif _nextPassages[_i].text == &quot;nw&quot;&gt;&gt;
-              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-northwest.png&quot;&gt;&gt;
-            &lt;&lt;elseif _nextPassages[_i].text == &quot;sw&quot;&gt;&gt;
-              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-southwest.png&quot;&gt;&gt;
-            &lt;&lt;elseif _nextPassages[_i].text == &quot;se&quot;&gt;&gt;
-              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-southeast.png&quot;&gt;&gt;
-            &lt;&lt;elseif _nextPassages[_i].text == &quot;e&quot;&gt;&gt;
-              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-east.png&quot;&gt;&gt;
-            &lt;&lt;elseif _nextPassages[_i].text == &quot;w&quot;&gt;&gt;
-              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-west.png&quot;&gt;&gt;
-            &lt;&lt;else&gt;&gt;
-              &lt;&lt;set _imgPath to &quot;assets/arrowSmall-south.png&quot;&gt;&gt;
-            &lt;&lt;/if&gt;&gt;
-          &lt;&lt;/if&gt;&gt;
-
-          /* can travel this way */
-          &lt;&lt;if _nextPassages[_i].valid&gt;&gt;
-            &lt;&lt;button [img[_imgPath][Begin]]&gt;&gt;
-              &lt;&lt;set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col)&gt;&gt;
-              &lt;&lt;set $game.player.row to _nextPassages[_i].row&gt;&gt;
-              &lt;&lt;set $game.player.col to _nextPassages[_i].col&gt;&gt;
-  
-              /* Update sanity based on +/- of the room you&#39;re going to */
-              &lt;&lt;set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col))&gt;&gt;
-              &lt;&lt;if _sanity == 0&gt;&gt;
-                &lt;&lt;set $gameState to setup.STATES.LOST_SANITY&gt;&gt;
-              &lt;&lt;/if&gt;&gt;
-  
-              &lt;&lt;run $game.setPassageVisited(_nextPassages[_i].row, _nextPassages[_i].col)&gt;&gt;
-              &lt;&lt;set $currentPassage = _nextPassage&gt;&gt;
-              &lt;&lt;if $game.totalFriends == $game.friendsRescued&gt;&gt;
-                &lt;&lt;set $gameState to setup.STATES.WIN&gt;&gt;
-              &lt;&lt;/if&gt;&gt;
-            &lt;&lt;/button&gt;&gt;
-          &lt;&lt;else&gt;&gt;
-            /* can&#39;t travel in this direction */
-            [img[_imgPath]]
-          &lt;&lt;/if&gt;&gt;
+      &lt;&lt;if _roomState == &quot;fight&quot;&gt;&gt;
+        &lt;div class=&quot;northwest&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;north&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;northeast&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;west&quot;&gt;
+        &lt;&lt;button [[Attack|Begin]]&gt;&gt;&lt;&lt;/button&gt;&gt;
         &lt;/div&gt;
-        &lt;&lt;/capture&gt;&gt;
-      &lt;&lt;/for&gt;&gt;
+        &lt;div class=&quot;wait&quot;&gt;
+        &lt;&lt;button [[Wait|Begin]]&gt;&gt;&lt;&lt;/button&gt;&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;east&quot;&gt;
+        &lt;&lt;button [[Run Away|Begin]]&gt;&gt;
+          &lt;&lt;script&gt;&gt;
+            variables().game.destroyCharacter(variables().game.player.row, variables().game.player.col)
+          &lt;&lt;/script&gt;&gt;
+        &lt;&lt;/button&gt;&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;southwest&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;south&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;southeast&quot;&gt;&lt;/div&gt;
+      &lt;&lt;else&gt;&gt;
+      &lt;&lt;set _nextPassages to $game.getPassages($game.player)&gt;&gt;
+        &lt;&lt;for _i to 0; _i lt _nextPassages.length; _i++&gt;&gt;
+          &lt;&lt;capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage&gt;&gt;
+          &lt;div @class=&quot;_nextPassages[_i].header&quot;&gt;
+            /* &lt;&lt;link [[_nextPassages[_i].text|Begin]]&gt;&gt; */
+  
+            &lt;&lt;if _nextPassages[_i].text == &quot;.&quot;&gt;&gt;
+              &lt;&lt;set _imgPath to &quot;assets/elementCircle.png&quot;&gt;&gt;
+            &lt;&lt;else&gt;&gt;
+              &lt;&lt;if _nextPassages[_i].text == &quot;n&quot;&gt;&gt;
+                &lt;&lt;set _imgPath to &quot;assets/arrowSmall-north.png&quot;&gt;&gt;
+              &lt;&lt;elseif _nextPassages[_i].text == &quot;ne&quot;&gt;&gt;
+                &lt;&lt;set _imgPath to &quot;assets/arrowSmall-northeast.png&quot;&gt;&gt;
+              &lt;&lt;elseif _nextPassages[_i].text == &quot;nw&quot;&gt;&gt;
+                &lt;&lt;set _imgPath to &quot;assets/arrowSmall-northwest.png&quot;&gt;&gt;
+              &lt;&lt;elseif _nextPassages[_i].text == &quot;sw&quot;&gt;&gt;
+                &lt;&lt;set _imgPath to &quot;assets/arrowSmall-southwest.png&quot;&gt;&gt;
+              &lt;&lt;elseif _nextPassages[_i].text == &quot;se&quot;&gt;&gt;
+                &lt;&lt;set _imgPath to &quot;assets/arrowSmall-southeast.png&quot;&gt;&gt;
+              &lt;&lt;elseif _nextPassages[_i].text == &quot;e&quot;&gt;&gt;
+                &lt;&lt;set _imgPath to &quot;assets/arrowSmall-east.png&quot;&gt;&gt;
+              &lt;&lt;elseif _nextPassages[_i].text == &quot;w&quot;&gt;&gt;
+                &lt;&lt;set _imgPath to &quot;assets/arrowSmall-west.png&quot;&gt;&gt;
+              &lt;&lt;else&gt;&gt;
+                &lt;&lt;set _imgPath to &quot;assets/arrowSmall-south.png&quot;&gt;&gt;
+              &lt;&lt;/if&gt;&gt;
+            &lt;&lt;/if&gt;&gt;
+  
+            /* can travel this way */
+            &lt;&lt;if _nextPassages[_i].valid&gt;&gt;
+              &lt;&lt;button [img[_imgPath][Begin]]&gt;&gt;
+                &lt;&lt;set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col)&gt;&gt;
+                &lt;&lt;set $game.player.row to _nextPassages[_i].row&gt;&gt;
+                &lt;&lt;set $game.player.col to _nextPassages[_i].col&gt;&gt;
+    
+                /* Update sanity based on +/- of the room you&#39;re going to */
+                &lt;&lt;set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col))&gt;&gt;
+                &lt;&lt;if _sanity == 0&gt;&gt;
+                  &lt;&lt;set $gameState to setup.STATES.LOST_SANITY&gt;&gt;
+                &lt;&lt;/if&gt;&gt;
+  
+                &lt;&lt;run $game.setPassageVisited(_nextPassages[_i].row, _nextPassages[_i].col)&gt;&gt;
+                &lt;&lt;set $currentPassage = _nextPassage&gt;&gt;
+                &lt;&lt;if $game.totalFriends == $game.friendsRescued&gt;&gt;
+                  &lt;&lt;set $gameState to setup.STATES.WIN&gt;&gt;
+                &lt;&lt;/if&gt;&gt;
+              &lt;&lt;/button&gt;&gt;
+            &lt;&lt;else&gt;&gt;
+              /* can&#39;t travel in this direction */
+              [img[_imgPath]]
+            &lt;&lt;/if&gt;&gt;
+          &lt;/div&gt;
+          &lt;&lt;/capture&gt;&gt;
+        &lt;&lt;/for&gt;&gt;
+      &lt;&lt;/if&gt;&gt;
     &lt;/div&gt;
     &lt;div class=&quot;map&quot;&gt;
       &lt;&lt;=$game.vizMap()&gt;&gt;
     &lt;/div&gt;
     &lt;div class=&quot;messages&quot;&gt;
-      &lt;div&gt;
+      &lt;div style=&quot;text-align: center&quot;&gt;
         XP: &lt;&lt;=$game.player.level&gt;&gt; | 
         HP: &lt;&lt;=$game.player.getHP()&gt;&gt; |
         AC: &lt;&lt;=$game.player.ac&gt;&gt; | 

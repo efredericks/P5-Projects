@@ -58,12 +58,14 @@ body::after {
 
 table {
   background: #000;
-  padding: 0px;
-  margin: 0px;
+  /* padding: 0px;
+  margin: 0px; */
+  border-collapse: separate;
+  border-spacing: 1em;
 }
 td {
-  padding: 0px;
-  margin: 0px;
+  /* padding: 0px;
+  margin: 0px; */
   background: rgba(4, 87, 104, 0.75);
   width: 20px;
   height: 20px;
@@ -75,8 +77,8 @@ td.visited {
   background: rgba(7, 52, 61, 0.75);
 }
 tr {
-  padding: 0px;
-  margin: 0px;
+  /* padding: 0px;
+  margin: 0px; */
 }
 
 /* grid layout */
@@ -392,4 +394,27 @@ c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
   animation-duration: 300s;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+}
+
+/* map viz */
+.map-container {
+  display: grid;
+  grid-template-columns: repeat(10, 20px);
+  grid-template-rows: repeat(10, 20px);
+  grid-gap: 2px;
+}
+.cell {
+   /* center the cell content */
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  width: 20px;
+  height: 20px;
+}
+
+.active {
+  background: #fff;
+}
+.visited {
+  background: rgba(7, 52, 61, 0.75);
 }
