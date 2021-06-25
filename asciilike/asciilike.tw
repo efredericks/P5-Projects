@@ -170,6 +170,9 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
         <</if>>
       <</if>>
 
+      /* get flavor text for nearby rooms */
+      <<set _thingsNear = $game.getThingsNear($game.player)>>
+
       <<set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col, $game.player.depth)>>
       <<if _friendsHere.length gt 0>>
         /* one friend */

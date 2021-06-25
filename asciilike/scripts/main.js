@@ -363,6 +363,11 @@ class GameManager {
     this.eventCharacters[`${depth}:${row}:${col}`] = null;
   }
 
+  // return what the nearby rooms have
+  getThingsNearby(player) {
+
+  }
+
   // return a random event
   randomEvent() {
     if (this.player.row == 0 && this.player.col == 0) // protect the 'starting location'
