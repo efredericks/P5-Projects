@@ -560,16 +560,22 @@ class GameManager {
     _wait.valid = true;
 
     // override for stairs
-    if (this.map[player.depth][player.row][player.col].stairsup)
+    if (this.map[player.depth][player.row][player.col].stairsup) {
       _wait.text = "<";
-    else if (this.map[player.depth][player.row][player.col].stairsdown)
+      _wait.stairsup = true; // duplicate for easier check in TW
+      _wait.depth = player.depth-1;
+    } else if (this.map[player.depth][player.row][player.col].stairsdown) {
       _wait.text = ">";
+      _wait.stairsdown = true; // duplicate for easier check in TW
+      _wait.depth = player.depth+1;
+    } else {
+      // set depths to player's
+      for (let i = 0; i < _passages.length; i++) {
+        _passages[i]['depth'] = player.depth;
+      }
+    }
 
     _passages.push(_wait);
-
-    for (let i = 0; i < _passages.length; i++) {
-      _passages[i]['depth'] = player.depth;
-    }
 
     return _passages;
   }

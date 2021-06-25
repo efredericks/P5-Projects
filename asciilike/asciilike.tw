@@ -251,9 +251,16 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
             /* can travel this way */
             <<if _nextPassages[_i].valid>>
               <<button [img[_imgPath][Begin]]>>
+                <<if _nextPassages[_i].stairsdown == true or _nextPassages[_i].stairsup == true>>
+                  <<set $game.player.depth to _nextPassages[_i].depth>>
+                  <<set $game.player.row to 0>>
+                  <<set $game.player.col to 0>>
+                <<else>>
+                  <<set $game.player.row to _nextPassages[_i].row>>
+                  <<set $game.player.col to _nextPassages[_i].col>>
+                <</if>>
+
                 <<set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col, _nextPassages[_i].depth)>>
-                <<set $game.player.row to _nextPassages[_i].row>>
-                <<set $game.player.col to _nextPassages[_i].col>>
     
                 /* Update sanity based on +/- of the room you're going to */
                 <<set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col, _nextPassages[_i].depth))>>
