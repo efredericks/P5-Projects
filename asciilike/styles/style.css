@@ -225,6 +225,13 @@ tr {
   background: rgb(209, 25, 255);
 }
 
+.down {
+  background: greenyellow;
+}
+.up {
+  background: purple;
+}
+
 /* Drunk Text - Start 
 c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
 */

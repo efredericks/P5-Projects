@@ -248,13 +248,14 @@ class GameManager {
     this.friendsRescued = 0;
     this.flashlightFriend = getRandomInteger(0, this.totalFriends);
 
-    this.player = new Character("Erik", 1, 10, 1, 0, 0);
+    this.player = new Character("Erik", 1, 10, 1, 0, 0, 0);
     this.player.isPlayer = true;
 
     this.eventCharacters = {}; // don't generate until random event triggers
+    let _depth = 0;
     for (let row = 0; row < this.mapHeight; row++)
       for (let col = 0; col < this.mapWidth; col++)
-        this.eventCharacters[`${row}:${col}`] = null;
+        this.eventCharacters[`${_depth}:${row}:${col}`] = null;
 
     this.flashlight = {
       'status': 'off',
@@ -262,62 +263,104 @@ class GameManager {
     };
   }
   init() {
-    for (let r = 0; r < this.mapHeight; r++) {
-      this.map[r] = [];
-      for (let c = 0; c < this.mapWidth; c++) {
-        if (r == 0 && c == 0) // always start at 0,0
-          this.map[r][c] = { 'passage': 'start', 'visited': true, 'sanity': 10 };
-        else {
-          let randomOffset = getRandomInteger(0, 100000);
-          let _noise = this.noiseGen.get2DNoise(c + randomOffset, r + randomOffset);
+    for (let d = 0; d < 5; d++) { // depth
+      this.map[d] = [];
 
-          let _room = setup.prefabs[0];
-          let _sanity = -1;
-          if (_noise < 0.0) { // empty
-            _room = setup.prefabs[0];
-          } else if (_noise < 0.4) { // cavern
-            _room = setup.prefabs[getRandomInteger(1, 4)];
-          } else if (_noise < 0.5) {
-            _room = setup.prefabs[4]; // tight squeeze
-            _sanity = -5;
-          } else if (_noise < 0.6) { // stream
-            _room = setup.prefabs[5];
-            _sanity = 5;
-          } else if (_noise < 0.7) { // pool 
-            _room = setup.prefabs[6];
-            _sanity = 5;
-          } else if (_noise < 0.8) { // void
-            _room = setup.prefabs[7];
-            _sanity = -10;
-          } else { // empty
-            _room = setup.prefabs[0];
+      for (let r = 0; r < this.mapHeight; r++) {
+        this.map[d][r] = [];
+        for (let c = 0; c < this.mapWidth; c++) {
+          if (r == 0 && c == 0) // always start at 0,0
+            this.map[d][r][c] = { 'passage': 'start', 'visited': true, 'sanity': 10 };
+          else {
+            let randomOffset = getRandomInteger(0, 100000);
+            let _noise = this.noiseGen.get2DNoise(c + randomOffset, r + randomOffset);
+
+            let _room = setup.prefabs[0];
+            let _sanity = -1;
+            if (_noise < 0.0) { // empty
+              _room = setup.prefabs[0];
+            } else if (_noise < 0.4) { // cavern
+              _room = setup.prefabs[getRandomInteger(1, 4)];
+            } else if (_noise < 0.5) {
+              _room = setup.prefabs[4]; // tight squeeze
+              _sanity = -5;
+            } else if (_noise < 0.6) { // stream
+              _room = setup.prefabs[5];
+              _sanity = 5;
+            } else if (_noise < 0.7) { // pool 
+              _room = setup.prefabs[6];
+              _sanity = 5;
+            } else if (_noise < 0.8) { // void
+              _room = setup.prefabs[7];
+              _sanity = -10;
+            } else { // empty
+              _room = setup.prefabs[0];
+            }
+
+            this.map[d][r][c] = { 'passage': _room, 'visited': false, 'sanity': _sanity };
           }
-
-          this.map[r][c] = { 'passage': _room, 'visited': false, 'sanity': _sanity };
         }
       }
+
+      let _downrow = null;
+      let _downcol = null;
+      let _uprow = null;
+      let _upcol = null;
+
+      if (d == 0) { // only down
+
+        do {
+          _downrow = getRandomInteger(3, this.mapHeight-1);
+          _downcol = getRandomInteger(3, this.mapWidth-1);
+        } while (_downrow == _uprow && _downcol == _upcol);
+
+      } else if (d == 4) { // only up
+
+        do {
+          _uprow = getRandomInteger(3, this.mapHeight-1);
+          _upcol = getRandomInteger(3, this.mapWidth-1);
+        } while (_downrow == _uprow && _downcol == _upcol);
+
+      } else { // both
+
+        do {
+          _downrow = getRandomInteger(3, this.mapHeight-1);
+          _downcol = getRandomInteger(3, this.mapWidth-1);
+        } while (_downrow == _uprow && _downcol == _upcol);
+
+        do {
+          _uprow = getRandomInteger(3, this.mapHeight-1);
+          _upcol = getRandomInteger(3, this.mapWidth-1);
+        } while (_downrow == _uprow && _downcol == _upcol);
+
+      }
+
+      if (_downrow != null && _downcol != null)
+        this.map[d][_downrow][_downcol] = {'passage': 'down1', 'visited': false, 'sanity': 5};
+      if (_uprow != null && _upcol != null)
+        this.map[d][_uprow][_upcol] = {'passage': 'up1', 'visited': false, 'sanity': 5};
     }
     console.log(this.map);
   }
 
-  hasCharacter(row, col) {
-    if (this.eventCharacters[`${row}:${col}`])
+  hasCharacter(row, col, depth) {
+    if (this.eventCharacters[`${depth}:${row}:${col}`])
       return true;
     return false;
   }
-  getCharacter(row, col) {
-    return this.eventCharacters[`${row}:${col}`];
+  getCharacter(row, col, depth) {
+    return this.eventCharacters[`${depth}:${row}:${col}`];
   }
-  createCharacter(row, col, type) {
+  createCharacter(row, col, depth, type) {
     if (type == "monster") {
-      this.eventCharacters[`${row}:${col}`] = {'type': type, 'monster': _monsters[getRandomInteger(0, _monsters.length)]};
+      this.eventCharacters[`${depth}:${row}:${col}`] = { 'type': type, 'monster': _monsters[getRandomInteger(0, _monsters.length)] };
 
     } else
-      this.eventCharacters[`${row}:${col}`] = {'type': type};
-    return this.eventCharacters[`${row}:${col}`];
+      this.eventCharacters[`${depth}:${row}:${col}`] = { 'type': type };
+    return this.eventCharacters[`${depth}:${row}:${col}`];
   }
-  destroyCharacter(row, col) {
-    this.eventCharacters[`${row}:${col}`] = null;
+  destroyCharacter(row, col, depth) {
+    this.eventCharacters[`${depth}:${row}:${col}`] = null;
   }
 
   // return a random event
@@ -341,7 +384,7 @@ class GameManager {
       return { 'event': null, 'return': false };
   }
 
-  vizMap() {
+  vizMap(depth) {
     // let ret = "<table>";
     let ret = "<div class='map-container'>"
     for (let r = 0; r < this.mapHeight; r++) {
@@ -350,23 +393,28 @@ class GameManager {
         let _cls;
         if (this.player.row == r && this.player.col == c)
           _cls = 'active';
-        else if (this.getPassageVisited(r, c))
+        else if (this.getPassageVisited(r, c, depth))
           _cls = 'visited';
         else {
           _cls = '';
 
           // tbd - temp viz
-          if (this.getPassage(r, c) == setup.prefabs[0])
+          if (this.getPassage(r, c, depth) == setup.prefabs[0])
             _cls += ' empty';
           // else if (this.getPassage(r,c) == setup.prefabs[1])
-          else if ([setup.prefabs[1], setup.prefabs[2], setup.prefabs[3]].indexOf(this.getPassage(r, c)) >= 0)
+          else if ([setup.prefabs[1], setup.prefabs[2], setup.prefabs[3]].indexOf(this.getPassage(r, c, depth)) >= 0)
             _cls += ' cavern';
-          else if (this.getPassage(r, c) == setup.prefabs[4])
+          else if (this.getPassage(r, c, depth) == setup.prefabs[4])
             _cls += ' tight';
-          else if (this.getPassage(r, c) == setup.prefabs[5])
+          else if (this.getPassage(r, c, depth) == setup.prefabs[5])
             _cls += ' stream';
-          else if (this.getPassage(r, c) == setup.prefabs[6])
+          else if (this.getPassage(r, c, depth) == setup.prefabs[6])
             _cls += ' pool';
+          else if (this.getPassage(r, c, depth) == 'down1')
+            _cls += ' down';
+          else if (this.getPassage(r, c, depth) == 'up1')
+            _cls += ' up';
+          
           else
             _cls += ' void';
         }
@@ -382,21 +430,21 @@ class GameManager {
     return ret;
   }
 
-  setPassageVisited(row, col) {
-    this.map[row][col].visited = true;
+  setPassageVisited(row, col, depth) {
+    this.map[depth][row][col].visited = true;
   }
-  getPassageVisited(row, col) {
-    return this.map[row][col].visited;
+  getPassageVisited(row, col, depth) {
+    return this.map[depth][row][col].visited;
   }
-  getPassage(row, col) {
-    return this.map[row][col].passage;
-  }
-
-  getMapSanity(row, col) {
-    return this.map[row][col].sanity;
+  getPassage(row, col, depth) {
+    return this.map[depth][row][col].passage;
   }
 
-  getFriendsHere(row, col) {
+  getMapSanity(row, col, depth) {
+    return this.map[depth][row][col].sanity;
+  }
+
+  getFriendsHere(row, col, depth) {
     let _friends = [];
     // debugging
     // if (row == 1 && col == 1 && this.friendsRescued == 0) {
@@ -405,7 +453,7 @@ class GameManager {
     //   _friends.push(this.friends[2]);
     // }
     for (let i = 0; i < this.friends.length; i++) {
-      if (this.friends[i].row == row && this.friends[i].col == col)
+      if (this.friends[i].row == row && this.friends[i].col == col && this.friends[i].depth == depth)
         _friends.push(this.friends[i]);
     }
     return _friends;
@@ -512,6 +560,10 @@ class GameManager {
     _wait.valid = true;
     _passages.push(_wait);
 
+    for (let i = 0; i < _passages.length; i++) {
+      _passages[i]['depth'] = player.depth;
+    }
+
     return _passages;
   }
 
@@ -531,7 +583,7 @@ class GameManager {
       _friendLocations[_indx] = i;
 
       // let _friend = new Character(_name, -1, -1, -1, _row, _col);
-      let _friend = new Character(_name, -1, -1, -1, 2, 2);
+      let _friend = new Character(_name, -1, -1, -1, 2, 2, i);
       _friends.push(_friend);
     }
 
@@ -548,7 +600,7 @@ window.GameManager = GameManager;
 //let offset = getSpriteOffset(14, 35);
 //imgBuffer.image(spriteSheet, 40, 40, TILE_WIDTH, TILE_HEIGHT, offset['dx'], offset['dy'], TILE_WIDTH, TILE_HEIGHT);
 class Character {
-  constructor(name, level, hp, ac, row, col) {
+  constructor(name, level, hp, ac, row, col, depth) {
     this.name = name;
     this.inventory = {};
     this.level = level;
@@ -560,6 +612,7 @@ class Character {
     this.sanity = 100;
     this.description = "I am a description";
     this.age = 14;
+    this.depth = depth;
   }
 
   // pass negative normally to decrement

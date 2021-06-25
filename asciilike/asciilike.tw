@@ -116,7 +116,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
       /* deal with a monster if one is here! */
       <<if $game.hasCharacter($game.player.row, $game.player.col)>>
         <<set _roomState to "fight">>
-        <<set _char to $game.getCharacter($game.player.row, $game.player.col)>>
+        <<set _char to $game.getCharacter($game.player.row, $game.player.col, $game.player.depth)>>
         <<if _char.type == "monster">>
             <div style="text-align:center;">
               <<set _monsterImgPath to "assets/tyler-rpg-9th-50-more-shades/" + _char.monster.img>>
@@ -143,10 +143,10 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
           /* Monster event! */
           <<elseif _event.event == "monster">>
             <<set _roomState to "fight">>
-            <<if $game.hasCharacter($game.player.row, $game.player.col)>>
-              <<set _char to $game.getCharacter($game.player.row, $game.player.col)>>
+            <<if $game.hasCharacter($game.player.row, $game.player.col, $game.player.depth)>>
+              <<set _char to $game.getCharacter($game.player.row, $game.player.col, $game.player.depth)>>
             <<else>>
-              <<set _char to $game.createCharacter($game.player.row, $game.player.col, 'monster')>>
+              <<set _char to $game.createCharacter($game.player.row, $game.player.col, $game.player.depth, 'monster')>>
             <</if>>
             /* Monster is: <<=_monster>> */
 
@@ -170,7 +170,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
         <</if>>
       <</if>>
 
-      <<set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col)>>
+      <<set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col, $game.player.depth)>>
       <<if _friendsHere.length gt 0>>
         /* one friend */
         <<if _friendsHere.length eq 1>>
@@ -208,7 +208,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
         <div class="east">
         <<button [[Run Away|Begin]]>>
           <<script>>
-            variables().game.destroyCharacter(variables().game.player.row, variables().game.player.col)
+            variables().game.destroyCharacter(variables().game.player.row, variables().game.player.col, variables().game.player.depth)
           <</script>>
         <</button>>
         </div>
@@ -247,17 +247,17 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
             /* can travel this way */
             <<if _nextPassages[_i].valid>>
               <<button [img[_imgPath][Begin]]>>
-                <<set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col)>>
+                <<set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col, _nextPassages[_i].depth)>>
                 <<set $game.player.row to _nextPassages[_i].row>>
                 <<set $game.player.col to _nextPassages[_i].col>>
     
                 /* Update sanity based on +/- of the room you're going to */
-                <<set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col))>>
+                <<set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col, _nextPassages[_i].depth))>>
                 <<if _sanity == 0>>
                   <<set $gameState to setup.STATES.LOST_SANITY>>
                 <</if>>
   
-                <<run $game.setPassageVisited(_nextPassages[_i].row, _nextPassages[_i].col)>>
+                <<run $game.setPassageVisited(_nextPassages[_i].row, _nextPassages[_i].col, _nextPassages[_i].depth)>>
                 <<set $currentPassage = _nextPassage>>
                 <<if $game.totalFriends == $game.friendsRescued>>
                   <<set $gameState to setup.STATES.WIN>>
@@ -273,7 +273,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
       <</if>>
     </div>
     <div class="map">
-      <<=$game.vizMap()>>
+      <<=$game.vizMap($game.player.depth)>>
     </div>
     <div class="messages">
       <div style="text-align: center">
@@ -283,7 +283,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
         Sanity: <<=$game.player.getSanity()>> | 
         Friends found: <<=$game.friendsRescued>> | 
         /* debug */
-        Row: <<=$game.player.row>> | Col: <<=$game.player.col>>
+        Row: <<=$game.player.row>> | Col: <<=$game.player.col>> | Depth: <<=$game.player.depth>>
       </div>
     </div>
   </div>
@@ -332,7 +332,7 @@ Welcome to the SugarCaves <<=$game.player.name>>!  You begin your story in the c
 <<if tags().includes("nofooter") isnot true>>
 Debug:<br />
 <<for _i to 0; _i lt $game.friends.length; _i++>>
-  <<print $game.friends[_i].name>>: [<<=$game.friends[_i].row>>:<<=$game.friends[_i].col>>] <br />
+  <<print $game.friends[_i].name>>: [<<=$game.friends[_i].row>>:<<=$game.friends[_i].col>>:<<=$game.friends[_i].depth>>] <br />
 <</for>>
 <<else>>
 <hr size="1" />
@@ -445,7 +445,7 @@ The beginning, it seems.
 You would feel awful leaving any friend behind (specifically, <<=$game.friends.length>>!).
 <</if>>
 
-:: empty [prefab]
+:: empty [prefab empty]
 Nothingness.  
 
 :: empty2 [prefab empty]
@@ -472,3 +472,26 @@ A massive pool placidly sits in the middle of the cavern.  A splash?  A ripple..
 
 :: void [prefab]
 You run blindly into the cavern and quickly catch yourself before you fall off the precipice into an abyss.  You kick a rock and lean down, listening for it to hit the bottom.  No sound returns.
+
+/*
+*thing* in next room:
+
+You hear a small cry from the <direction>.
+A scuttling carapace clicks in the distance.
+A reassuring glow from the <direction>.
+Manic giggles rebound overhead, echoing off the angular walls.
+
+*/
+
+:: fungal1 [prefab fungal]
+Purple luminescence coats the floors and walls.  The fungi watch you intently.  You take care not to step on any of them.
+
+:: fungal2 [prefab fungal]
+A single massive toadstool towers over the middle of the cavern.  It is faceless, yet appears to be watching you intently.  
+
+:: down1 [prefab down]
+Natural stairs cut into the rock lead downwards.
+
+:: up1 [prefab up]
+Small gaps and outcroppings resemble natural handholds.  You can climb up here.
+
