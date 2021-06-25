@@ -336,9 +336,9 @@ class GameManager {
       }
 
       if (_downrow != null && _downcol != null)
-        this.map[d][_downrow][_downcol] = {'passage': 'down1', 'visited': false, 'sanity': 5};
+        this.map[d][_downrow][_downcol] = {'passage': 'down1', 'visited': false, 'sanity': 5, 'stairsdown': true};
       if (_uprow != null && _upcol != null)
-        this.map[d][_uprow][_upcol] = {'passage': 'up1', 'visited': false, 'sanity': 5};
+        this.map[d][_uprow][_upcol] = {'passage': 'up1', 'visited': false, 'sanity': 5, 'stairsup': true};
     }
     console.log(this.map);
   }
@@ -558,6 +558,13 @@ class GameManager {
     _wait.row = player.row;
     _wait.col = player.col;
     _wait.valid = true;
+
+    // override for stairs
+    if (this.map[player.depth][player.row][player.col].stairsup)
+      _wait.text = "<";
+    else if (this.map[player.depth][player.row][player.col].stairsdown)
+      _wait.text = ">";
+
     _passages.push(_wait);
 
     for (let i = 0; i < _passages.length; i++) {

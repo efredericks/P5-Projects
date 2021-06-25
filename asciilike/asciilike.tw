@@ -224,6 +224,10 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
   
             <<if _nextPassages[_i].text == ".">>
               <<set _imgPath to "assets/elementCircle.png">>
+            <<elseif _nextPassages[_i].text == "<">>
+              <<set _imgPath to "assets/arrowSmall-west.png">>
+            <<elseif _nextPassages[_i].text == ">">>
+              <<set _imgPath to "assets/arrowSmall-east.png">>
             <<else>>
               <<if _nextPassages[_i].text == "n">>
                 <<set _imgPath to "assets/arrowSmall-north.png">>
