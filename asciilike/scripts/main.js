@@ -365,7 +365,9 @@ class GameManager {
 
   // return a random event
   randomEvent() {
-    if (Math.random() > 0.25) {
+    if (this.player.row == 0 && this.player.col == 0) // protect the 'starting location'
+      return { 'event': null, 'return': false };
+    else if (Math.random() > 0.25) {
       let _r = Math.random();
 
       // spores
@@ -393,10 +395,13 @@ class GameManager {
         let _cls;
         if (this.player.row == r && this.player.col == c)
           _cls = 'active';
-        else if (this.getPassageVisited(r, c, depth))
-          _cls = 'visited';
+        // else if (this.getPassageVisited(r, c, depth))
+        //   _cls = 'visited';
         else {
-          _cls = '';
+          if (this.getPassageVisited(r, c, depth))
+            _cls = 'visited';
+          else
+            _cls = '';
 
           // tbd - temp viz
           if (this.getPassage(r, c, depth) == setup.prefabs[0])
@@ -557,6 +562,7 @@ class GameManager {
     let _wait = { header: "wait", text: "." };
     _wait.row = player.row;
     _wait.col = player.col;
+    _wait.depth = player.depth;
     _wait.valid = true;
 
     // override for stairs
@@ -568,11 +574,12 @@ class GameManager {
       _wait.text = ">";
       _wait.stairsdown = true; // duplicate for easier check in TW
       _wait.depth = player.depth+1;
-    } else {
-      // set depths to player's
-      for (let i = 0; i < _passages.length; i++) {
+    }
+
+    // set depths to player's
+    for (let i = 0; i < _passages.length; i++) {
+      if (!_passages[i].stairsdown && !_passages[i].stairsup)
         _passages[i]['depth'] = player.depth;
-      }
     }
 
     _passages.push(_wait);
