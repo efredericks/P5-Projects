@@ -296,7 +296,8 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
 <</nobr>>
 
 :: Begin2 [noinventory] 
-Welcome to the SugarCaves <<=$game.player.name>>!  You begin your story in the cave.  You have <<=$game.friends.length>> missing friends!
+You find yourself in the Sugar Caves, standing in an empty cavern at the beginning of your journey.  You search the room and find multiple paths that you can follow.  Go forth and find your <<=$game.friends.length>> missing friends!
+/* Welcome to the SugarCaves <<=$game.player.name>>!  You begin your story in the cave.  You have <<=$game.friends.length>> missing friends! */
 
 /* :: PassageHeader
 <<nobr>>
