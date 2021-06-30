@@ -274,7 +274,9 @@ class GameManager {
     };
 
     this.spriteSheet = new Image();
-    this.spriteSheet.src = "./assets/kenny-microroguelike/colored_tilemap_packed.png";
+    this.spriteSheet.src = "./assets/1bitpack_kenney_1.1/Tilesheet/colored_transparent_packed.png"
+    this.tileSize = 16;
+    // this.spriteSheet.src = "./assets/kenny-microroguelike/colored_tilemap_packed.png";
     // spriteSheet.onload = stateHandler;// need to make sure this is loaded!
 
 
@@ -376,7 +378,6 @@ class GameManager {
 
     }
 
-
     console.log(this.map);
   }
 
@@ -452,42 +453,84 @@ class GameManager {
       return { 'event': null, 'return': false };
   }
 
-  vizMap(depth) {
-    // let canvas = document.createElement('canvas');
-    // let tileSize = 8;
+  vizMapCanvas(depth) {
+    let _div = document.getElementById("map-canvas-holder");
+    let canvas = document.createElement('canvas');
 
-    // let ctx = canvas.getContext("2d");
-    // canvas.width = 10 * tileSize;
-    // canvas.height = 10 * tileSize;
-    // canvas.style.width = canvas.width + 'px';
-    // canvas.style.height = canvas.height + 'px';
-    // ctx.imageSmoothingEnabled = false;
+    let buff = 2;
 
-    // let x_pos = 0;
-    // let y_pos = 0;
-    // for (let r = 0; r < this.mapHeight; r++) {
-    //   for (let c = 0; c < this.mapWidth; c++) {
+    let ctx = canvas.getContext("2d");
+    canvas.width = 10 * this.tileSize * 2 + (buff * 9);
+    canvas.height = 10 * this.tileSize * 2 + (buff * 9);
+    canvas.style.width = canvas.width + 'px';
+    canvas.style.height = canvas.height + 'px';
+    ctx.imageSmoothingEnabled = false;
 
-    //     let offset = getSpriteOffset(1, 4, tileSize);
-    //     ctx.drawImage(
-    //       this.spriteSheet,
-    //       offset['dx'],
-    //       offset['dy'],
-    //       tileSize,
-    //       tileSize,
-    //       Math.round(x_pos),
-    //       Math.round(y_pos),
-    //       tileSize,
-    //       tileSize
-    //     );
+    ctx.fillStyle = "rgba(71,45,60,0.8)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    //     x_pos += tileSize;
-    //   }
-    //   y_pos += tileSize;
-    //   x_pos = 0;
-    // }
+    // ctx.fillStyle = "red";
+    // ctx.fillRect(10, 10, 80, 80);
+
+
+    let x_pos = 0;
+    let y_pos = 0;
+    for (let r = 0; r < this.mapHeight; r++) {
+      for (let c = 0; c < this.mapWidth; c++) {
+        // ctx.fillStyle = "rgba(255,0,0,1.0)";
+        // ctx.fillRect(x_pos,y_pos,tileSize,tileSize);
+        let offset;
+
+        if (r == this.player.row && c == this.player.col)
+          offset = getSpriteOffset(14, 35, this.tileSize);
+        else {
+          if (this.hasCharacter(r, c, depth)) { // enemy here
+            offset = getSpriteOffset(5, 24, this.tileSize);
+            // _txt = "+";
+          } else if (this.getPassage(r, c, depth) == "start") { // starting point
+            offset = getSpriteOffset(10, 14, this.tileSize);
+          } else if (this.getPassage(r, c, depth) == setup.prefabs[0]) { // empty
+            offset = getSpriteOffset(0, 1, this.tileSize);
+          } else if ([setup.prefabs[1], setup.prefabs[2], setup.prefabs[3]].indexOf(this.getPassage(r, c, depth)) >= 0) { // cavern
+            offset = getSpriteOffset(0, getRandomInteger(2, 5), this.tileSize);
+          } else if (this.getPassage(r, c, depth) == setup.prefabs[4]) { // tight
+            offset = getSpriteOffset(2, 6, this.tileSize);
+          } else if (this.getPassage(r, c, depth) == setup.prefabs[5]) { // stream
+            offset = getSpriteOffset(4, 8, this.tileSize);
+          } else if (this.getPassage(r, c, depth) == setup.prefabs[6]) { // pool
+            offset = getSpriteOffset(5, 8, this.tileSize);
+          } else if (this.getPassage(r, c, depth) == 'down1') {
+            offset = getSpriteOffset(6, 3, this.tileSize);
+          } else if (this.getPassage(r, c, depth) == 'up1') {
+            offset = getSpriteOffset(6, 2, this.tileSize);
+          } else { // void
+            offset = getSpriteOffset(21, 39, this.tileSize);
+          }
+        }
+
+        ctx.drawImage(
+          this.spriteSheet,
+          offset['dx'],
+          offset['dy'],
+          this.tileSize,
+          this.tileSize,
+          Math.round(x_pos),
+          Math.round(y_pos),
+          this.tileSize * 2,
+          this.tileSize * 2
+        );
+
+        x_pos += this.tileSize * 2 + buff;
+      }
+      y_pos += this.tileSize * 2 + buff;
+      x_pos = 0;
+    }
     // return canvas;
     // ret += "</canvas>";
+    _div.appendChild(canvas);
+  }
+
+  vizMap(depth) {
     // let ret = "<table>";
     let ret = "<div class='map-container'>"
     for (let r = 0; r < this.mapHeight; r++) {

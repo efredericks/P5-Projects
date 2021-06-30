@@ -287,8 +287,9 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
         <</for>>
       <</if>>
     </div>
-    <div class="map">
-        <<=$game.vizMap($game.player.depth)>>
+    <div class="map" id="map-canvas-holder">
+        /* <<=$game.vizMapCanvas($game.player.depth)>> */
+        /* <<=$game.vizMap($game.player.depth)>> */
     </div>
     <div class="messages">
       <div style="text-align: center">
@@ -303,6 +304,10 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
     </div>
   </div>
 </div>
+
+<<timed 40ms>>
+<<run $game.vizMapCanvas($game.player.depth)>>
+<</timed>>
 
 <<elseif $gameState == setup.STATES.WIN>>
   <h1>YOU WON</h1>
