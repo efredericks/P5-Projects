@@ -118,6 +118,9 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
         <<set _roomState to "fight">>
         <<set _char to $game.getCharacter($game.player.row, $game.player.col, $game.player.depth)>>
         <<if _char.type == "monster">>
+            <<if _char.boss == true>>
+              <h1>ALERT: THE BOSS</h1>
+            <</if>>
             <div style="text-align:center;">
               <<set _monsterImgPath to "assets/tyler-rpg-9th-50-more-shades/" + _char.monster.img>>
               [img[_monsterImgPath]]
@@ -229,9 +232,9 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
             <<if _nextPassages[_i].text == ".">>
               <<set _imgPath to "assets/elementCircle.png">>
             <<elseif _nextPassages[_i].text == "<">>
-              <<set _imgPath to "assets/arrowSmall-west.png">>
+              <<set _imgPath to "assets/goUp.png">>
             <<elseif _nextPassages[_i].text == ">">>
-              <<set _imgPath to "assets/arrowSmall-east.png">>
+              <<set _imgPath to "assets/goDown.png">>
             <<else>>
               <<if _nextPassages[_i].text == "n">>
                 <<set _imgPath to "assets/arrowSmall-north.png">>
@@ -517,3 +520,5 @@ Natural stairs cut into the rock lead downwards.
 :: up1 [prefab up]
 Small gaps and outcroppings resemble natural handholds.  You can climb up here.
 
+:: fire [prefab fire]
+Four, I mean five!  I mean fire!

@@ -232,6 +232,7 @@ setup.prefabs = [
   'stream',
   'pool',
   'void',
+  'fire',
 ];
 
 class GameManager {
@@ -302,38 +303,49 @@ class GameManager {
     for (let d = 0; d < this.maxDepth; d++) { // depth
       this.map[d] = [];
 
-      for (let r = 0; r < this.mapHeight; r++) {
-        this.map[d][r] = [];
-        for (let c = 0; c < this.mapWidth; c++) {
-          if (r == 0 && c == 0) // always start at 0,0
-            this.map[d][r][c] = { 'passage': 'start', 'visited': true, 'sanity': 10 };
-          else {
-            let randomOffset = getRandomInteger(0, 100000);
-            let _noise = this.noiseGen.get2DNoise(c + randomOffset, r + randomOffset);
+      if (d < this.maxDepth - 1) {
+        for (let r = 0; r < this.mapHeight; r++) {
+          this.map[d][r] = [];
+          for (let c = 0; c < this.mapWidth; c++) {
+            if (r == 0 && c == 0 && d == 0) // always start at 0,0
+              this.map[d][r][c] = { 'passage': 'start', 'visited': true, 'sanity': 10 };
+            else {
+              let randomOffset = getRandomInteger(0, 100000);
+              let _noise = this.noiseGen.get2DNoise(c + randomOffset, r + randomOffset);
 
-            let _room = setup.prefabs[0];
-            let _sanity = -1;
-            if (_noise < 0.0) { // empty
-              _room = setup.prefabs[0];
-            } else if (_noise < 0.4) { // cavern
-              _room = setup.prefabs[getRandomInteger(1, 4)];
-            } else if (_noise < 0.5) {
-              _room = setup.prefabs[4]; // tight squeeze
-              _sanity = -5;
-            } else if (_noise < 0.6) { // stream
-              _room = setup.prefabs[5];
-              _sanity = 5;
-            } else if (_noise < 0.7) { // pool 
-              _room = setup.prefabs[6];
-              _sanity = 5;
-            } else if (_noise < 0.8) { // void
-              _room = setup.prefabs[7];
-              _sanity = -10;
-            } else { // empty
-              _room = setup.prefabs[0];
+              let _room = setup.prefabs[0];
+              let _sanity = -1;
+              if (_noise < 0.0) { // empty
+                _room = setup.prefabs[0];
+              } else if (_noise < 0.4) { // cavern
+                _room = setup.prefabs[getRandomInteger(1, 4)];
+              } else if (_noise < 0.5) {
+                _room = setup.prefabs[4]; // tight squeeze
+                _sanity = -5;
+              } else if (_noise < 0.6) { // stream
+                _room = setup.prefabs[5];
+                _sanity = 5;
+              } else if (_noise < 0.7) { // pool 
+                _room = setup.prefabs[6];
+                _sanity = 5;
+              } else if (_noise < 0.8) { // void
+                _room = setup.prefabs[7];
+                _sanity = -10;
+              } else { // empty
+                _room = setup.prefabs[0];
+              }
+
+              this.map[d][r][c] = { 'passage': _room, 'visited': false, 'sanity': _sanity };
             }
-
-            this.map[d][r][c] = { 'passage': _room, 'visited': false, 'sanity': _sanity };
+          }
+        }
+      } else {
+        for (let r = 0; r < this.mapHeight; r++) {
+          this.map[d][r] = [];
+          let _room = setup.prefabs[0];
+          for (let c = 0; c < this.mapWidth; c++) {
+            _room = setup.prefabs[8];
+            this.map[d][r][c] = { 'passage': _room, 'visited': false, 'sanity': 0};//-10 };
           }
         }
       }
@@ -350,7 +362,7 @@ class GameManager {
           _downcol = getRandomInteger(3, this.mapWidth - 1);
         } while (_downrow == _uprow && _downcol == _upcol);
 
-      } else if (d == 4) { // only up
+      } else if (d == this.maxDepth - 1) { // only up
 
         do {
           _uprow = getRandomInteger(3, this.mapHeight - 1);
@@ -384,7 +396,14 @@ class GameManager {
   generateCharacters() {
     let _chars = {};
 
-    // monsters
+    // boss
+    _chars[`${this.maxDepth - 1}:${this.mapHeight - 1}:${this.mapWidth - 1}`] = {
+      'type': 'monster',
+      'monster': _monsters[getRandomInteger(0, _monsters.length)],
+      'boss': true
+    };
+
+    // randomly generate the rest of the monsters
     for (let d = 0; d < this.maxDepth; d++) {
       for (let _i = d + 1; _i > 0; _i--) {
         let _row, _col, _key;
@@ -457,7 +476,7 @@ class GameManager {
     let _div = document.getElementById("map-canvas-holder");
     let canvas = document.createElement('canvas');
 
-    let buff = 2;
+    let buff = 0;//2;
 
     let ctx = canvas.getContext("2d");
     canvas.width = 10 * this.tileSize * 2 + (buff * 9);
@@ -499,6 +518,8 @@ class GameManager {
             offset = getSpriteOffset(4, 8, this.tileSize);
           } else if (this.getPassage(r, c, depth) == setup.prefabs[6]) { // pool
             offset = getSpriteOffset(5, 8, this.tileSize);
+          } else if (this.getPassage(r, c, depth) == setup.prefabs[8]) { // fire
+            offset = getSpriteOffset(13, 6, this.tileSize);
           } else if (this.getPassage(r, c, depth) == 'down1') {
             offset = getSpriteOffset(6, 3, this.tileSize);
           } else if (this.getPassage(r, c, depth) == 'up1') {
