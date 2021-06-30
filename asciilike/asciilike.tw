@@ -146,7 +146,8 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
             <<if $game.hasCharacter($game.player.row, $game.player.col, $game.player.depth)>>
               <<set _char to $game.getCharacter($game.player.row, $game.player.col, $game.player.depth)>>
             <<else>>
-              <<set _char to $game.createCharacter($game.player.row, $game.player.col, $game.player.depth, 'monster')>>
+              <h1>ERROR</h1>
+              /* <<set _char to $game.createCharacter($game.player.row, $game.player.col, $game.player.depth, 'monster')>> */
             <</if>>
             /* Monster is: <<=_monster>> */
 
@@ -286,7 +287,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
         <</for>>
       <</if>>
     </div>
-    <div class="map" id="map-holder">
+    <div class="map">
         <<=$game.vizMap($game.player.depth)>>
     </div>
     <div class="messages">

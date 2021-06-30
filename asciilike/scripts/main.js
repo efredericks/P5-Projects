@@ -236,7 +236,6 @@ setup.prefabs = [
 
 class GameManager {
   constructor(rooms) {
-    console.log(rooms);
     this.map = [];
     this.npcs = [];
     this.mapWidth = 10;
@@ -257,11 +256,17 @@ class GameManager {
     this.player = new Character("Erik", 1, 10, 1, 0, 0, 0);
     this.player.isPlayer = true;
 
-    this.eventCharacters = this.generateCharacters(); 
+    this.eventCharacters = {}
     let _depth = 0;
-    // for (let row = 0; row < this.mapHeight; row++)
-    //   for (let col = 0; col < this.mapWidth; col++)
-    //     this.eventCharacters[`${_depth}:${row}:${col}`] = null;
+    for (let d = 0; d < this.maxDepth; d++) {
+      for (let row = 0; row < this.mapHeight; row++)
+        for (let col = 0; col < this.mapWidth; col++)
+          this.eventCharacters[`${d}:${row}:${col}`] = null;
+    }
+    // generate monsters
+    this.eventCharacters = this.generateCharacters();
+    console.log(this.eventCharacters);
+
 
     this.flashlight = {
       'status': 'off',
@@ -368,16 +373,19 @@ class GameManager {
         this.map[d][_downrow][_downcol] = { 'passage': 'down1', 'visited': false, 'sanity': 5, 'stairsdown': true };
       if (_uprow != null && _upcol != null)
         this.map[d][_uprow][_upcol] = { 'passage': 'up1', 'visited': false, 'sanity': 5, 'stairsup': true };
+
     }
+
+
     console.log(this.map);
   }
 
   generateCharacters() {
     let _chars = {};
 
+    // monsters
     for (let d = 0; d < this.maxDepth; d++) {
-      // monsters
-      for (let _i = d+1; _i >= 0; _i--) {
+      for (let _i = d + 1; _i > 0; _i--) {
         let _row, _col, _key;
         do {
           _row = getRandomInteger(1, this.mapHeight);
@@ -391,26 +399,27 @@ class GameManager {
       }
     }
 
-    console.log(_chars);
     return _chars;
   }
 
   hasCharacter(row, col, depth) {
-    if (this.eventCharacters[`${depth}:${row}:${col}`] != null)
+    let _key = `${depth}:${row}:${col}`;
+    if (this.eventCharacters[_key] != null) {
       return true;
+    }
     return false;
   }
   getCharacter(row, col, depth) {
     return this.eventCharacters[`${depth}:${row}:${col}`];
   }
-  createCharacter(row, col, depth, type) {
-    if (type == "monster") {
-      this.eventCharacters[`${depth}:${row}:${col}`] = { 'type': type, 'monster': _monsters[getRandomInteger(0, _monsters.length)] };
+  // createCharacter(row, col, depth, type) {
+  //   if (type == "monster") {
+  //     this.eventCharacters[`${depth}:${row}:${col}`] = { 'type': type, 'monster': _monsters[getRandomInteger(0, _monsters.length)] };
 
-    } else
-      this.eventCharacters[`${depth}:${row}:${col}`] = { 'type': type };
-    return this.eventCharacters[`${depth}:${row}:${col}`];
-  }
+  //   } else
+  //     this.eventCharacters[`${depth}:${row}:${col}`] = { 'type': type };
+  //   return this.eventCharacters[`${depth}:${row}:${col}`];
+  // }
   destroyCharacter(row, col, depth) {
     this.eventCharacters[`${depth}:${row}:${col}`] = null;
   }
@@ -493,13 +502,13 @@ class GameManager {
         else {
           if (this.getPassageVisited(r, c, depth))
             _cls = 'visited';
-          else 
+          else
             _cls = '';
 
           // tbd - temp viz
           if (this.hasCharacter(r, c, depth)) {
-            _cls = 'monster';
-            _txt = "+";
+            _cls = ' monster';
+            // _txt = "+";
           } else if (this.getPassage(r, c, depth) == setup.prefabs[0]) {
             _cls += ' empty';
             // else if (this.getPassage(r,c) == setup.prefabs[1])
@@ -527,7 +536,7 @@ class GameManager {
           }
         }
 
-        ret += "<div class='map-cell " + _cls + "'>" + _txt + "</div>";
+        ret += "<div class='map-cell " + _cls + "'></div>";
 
         // ret += "<td class='" + _cls + "'></td>";
       }
@@ -535,6 +544,7 @@ class GameManager {
     }
     // ret += "</table>";
     ret += "</div>";
+
     return ret;
   }
 
@@ -712,10 +722,6 @@ class GameManager {
 
     return _friends;
   }
-
-  generateCharacter(row, col) {
-  }
-
 };
 window.GameManager = GameManager;
 
