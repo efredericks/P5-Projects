@@ -238,7 +238,7 @@ tr {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr auto;
-  gap: 15px 15px;
+  gap: 5px 5px; /*15px 15px;*/
   grid-auto-flow: row;
   grid-template-areas:
     "main main nav"
@@ -543,6 +543,10 @@ c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
 
 canvas {
   border-radius: 5px;
+}
+
+#story {
+  margin-top: 1em;
 }</style><script role="script" id="twine-user-script" type="text/twine-javascript">/* twine-user-script #1: "Story JavaScript" */
 /* js/constants.js, js/room.js, js/traceryGen.js, js/person.js, js/macroWhen.js */
 /* twine-user-script #2: "fast-simplex-noise.js" */
@@ -1880,10 +1884,32 @@ class GameManager {
       _wait.text = "<";
       _wait.stairsup = true; // duplicate for easier check in TW
       _wait.depth = player.depth - 1;
+
+      // set starting location
+      for (let _r = 0; _r < this.mapHeight-1; _r++) {
+        for (let _c = 0; _c < this.mapWidth-1; _c++) {
+          if (this.map[player.depth-1][_r][_c].stairsdown) {
+            _wait.startRow = _r;
+            _wait.startCol = _c;
+            break;
+          }
+        }
+      }
     } else if (this.map[player.depth][player.row][player.col].stairsdown) {
       _wait.text = ">";
       _wait.stairsdown = true; // duplicate for easier check in TW
       _wait.depth = player.depth + 1;
+
+      // set starting location
+      for (let _r = 0; _r < this.mapHeight-1; _r++) {
+        for (let _c = 0; _c < this.mapWidth-1; _c++) {
+          if (this.map[player.depth+1][_r][_c].stairsup) {
+            _wait.startRow = _r;
+            _wait.startCol = _c;
+            break;
+          }
+        }
+      }
     }
 
     // set depths to player's
@@ -2209,24 +2235,24 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
               &lt;&lt;button [img[_imgPath][Begin]]&gt;&gt;
                 &lt;&lt;if _nextPassages[_i].stairsdown == true or _nextPassages[_i].stairsup == true&gt;&gt;
                   &lt;&lt;set $game.player.depth to _nextPassages[_i].depth&gt;&gt;
-                  &lt;&lt;set $game.player.row to 0&gt;&gt;
-                  &lt;&lt;set $game.player.col to 0&gt;&gt;
+                  &lt;&lt;set $game.player.row to _nextPassages[_i].startRow&gt;&gt;
+                  &lt;&lt;set $game.player.col to _nextPassages[_i].startCol&gt;&gt;
                 &lt;&lt;else&gt;&gt;
                   &lt;&lt;set $game.player.row to _nextPassages[_i].row&gt;&gt;
                   &lt;&lt;set $game.player.col to _nextPassages[_i].col&gt;&gt;
                 &lt;&lt;/if&gt;&gt;
 
-                &lt;&lt;set _nextPassage to $game.getPassage(_nextPassages[_i].row, _nextPassages[_i].col, _nextPassages[_i].depth)&gt;&gt;
+                &lt;&lt;set _nextPassage to $game.getPassage($game.player.row, $game.player.col, $game.player.depth)&gt;&gt;
     
                 /* Update sanity based on +/- of the room you&#39;re going to */
-                &lt;&lt;set _sanity to $game.player.updateSanity($game.getMapSanity(_nextPassages[_i].row, _nextPassages[_i].col, _nextPassages[_i].depth))&gt;&gt;
+                &lt;&lt;set _sanity to $game.player.updateSanity($game.getMapSanity($game.player.row, $game.player.col, $game.player.depth))&gt;&gt;
                 &lt;&lt;if _sanity == 0&gt;&gt;
                   &lt;&lt;set $gameState to setup.STATES.LOST_SANITY&gt;&gt;
                 &lt;&lt;/if&gt;&gt;
   
-                &lt;&lt;run $game.setPassageVisited(_nextPassages[_i].row, _nextPassages[_i].col, _nextPassages[_i].depth)&gt;&gt;
+                &lt;&lt;run $game.setPassageVisited($game.player.row, $game.player.col, $game.player.depth)&gt;&gt;
                 &lt;&lt;set $currentPassage = _nextPassage&gt;&gt;
-                &lt;&lt;if $game.totalFriends == $game.friendsRescued&gt;&gt;
+                &lt;&lt;if $game.totalFriends == $game.friendsRescued &amp;&amp; $game.player.row == 0 &amp;&amp; $game.player.col == 0 &amp;&amp; $game.player.depth == 0&gt;&gt;
                   &lt;&lt;set $gameState to setup.STATES.WIN&gt;&gt;
                 &lt;&lt;/if&gt;&gt;
               &lt;&lt;/button&gt;&gt;

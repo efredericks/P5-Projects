@@ -747,10 +747,32 @@ class GameManager {
       _wait.text = "<";
       _wait.stairsup = true; // duplicate for easier check in TW
       _wait.depth = player.depth - 1;
+
+      // set starting location
+      for (let _r = 0; _r < this.mapHeight-1; _r++) {
+        for (let _c = 0; _c < this.mapWidth-1; _c++) {
+          if (this.map[player.depth-1][_r][_c].stairsdown) {
+            _wait.startRow = _r;
+            _wait.startCol = _c;
+            break;
+          }
+        }
+      }
     } else if (this.map[player.depth][player.row][player.col].stairsdown) {
       _wait.text = ">";
       _wait.stairsdown = true; // duplicate for easier check in TW
       _wait.depth = player.depth + 1;
+
+      // set starting location
+      for (let _r = 0; _r < this.mapHeight-1; _r++) {
+        for (let _c = 0; _c < this.mapWidth-1; _c++) {
+          if (this.map[player.depth+1][_r][_c].stairsup) {
+            _wait.startRow = _r;
+            _wait.startCol = _c;
+            break;
+          }
+        }
+      }
     }
 
     // set depths to player's
