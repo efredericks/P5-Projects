@@ -1,6 +1,11 @@
 ///globals
 ///helper functions
 
+function getSpriteOffset(row, col, tileSize) {
+  let dx = col * tileSize;
+  let dy = row * tileSize;
+  return { 'dx': dx, 'dy': dy };
+}
 
 setup.STATES = {
   GAME: 0,
@@ -144,7 +149,7 @@ let _monsters = [
     'img': 'Black Scratchy.png'
   },
   {
-    'name': 'Scream.png',
+    'name': 'Scream',
     'img': 'Black Scream.png'
   },
   {
@@ -236,6 +241,7 @@ class GameManager {
     this.npcs = [];
     this.mapWidth = 10;
     this.mapHeight = 10;
+    this.maxDepth = 5;
     this.noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 8 });
     // this.noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });
     this.init();
@@ -251,19 +257,42 @@ class GameManager {
     this.player = new Character("Erik", 1, 10, 1, 0, 0, 0);
     this.player.isPlayer = true;
 
-    this.eventCharacters = {}; // don't generate until random event triggers
+    this.eventCharacters = this.generateCharacters(); 
     let _depth = 0;
-    for (let row = 0; row < this.mapHeight; row++)
-      for (let col = 0; col < this.mapWidth; col++)
-        this.eventCharacters[`${_depth}:${row}:${col}`] = null;
+    // for (let row = 0; row < this.mapHeight; row++)
+    //   for (let col = 0; col < this.mapWidth; col++)
+    //     this.eventCharacters[`${_depth}:${row}:${col}`] = null;
 
     this.flashlight = {
       'status': 'off',
       'battery': 100
     };
+
+    this.spriteSheet = new Image();
+    this.spriteSheet.src = "./assets/kenny-microroguelike/colored_tilemap_packed.png";
+    // spriteSheet.onload = stateHandler;// need to make sure this is loaded!
+
+
+    // testgen
+    // this.worker = new Worker("scripts/testgen-worker.js");
+    // this.worker.iterations = 0;
+    // this.worker.onmessage = e => {
+    //   const message = e.data;
+    //   console.log(`[From worker]: ${message}`);
+
+    //   let msg = "SERVER";
+    //   this.worker.iterations++;
+    //   if (this.worker.iterations > 3) {
+    //     msg = "CLOSE";
+    //   }
+
+    //   const reply = setTimeout(() => this.worker.postMessage(msg), 3000);
+    // };
+    // this.worker.postMessage("=== main testing loop begin ===");
+
   }
   init() {
-    for (let d = 0; d < 5; d++) { // depth
+    for (let d = 0; d < this.maxDepth; d++) { // depth
       this.map[d] = [];
 
       for (let r = 0; r < this.mapHeight; r++) {
@@ -310,41 +339,64 @@ class GameManager {
       if (d == 0) { // only down
 
         do {
-          _downrow = getRandomInteger(3, this.mapHeight-1);
-          _downcol = getRandomInteger(3, this.mapWidth-1);
+          _downrow = getRandomInteger(3, this.mapHeight - 1);
+          _downcol = getRandomInteger(3, this.mapWidth - 1);
         } while (_downrow == _uprow && _downcol == _upcol);
 
       } else if (d == 4) { // only up
 
         do {
-          _uprow = getRandomInteger(3, this.mapHeight-1);
-          _upcol = getRandomInteger(3, this.mapWidth-1);
+          _uprow = getRandomInteger(3, this.mapHeight - 1);
+          _upcol = getRandomInteger(3, this.mapWidth - 1);
         } while (_downrow == _uprow && _downcol == _upcol);
 
       } else { // both
 
         do {
-          _downrow = getRandomInteger(3, this.mapHeight-1);
-          _downcol = getRandomInteger(3, this.mapWidth-1);
+          _downrow = getRandomInteger(3, this.mapHeight - 1);
+          _downcol = getRandomInteger(3, this.mapWidth - 1);
         } while (_downrow == _uprow && _downcol == _upcol);
 
         do {
-          _uprow = getRandomInteger(3, this.mapHeight-1);
-          _upcol = getRandomInteger(3, this.mapWidth-1);
+          _uprow = getRandomInteger(3, this.mapHeight - 1);
+          _upcol = getRandomInteger(3, this.mapWidth - 1);
         } while (_downrow == _uprow && _downcol == _upcol);
 
       }
 
       if (_downrow != null && _downcol != null)
-        this.map[d][_downrow][_downcol] = {'passage': 'down1', 'visited': false, 'sanity': 5, 'stairsdown': true};
+        this.map[d][_downrow][_downcol] = { 'passage': 'down1', 'visited': false, 'sanity': 5, 'stairsdown': true };
       if (_uprow != null && _upcol != null)
-        this.map[d][_uprow][_upcol] = {'passage': 'up1', 'visited': false, 'sanity': 5, 'stairsup': true};
+        this.map[d][_uprow][_upcol] = { 'passage': 'up1', 'visited': false, 'sanity': 5, 'stairsup': true };
     }
     console.log(this.map);
   }
 
+  generateCharacters() {
+    let _chars = {};
+
+    for (let d = 0; d < this.maxDepth; d++) {
+      // monsters
+      for (let _i = d+1; _i >= 0; _i--) {
+        let _row, _col, _key;
+        do {
+          _row = getRandomInteger(1, this.mapHeight);
+          _col = getRandomInteger(1, this.mapWidth);
+          _key = `${d}:${_row}:${_col}`;
+        } while (_key in _chars);
+        _chars[_key] = {
+          'type': 'monster',
+          'monster': _monsters[getRandomInteger(0, _monsters.length)],
+        };
+      }
+    }
+
+    console.log(_chars);
+    return _chars;
+  }
+
   hasCharacter(row, col, depth) {
-    if (this.eventCharacters[`${depth}:${row}:${col}`])
+    if (this.eventCharacters[`${depth}:${row}:${col}`] != null)
       return true;
     return false;
   }
@@ -383,8 +435,8 @@ class GameManager {
         return { 'event': 'spores', 'return': true };
       else if (_r < 0.5)
         return { 'event': 'npc', 'return': true };
-      else if (_r < 0.75)
-        return { 'event': 'monster', 'return': true };
+      // else if (_r < 0.75)
+      //   return { 'event': 'monster', 'return': true };
       else
         return { 'event': 'tbd', 'return': true };
     } else
@@ -392,12 +444,48 @@ class GameManager {
   }
 
   vizMap(depth) {
+    // let canvas = document.createElement('canvas');
+    // let tileSize = 8;
+
+    // let ctx = canvas.getContext("2d");
+    // canvas.width = 10 * tileSize;
+    // canvas.height = 10 * tileSize;
+    // canvas.style.width = canvas.width + 'px';
+    // canvas.style.height = canvas.height + 'px';
+    // ctx.imageSmoothingEnabled = false;
+
+    // let x_pos = 0;
+    // let y_pos = 0;
+    // for (let r = 0; r < this.mapHeight; r++) {
+    //   for (let c = 0; c < this.mapWidth; c++) {
+
+    //     let offset = getSpriteOffset(1, 4, tileSize);
+    //     ctx.drawImage(
+    //       this.spriteSheet,
+    //       offset['dx'],
+    //       offset['dy'],
+    //       tileSize,
+    //       tileSize,
+    //       Math.round(x_pos),
+    //       Math.round(y_pos),
+    //       tileSize,
+    //       tileSize
+    //     );
+
+    //     x_pos += tileSize;
+    //   }
+    //   y_pos += tileSize;
+    //   x_pos = 0;
+    // }
+    // return canvas;
+    // ret += "</canvas>";
     // let ret = "<table>";
     let ret = "<div class='map-container'>"
     for (let r = 0; r < this.mapHeight; r++) {
       // ret += "<tr>";
       for (let c = 0; c < this.mapWidth; c++) {
         let _cls;
+        let _txt = ".";
         if (this.player.row == r && this.player.col == c)
           _cls = 'active';
         // else if (this.getPassageVisited(r, c, depth))
@@ -405,31 +493,41 @@ class GameManager {
         else {
           if (this.getPassageVisited(r, c, depth))
             _cls = 'visited';
-          else
+          else 
             _cls = '';
 
           // tbd - temp viz
-          if (this.getPassage(r, c, depth) == setup.prefabs[0])
+          if (this.hasCharacter(r, c, depth)) {
+            _cls = 'monster';
+            _txt = "+";
+          } else if (this.getPassage(r, c, depth) == setup.prefabs[0]) {
             _cls += ' empty';
-          // else if (this.getPassage(r,c) == setup.prefabs[1])
-          else if ([setup.prefabs[1], setup.prefabs[2], setup.prefabs[3]].indexOf(this.getPassage(r, c, depth)) >= 0)
+            // else if (this.getPassage(r,c) == setup.prefabs[1])
+          } else if ([setup.prefabs[1], setup.prefabs[2], setup.prefabs[3]].indexOf(this.getPassage(r, c, depth)) >= 0) {
             _cls += ' cavern';
-          else if (this.getPassage(r, c, depth) == setup.prefabs[4])
+            _txt = "o";
+          } else if (this.getPassage(r, c, depth) == setup.prefabs[4]) {
             _cls += ' tight';
-          else if (this.getPassage(r, c, depth) == setup.prefabs[5])
+            _txt = "|";
+          } else if (this.getPassage(r, c, depth) == setup.prefabs[5]) {
             _cls += ' stream';
-          else if (this.getPassage(r, c, depth) == setup.prefabs[6])
+            _txt = "~";
+          } else if (this.getPassage(r, c, depth) == setup.prefabs[6]) {
             _cls += ' pool';
-          else if (this.getPassage(r, c, depth) == 'down1')
+            _txt = "p";
+          } else if (this.getPassage(r, c, depth) == 'down1') {
             _cls += ' down';
-          else if (this.getPassage(r, c, depth) == 'up1')
+            _txt = ">";
+          } else if (this.getPassage(r, c, depth) == 'up1') {
             _cls += ' up';
-          
-          else
+            _txt = "<";
+          } else {
             _cls += ' void';
+            _txt = "*";
+          }
         }
 
-        ret += "<div class='map-cell " + _cls + "'></div>";
+        ret += "<div class='map-cell " + _cls + "'>" + _txt + "</div>";
 
         // ret += "<td class='" + _cls + "'></td>";
       }
@@ -574,11 +672,11 @@ class GameManager {
     if (this.map[player.depth][player.row][player.col].stairsup) {
       _wait.text = "<";
       _wait.stairsup = true; // duplicate for easier check in TW
-      _wait.depth = player.depth-1;
+      _wait.depth = player.depth - 1;
     } else if (this.map[player.depth][player.row][player.col].stairsdown) {
       _wait.text = ">";
       _wait.stairsdown = true; // duplicate for easier check in TW
-      _wait.depth = player.depth+1;
+      _wait.depth = player.depth + 1;
     }
 
     // set depths to player's

@@ -225,6 +225,11 @@ tr {
   background: rgb(209, 25, 255);
 }
 
+.monster {
+  background: rgb(255, 238, 0);
+
+}
+
 .down {
   background: greenyellow;
 }
@@ -417,6 +422,12 @@ c/o: https://qjzhvmqlzvoo5lqnrvuhmg-on.drv.tw/UInv/Sample_Code.html#Drunk%20Text
   display: flex;
   width: 20px;
   height: 20px;
+}
+
+.map-cell {
+  font-size: 8px;
+  font-family:'Courier New', Courier, monospace;
+  color: #fff;
 }
 
 .active {

@@ -114,7 +114,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
   <div class="game-area">
     <div class="main">
       /* deal with a monster if one is here! */
-      <<if $game.hasCharacter($game.player.row, $game.player.col)>>
+      <<if $game.hasCharacter($game.player.row, $game.player.col, $game.player.depth)>>
         <<set _roomState to "fight">>
         <<set _char to $game.getCharacter($game.player.row, $game.player.col, $game.player.depth)>>
         <<if _char.type == "monster">>
@@ -171,7 +171,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
       <</if>>
 
       /* get flavor text for nearby rooms */
-      <<set _thingsNear = $game.getThingsNear($game.player)>>
+      /* <<set _thingsNear = $game.getThingsNear($game.player)>> */
 
       <<set _friendsHere = $game.getFriendsHere($game.player.row, $game.player.col, $game.player.depth)>>
       <<if _friendsHere.length gt 0>>
@@ -286,8 +286,8 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
         <</for>>
       <</if>>
     </div>
-    <div class="map">
-      <<=$game.vizMap($game.player.depth)>>
+    <div class="map" id="map-holder">
+        <<=$game.vizMap($game.player.depth)>>
     </div>
     <div class="messages">
       <div style="text-align: center">
@@ -302,6 +302,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
     </div>
   </div>
 </div>
+
 <<elseif $gameState == setup.STATES.WIN>>
   <h1>YOU WON</h1>
 <<elseif $gameState == setup.STATES.LOST_SANITY>>
