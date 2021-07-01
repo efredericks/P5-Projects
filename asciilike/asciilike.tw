@@ -2,6 +2,7 @@
 Assets: 
 * UI: kenny.nl - Cartography pack: https://www.kenney.nl/assets/cartography-pack
 * Enemies: Tyler Warren RPG Battlers: https://tylerjwarren.itch.io/tylerwarrenrpg-9th-50
+* Names: Darius Kazemi: https://github.com/dariusk/corpora
 
 
 * Gameplay thoughts:
@@ -223,7 +224,8 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
         <div class="south"></div>
         <div class="southeast"></div>
       <<else>>
-      <<set _nextPassages to $game.getPassages($game.player)>>
+        <<set _nextPassages to $game.getPassages($game.player)>>
+
         <<for _i to 0; _i lt _nextPassages.length; _i++>>
           <<capture $game, _i, _txt, _nextPassages[_i], _nextRow, _nextCol, _nextPassage>>
           <div @class="_nextPassages[_i].header">
@@ -274,6 +276,9 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
                 <<if _sanity == 0>>
                   <<set $gameState to setup.STATES.LOST_SANITY>>
                 <</if>>
+
+                /* Update monsters */
+                <<run $game.updateCharacters($game.player.depth)>>
   
                 <<run $game.setPassageVisited($game.player.row, $game.player.col, $game.player.depth)>>
                 <<set $currentPassage = _nextPassage>>
@@ -522,3 +527,6 @@ Small gaps and outcroppings resemble natural handholds.  You can climb up here.
 
 :: fire [prefab fire]
 Four, I mean five!  I mean fire!
+
+:: wall [prefab wall]
+A wall, you shouldn't be seeing this.

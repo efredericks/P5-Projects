@@ -268,6 +268,8 @@ class GameManager {
     this.eventCharacters = this.generateCharacters();
     console.log(this.eventCharacters);
 
+    // carve out if necessary (post monsters/characters generation)
+    this.carveCaverns();
 
     this.flashlight = {
       'status': 'off',
@@ -304,48 +306,61 @@ class GameManager {
       this.map[d] = [];
 
       if (d < this.maxDepth - 1) {
-        for (let r = 0; r < this.mapHeight; r++) {
-          this.map[d][r] = [];
-          for (let c = 0; c < this.mapWidth; c++) {
-            if (r == 0 && c == 0 && d == 0) // always start at 0,0
-              this.map[d][r][c] = { 'passage': 'start', 'visited': true, 'sanity': 10 };
-            else {
-              let randomOffset = getRandomInteger(0, 100000);
-              let _noise = this.noiseGen.get2DNoise(c + randomOffset, r + randomOffset);
+        if (d == 0) { // first floor
 
-              let _room = setup.prefabs[0];
-              let _sanity = -1;
-              if (_noise < 0.0) { // empty
-                _room = setup.prefabs[0];
-              } else if (_noise < 0.4) { // cavern
-                _room = setup.prefabs[getRandomInteger(1, 4)];
-              } else if (_noise < 0.5) {
-                _room = setup.prefabs[4]; // tight squeeze
-                _sanity = -5;
-              } else if (_noise < 0.6) { // stream
-                _room = setup.prefabs[5];
-                _sanity = 5;
-              } else if (_noise < 0.7) { // pool 
-                _room = setup.prefabs[6];
-                _sanity = 5;
-              } else if (_noise < 0.8) { // void
-                _room = setup.prefabs[7];
-                _sanity = -10;
-              } else { // empty
-                _room = setup.prefabs[0];
+          // fill with walls
+          for (let r = 0; r < this.mapHeight; r++) {
+            this.map[d][r] = [];
+            for (let c = 0; c < this.mapWidth; c++) {
+              this.map[d][r][c] = { 'passage': 'wall', 'visited': false, 'sanity': 0 };//-10 };
+            }
+          }
+
+        } else { // other floors
+
+          for (let r = 0; r < this.mapHeight; r++) {
+            this.map[d][r] = [];
+            for (let c = 0; c < this.mapWidth; c++) {
+              if (r == 0 && c == 0 && d == 0) // always start at 0,0
+                this.map[d][r][c] = { 'passage': 'start', 'visited': true, 'sanity': 10 };
+              else {
+                let randomOffset = getRandomInteger(0, 100000);
+                let _noise = this.noiseGen.get2DNoise(c + randomOffset, r + randomOffset);
+
+                let _room = setup.prefabs[0];
+                let _sanity = -1;
+                if (_noise < 0.0) { // empty
+                  _room = setup.prefabs[0];
+                } else if (_noise < 0.4) { // cavern
+                  _room = setup.prefabs[getRandomInteger(1, 4)];
+                } else if (_noise < 0.5) {
+                  _room = setup.prefabs[4]; // tight squeeze
+                  _sanity = -5;
+                } else if (_noise < 0.6) { // stream
+                  _room = setup.prefabs[5];
+                  _sanity = 5;
+                } else if (_noise < 0.7) { // pool 
+                  _room = setup.prefabs[6];
+                  _sanity = 5;
+                } else if (_noise < 0.8) { // void
+                  _room = setup.prefabs[7];
+                  _sanity = -10;
+                } else { // empty
+                  _room = setup.prefabs[0];
+                }
+
+                this.map[d][r][c] = { 'passage': _room, 'visited': false, 'sanity': _sanity };
               }
-
-              this.map[d][r][c] = { 'passage': _room, 'visited': false, 'sanity': _sanity };
             }
           }
         }
-      } else {
+      } else { // last level
         for (let r = 0; r < this.mapHeight; r++) {
           this.map[d][r] = [];
           let _room = setup.prefabs[0];
           for (let c = 0; c < this.mapWidth; c++) {
             _room = setup.prefabs[8];
-            this.map[d][r][c] = { 'passage': _room, 'visited': false, 'sanity': 0};//-10 };
+            this.map[d][r][c] = { 'passage': _room, 'visited': false, 'sanity': 0 };//-10 };
           }
         }
       }
@@ -389,9 +404,89 @@ class GameManager {
         this.map[d][_uprow][_upcol] = { 'passage': 'up1', 'visited': false, 'sanity': 5, 'stairsup': true };
 
     }
-
-    console.log(this.map);
+    // console.log(this.map);
   }
+
+  // only carve out walls, no need to carve other things
+  isCarveable(d, r, c) {
+    if (r >= 0 && r < this.mapHeight && c >= 0 && c < this.mapWidth) {
+      if (this.map[d][r][c].passage == 'wall')
+        return true;
+      else
+        return false;
+    }
+    return false;
+  }
+
+  carveCaverns() {
+    let d = 0; // looperize this later, depending on how we do things
+    let thingsToCarve = []; // r:val, c:val
+
+    // make space around:
+    // stairs, enemies
+    for (let r = 0; r < this.mapHeight; r++) {
+      for (let c = 0; c < this.mapWidth; c++) {
+        if (this.map[d][r][c].passage == "up1" || this.map[d][r][c].passage == "down1" || this.hasCharacter(r, c, d))
+          thingsToCarve.push({ 'r': r, 'c': c });
+      }
+    }
+    // items
+
+    // player
+    thingsToCarve.push({ 'r': this.player.row, 'c': this.player.col });
+
+    for (let _i = 0; _i < thingsToCarve.length; _i++) {
+      let _r = thingsToCarve[_i].r;
+      let _c = thingsToCarve[_i].c;
+
+      // .
+      if (this.isCarveable(d, _r, _c))
+        this.map[d][_r][_c] = { 'passage': setup.prefabs[0], 'visited': false, 'sanity': 0 };
+      // n
+      if (this.isCarveable(d, _r - 1, _c))
+        this.map[d][_r - 1][_c] = { 'passage': setup.prefabs[0], 'visited': false, 'sanity': 0 };
+      // ne
+      if (this.isCarveable(d, _r - 1, _c + 1))
+        this.map[d][_r - 1][_c + 1] = { 'passage': setup.prefabs[0], 'visited': false, 'sanity': 0 };
+      // e
+      if (this.isCarveable(d, _r, _c + 1))
+        this.map[d][_r][_c + 1] = { 'passage': setup.prefabs[0], 'visited': false, 'sanity': 0 };
+      // se
+      if (this.isCarveable(d, _r + 1, _c + 1))
+        this.map[d][_r + 1][_c + 1] = { 'passage': setup.prefabs[0], 'visited': false, 'sanity': 0 };
+      // s
+      if (this.isCarveable(d, _r + 1, _c))
+        this.map[d][_r + 1][_c] = { 'passage': setup.prefabs[0], 'visited': false, 'sanity': 0 };
+      // sw
+      if (this.isCarveable(d, _r + 1, _c - 1))
+        this.map[d][_r + 1][_c - 1] = { 'passage': setup.prefabs[0], 'visited': false, 'sanity': 0 };
+      // w
+      if (this.isCarveable(d, _r, _c - 1))
+        this.map[d][_r][_c - 1] = { 'passage': setup.prefabs[0], 'visited': false, 'sanity': 0 };
+      // nw
+      if (this.isCarveable(d, _r - 1, _c - 1))
+        this.map[d][_r - 1][_c - 1] = { 'passage': setup.prefabs[0], 'visited': false, 'sanity': 0 };
+    }
+
+    // carve tunnels
+
+  }
+
+  // monster/NPC AI
+  updateCharacters(depth) {
+    let _updates = {};
+
+    // depth is the first part of the key
+    Object.entries(this.eventCharacters).forEach(([key, value]) => {
+      if (key.substring(0, 2) === "0:") {
+        if (Math.random() > 0.9) {
+          // figure out new position --- TBD
+          _updates[key] = key; // key -> old, val -> new
+        }
+      }
+    });
+  }
+
 
   generateCharacters() {
     let _chars = {};
@@ -520,6 +615,8 @@ class GameManager {
             offset = getSpriteOffset(5, 8, this.tileSize);
           } else if (this.getPassage(r, c, depth) == setup.prefabs[8]) { // fire
             offset = getSpriteOffset(13, 6, this.tileSize);
+          } else if (this.getPassage(r, c, depth) == 'wall') {
+            offset = getSpriteOffset(2, 5, this.tileSize);
           } else if (this.getPassage(r, c, depth) == 'down1') {
             offset = getSpriteOffset(6, 3, this.tileSize);
           } else if (this.getPassage(r, c, depth) == 'up1') {
@@ -650,8 +747,7 @@ class GameManager {
     }
   }
 
-
-  // cardinal directions only
+  // get valid passages for movement
   getPassages(player) {
     let _passages = [];
 
@@ -749,9 +845,9 @@ class GameManager {
       _wait.depth = player.depth - 1;
 
       // set starting location
-      for (let _r = 0; _r < this.mapHeight-1; _r++) {
-        for (let _c = 0; _c < this.mapWidth-1; _c++) {
-          if (this.map[player.depth-1][_r][_c].stairsdown) {
+      for (let _r = 0; _r < this.mapHeight - 1; _r++) {
+        for (let _c = 0; _c < this.mapWidth - 1; _c++) {
+          if (this.map[player.depth - 1][_r][_c].stairsdown) {
             _wait.startRow = _r;
             _wait.startCol = _c;
             break;
@@ -764,9 +860,9 @@ class GameManager {
       _wait.depth = player.depth + 1;
 
       // set starting location
-      for (let _r = 0; _r < this.mapHeight-1; _r++) {
-        for (let _c = 0; _c < this.mapWidth-1; _c++) {
-          if (this.map[player.depth+1][_r][_c].stairsup) {
+      for (let _r = 0; _r < this.mapHeight - 1; _r++) {
+        for (let _c = 0; _c < this.mapWidth - 1; _c++) {
+          if (this.map[player.depth + 1][_r][_c].stairsup) {
             _wait.startRow = _r;
             _wait.startCol = _c;
             break;
@@ -775,13 +871,19 @@ class GameManager {
       }
     }
 
+    _passages.push(_wait);
+
     // set depths to player's
     for (let i = 0; i < _passages.length; i++) {
       if (!_passages[i].stairsdown && !_passages[i].stairsup)
         _passages[i]['depth'] = player.depth;
+
+      // check for validity (i.e., collisions)
+      if (_passages[i].valid)
+        if (this.map[_passages[i].depth][_passages[i].row][_passages[i].col].passage == "wall")
+          _passages[i].valid = false;
     }
 
-    _passages.push(_wait);
 
     return _passages;
   }
@@ -790,8 +892,9 @@ class GameManager {
     let _friendLocations = {};
     let _friends = [];
 
+    let _names = this.generateNames();
+
     for (let i = 0; i < 4; i++) {
-      let _name = `Friend${i}`;
 
       let _row, _col, _indx;
       do {
@@ -802,11 +905,429 @@ class GameManager {
       _friendLocations[_indx] = i;
 
       // let _friend = new Character(_name, -1, -1, -1, _row, _col);
-      let _friend = new Character(_name, -1, -1, -1, 2, 2, i);
+      let _friend = new Character(_names[i], -1, -1, -1, 2, 2, i);
       _friends.push(_friend);
     }
 
     return _friends;
+  }
+
+  generateNames() {
+    let ret_names = [];
+    // DariusK's corpora, just copy/pasted to avoid loading and waiting for a promise
+    // Probably the worst way to do this but we'll fix it in post /shrug
+    let _names = {
+      "description": "First names of men and women, pulled from the US Census for the 2000s.",
+      "firstNames": [
+        "Aaliyah",
+        "Aaron",
+        "Abby",
+        "Abigail",
+        "Abraham",
+        "Adam",
+        "Addison",
+        "Adrian",
+        "Adriana",
+        "Adrianna",
+        "Aidan",
+        "Aiden",
+        "Alan",
+        "Alana",
+        "Alejandro",
+        "Alex",
+        "Alexa",
+        "Alexander",
+        "Alexandra",
+        "Alexandria",
+        "Alexia",
+        "Alexis",
+        "Alicia",
+        "Allison",
+        "Alondra",
+        "Alyssa",
+        "Amanda",
+        "Amber",
+        "Amelia",
+        "Amy",
+        "Ana",
+        "Andrea",
+        "Andres",
+        "Andrew",
+        "Angel",
+        "Angela",
+        "Angelica",
+        "Angelina",
+        "Anna",
+        "Anthony",
+        "Antonio",
+        "Ariana",
+        "Arianna",
+        "Ashley",
+        "Ashlyn",
+        "Ashton",
+        "Aubrey",
+        "Audrey",
+        "Austin",
+        "Autumn",
+        "Ava",
+        "Avery",
+        "Ayden",
+        "Bailey",
+        "Benjamin",
+        "Bianca",
+        "Blake",
+        "Braden",
+        "Bradley",
+        "Brady",
+        "Brandon",
+        "Brayden",
+        "Breanna",
+        "Brendan",
+        "Brian",
+        "Briana",
+        "Brianna",
+        "Brittany",
+        "Brody",
+        "Brooke",
+        "Brooklyn",
+        "Bryan",
+        "Bryce",
+        "Bryson",
+        "Caden",
+        "Caitlin",
+        "Caitlyn",
+        "Caleb",
+        "Cameron",
+        "Camila",
+        "Carlos",
+        "Caroline",
+        "Carson",
+        "Carter",
+        "Cassandra",
+        "Cassidy",
+        "Catherine",
+        "Cesar",
+        "Charles",
+        "Charlotte",
+        "Chase",
+        "Chelsea",
+        "Cheyenne",
+        "Chloe",
+        "Christian",
+        "Christina",
+        "Christopher",
+        "Claire",
+        "Cody",
+        "Colby",
+        "Cole",
+        "Colin",
+        "Collin",
+        "Colton",
+        "Conner",
+        "Connor",
+        "Cooper",
+        "Courtney",
+        "Cristian",
+        "Crystal",
+        "Daisy",
+        "Dakota",
+        "Dalton",
+        "Damian",
+        "Daniel",
+        "Daniela",
+        "Danielle",
+        "David",
+        "Delaney",
+        "Derek",
+        "Destiny",
+        "Devin",
+        "Devon",
+        "Diana",
+        "Diego",
+        "Dominic",
+        "Donovan",
+        "Dylan",
+        "Edgar",
+        "Eduardo",
+        "Edward",
+        "Edwin",
+        "Eli",
+        "Elias",
+        "Elijah",
+        "Elizabeth",
+        "Ella",
+        "Ellie",
+        "Emily",
+        "Emma",
+        "Emmanuel",
+        "Eric",
+        "Erica",
+        "Erick",
+        "Erik",
+        "Erin",
+        "Ethan",
+        "Eva",
+        "Evan",
+        "Evelyn",
+        "Faith",
+        "Fernando",
+        "Francisco",
+        "Gabriel",
+        "Gabriela",
+        "Gabriella",
+        "Gabrielle",
+        "Gage",
+        "Garrett",
+        "Gavin",
+        "Genesis",
+        "George",
+        "Gianna",
+        "Giovanni",
+        "Giselle",
+        "Grace",
+        "Gracie",
+        "Grant",
+        "Gregory",
+        "Hailey",
+        "Haley",
+        "Hannah",
+        "Hayden",
+        "Hector",
+        "Henry",
+        "Hope",
+        "Hunter",
+        "Ian",
+        "Isaac",
+        "Isabel",
+        "Isabella",
+        "Isabelle",
+        "Isaiah",
+        "Ivan",
+        "Jack",
+        "Jackson",
+        "Jacob",
+        "Jacqueline",
+        "Jada",
+        "Jade",
+        "Jaden",
+        "Jake",
+        "Jalen",
+        "James",
+        "Jared",
+        "Jasmin",
+        "Jasmine",
+        "Jason",
+        "Javier",
+        "Jayden",
+        "Jayla",
+        "Jazmin",
+        "Jeffrey",
+        "Jenna",
+        "Jennifer",
+        "Jeremiah",
+        "Jeremy",
+        "Jesse",
+        "Jessica",
+        "Jesus",
+        "Jillian",
+        "Jocelyn",
+        "Joel",
+        "John",
+        "Johnathan",
+        "Jonah",
+        "Jonathan",
+        "Jordan",
+        "Jordyn",
+        "Jorge",
+        "Jose",
+        "Joseph",
+        "Joshua",
+        "Josiah",
+        "Juan",
+        "Julia",
+        "Julian",
+        "Juliana",
+        "Justin",
+        "Kaden",
+        "Kaitlyn",
+        "Kaleb",
+        "Karen",
+        "Karina",
+        "Kate",
+        "Katelyn",
+        "Katherine",
+        "Kathryn",
+        "Katie",
+        "Kayla",
+        "Kaylee",
+        "Kelly",
+        "Kelsey",
+        "Kendall",
+        "Kennedy",
+        "Kenneth",
+        "Kevin",
+        "Kiara",
+        "Kimberly",
+        "Kyle",
+        "Kylee",
+        "Kylie",
+        "Landon",
+        "Laura",
+        "Lauren",
+        "Layla",
+        "Leah",
+        "Leonardo",
+        "Leslie",
+        "Levi",
+        "Liam",
+        "Liliana",
+        "Lillian",
+        "Lilly",
+        "Lily",
+        "Lindsey",
+        "Logan",
+        "Lucas",
+        "Lucy",
+        "Luis",
+        "Luke",
+        "Lydia",
+        "Mackenzie",
+        "Madeline",
+        "Madelyn",
+        "Madison",
+        "Makayla",
+        "Makenzie",
+        "Malachi",
+        "Manuel",
+        "Marco",
+        "Marcus",
+        "Margaret",
+        "Maria",
+        "Mariah",
+        "Mario",
+        "Marissa",
+        "Mark",
+        "Martin",
+        "Mary",
+        "Mason",
+        "Matthew",
+        "Max",
+        "Maxwell",
+        "Maya",
+        "Mckenzie",
+        "Megan",
+        "Melanie",
+        "Melissa",
+        "Mia",
+        "Micah",
+        "Michael",
+        "Michelle",
+        "Miguel",
+        "Mikayla",
+        "Miranda",
+        "Molly",
+        "Morgan",
+        "Mya",
+        "Naomi",
+        "Natalia",
+        "Natalie",
+        "Nathan",
+        "Nathaniel",
+        "Nevaeh",
+        "Nicholas",
+        "Nicolas",
+        "Nicole",
+        "Noah",
+        "Nolan",
+        "Oliver",
+        "Olivia",
+        "Omar",
+        "Oscar",
+        "Owen",
+        "Paige",
+        "Parker",
+        "Patrick",
+        "Paul",
+        "Payton",
+        "Peter",
+        "Peyton",
+        "Preston",
+        "Rachel",
+        "Raymond",
+        "Reagan",
+        "Rebecca",
+        "Ricardo",
+        "Richard",
+        "Riley",
+        "Robert",
+        "Ruby",
+        "Ryan",
+        "Rylee",
+        "Sabrina",
+        "Sadie",
+        "Samantha",
+        "Samuel",
+        "Sara",
+        "Sarah",
+        "Savannah",
+        "Sean",
+        "Sebastian",
+        "Serenity",
+        "Sergio",
+        "Seth",
+        "Shane",
+        "Shawn",
+        "Shelby",
+        "Sierra",
+        "Skylar",
+        "Sofia",
+        "Sophia",
+        "Sophie",
+        "Spencer",
+        "Stephanie",
+        "Stephen",
+        "Steven",
+        "Summer",
+        "Sydney",
+        "Tanner",
+        "Taylor",
+        "Thomas",
+        "Tiffany",
+        "Timothy",
+        "Travis",
+        "Trenton",
+        "Trevor",
+        "Trinity",
+        "Tristan",
+        "Tyler",
+        "Valeria",
+        "Valerie",
+        "Vanessa",
+        "Veronica",
+        "Victor",
+        "Victoria",
+        "Vincent",
+        "Wesley",
+        "William",
+        "Wyatt",
+        "Xavier",
+        "Zachary",
+        "Zoe",
+        "Zoey"
+      ]
+    };
+
+    // grab unique names
+    for (let i = 0; i < 4; i++) {
+      let _n;
+
+      do {
+        _n = _names.firstNames[getRandomInteger(0, _names.firstNames.length)];
+      } while (ret_names.includes(_n));
+      ret_names.push(_n)
+    }
+
+    return ret_names;
   }
 };
 window.GameManager = GameManager;
