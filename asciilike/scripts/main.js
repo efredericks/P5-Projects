@@ -268,8 +268,10 @@ class GameManager {
     this.eventCharacters = this.generateCharacters();
     console.log(this.eventCharacters);
 
+    this.placeCharacter(this.player);
+
     // carve out if necessary (post monsters/characters generation)
-    this.carveCaverns();
+    // this.carveCaverns();
 
     this.flashlight = {
       'status': 'off',
@@ -306,54 +308,144 @@ class GameManager {
       this.map[d] = [];
 
       if (d < this.maxDepth - 1) {
-        if (d == 0) { // first floor
+        // if (d <= 1) { // first floor
 
-          // fill with walls
-          for (let r = 0; r < this.mapHeight; r++) {
-            this.map[d][r] = [];
-            for (let c = 0; c < this.mapWidth; c++) {
-              this.map[d][r][c] = { 'passage': 'wall', 'visited': false, 'sanity': 0 };//-10 };
-            }
+        // fill with walls
+        for (let r = 0; r < this.mapHeight; r++) {
+          this.map[d][r] = [];
+          for (let c = 0; c < this.mapWidth; c++) {
+            this.map[d][r][c] = { 'passage': 'wall', 'visited': false, 'sanity': 0 };
           }
+        }
 
-        } else { // other floors
+        // // drunkard's walk -- not working, just random now
+        // TBD: need to ensure that there is a valid path!
+        let num_cells = Math.ceil(0.5 * this.mapWidth * this.mapHeight);
+        let start_row = 0;//Math.floor(this.mapHeight/2);//getRandomInteger(1, this.mapHeight - 1);
+        let start_col = 0;//Math.floor(this.mapWidth/2);//getRandomInteger(1, this.mapWidth - 1);
+        this.map[d][start_row][start_col] = { 'passage': setup.prefabs[getRandomInteger(1, 4)], 'visited': false, 'sanity': -1 };
+        let total = 1;
 
-          for (let r = 0; r < this.mapHeight; r++) {
-            this.map[d][r] = [];
-            for (let c = 0; c < this.mapWidth; c++) {
-              if (r == 0 && c == 0 && d == 0) // always start at 0,0
-                this.map[d][r][c] = { 'passage': 'start', 'visited': true, 'sanity': 10 };
-              else {
-                let randomOffset = getRandomInteger(0, 100000);
-                let _noise = this.noiseGen.get2DNoise(c + randomOffset, r + randomOffset);
+        while (total < num_cells) {
+          start_row = getRandomInteger(1, this.mapHeight - 1);
+          start_col = getRandomInteger(1, this.mapWidth - 1);
+          if (this.map[d][start_row][start_col].passage == "wall") {
+            this.map[d][start_row][start_col] = { 'passage': setup.prefabs[getRandomInteger(1, 4)], 'visited': false, 'sanity': -1 };
+            total++;
+          }
+        }
 
-                let _room = setup.prefabs[0];
-                let _sanity = -1;
-                if (_noise < 0.0) { // empty
-                  _room = setup.prefabs[0];
-                } else if (_noise < 0.4) { // cavern
-                  _room = setup.prefabs[getRandomInteger(1, 4)];
-                } else if (_noise < 0.5) {
-                  _room = setup.prefabs[4]; // tight squeeze
-                  _sanity = -5;
-                } else if (_noise < 0.6) { // stream
-                  _room = setup.prefabs[5];
-                  _sanity = 5;
-                } else if (_noise < 0.7) { // pool 
-                  _room = setup.prefabs[6];
-                  _sanity = 5;
-                } else if (_noise < 0.8) { // void
-                  _room = setup.prefabs[7];
-                  _sanity = -10;
-                } else { // empty
-                  _room = setup.prefabs[0];
-                }
 
-                this.map[d][r][c] = { 'passage': _room, 'visited': false, 'sanity': _sanity };
+        // while (total <= num_cells) {
+        //   let dirs = [
+        //     [-1,-1],
+        //     [-1,0],
+        //     [-1,1],
+        //     [0,-1],
+        //     [0,0],
+        //     [0,1],
+        //     [1,-1],
+        //     [1,0],
+        //     [1,1],
+        //   ];
+
+        //   let indx = getRandomInteger(0, dirs.length);
+        //   let _r = start_row + dirs[indx][0];
+        //   let _c = start_col + dirs[indx][1];
+
+        //   if (_r >= 0 && _c >= 0 && _r <= this.mapHeight-1 && _c <= this.mapWidth-1) {
+        //     // if (this.map[d][_r][_c].passage == "wall") {
+        //      this.map[d][_r][_c] = { 'passage': setup.prefabs[getRandomInteger(1, 4)], 'visited': false, 'sanity': -1 };
+        //      total++;
+        //     // }
+        //   } 
+
+
+        // let validPassages = this.getPassages({ 'row': start_row, 'col': start_col, 'depth': d })
+        // let indx = getRandomInteger(0, validPassages.length);
+        // if (validPassages[indx].valid && validPassages[indx].header != "wait") {
+        //   start_row = validPassages[indx].row;
+        //   start_col = validPassages[indx].col;
+        //   this.map[d][start_row][start_col] = { 'passage': setup.prefabs[getRandomInteger(1, 4)], 'visited': false, 'sanity': -1 };
+        //   total++;
+        // }
+        // }
+
+        for (let r = 0; r < this.mapHeight; r++) {
+          for (let c = 0; c < this.mapWidth; c++) {
+            if (this.map[d][r][c].passage != 'wall') {
+              let randomOffset = getRandomInteger(0, 100000);
+              let _noise = this.noiseGen.get2DNoise(c + randomOffset, r + randomOffset);
+
+              let _room = setup.prefabs[0];
+              let _sanity = -1;
+              if (_noise < 0.0) { // empty
+                _room = setup.prefabs[0];
+              } else if (_noise < 0.4) { // cavern
+                _room = setup.prefabs[getRandomInteger(1, 4)];
+              } else if (_noise < 0.5) {
+                _room = setup.prefabs[4]; // tight squeeze
+                _sanity = -5;
+              } else if (_noise < 0.6) { // stream
+                _room = setup.prefabs[5];
+                _sanity = 5;
+              } else if (_noise < 0.7) { // pool 
+                _room = setup.prefabs[6];
+                _sanity = 5;
+              } else if (_noise < 0.8) { // void
+                _room = setup.prefabs[7];
+                _sanity = -10;
+              } else { // empty
+                _room = setup.prefabs[0];
               }
+
+              this.map[d][r][c] = { 'passage': _room, 'visited': false, 'sanity': _sanity };
             }
           }
         }
+
+
+
+
+        /*
+      } else { // other floors
+
+        for (let r = 0; r < this.mapHeight; r++) {
+          this.map[d][r] = [];
+          for (let c = 0; c < this.mapWidth; c++) {
+            if (r == 0 && c == 0 && d == 0) // always start at 0,0
+              this.map[d][r][c] = { 'passage': 'start', 'visited': true, 'sanity': 10 };
+            else {
+              let randomOffset = getRandomInteger(0, 100000);
+              let _noise = this.noiseGen.get2DNoise(c + randomOffset, r + randomOffset);
+
+              let _room = setup.prefabs[0];
+              let _sanity = -1;
+              if (_noise < 0.0) { // empty
+                _room = setup.prefabs[0];
+              } else if (_noise < 0.4) { // cavern
+                _room = setup.prefabs[getRandomInteger(1, 4)];
+              } else if (_noise < 0.5) {
+                _room = setup.prefabs[4]; // tight squeeze
+                _sanity = -5;
+              } else if (_noise < 0.6) { // stream
+                _room = setup.prefabs[5];
+                _sanity = 5;
+              } else if (_noise < 0.7) { // pool 
+                _room = setup.prefabs[6];
+                _sanity = 5;
+              } else if (_noise < 0.8) { // void
+                _room = setup.prefabs[7];
+                _sanity = -10;
+              } else { // empty
+                _room = setup.prefabs[0];
+              }
+
+              this.map[d][r][c] = { 'passage': _room, 'visited': false, 'sanity': _sanity };
+            }
+          }
+        }
+      }*/
       } else { // last level
         for (let r = 0; r < this.mapHeight; r++) {
           this.map[d][r] = [];
@@ -375,26 +467,26 @@ class GameManager {
         do {
           _downrow = getRandomInteger(3, this.mapHeight - 1);
           _downcol = getRandomInteger(3, this.mapWidth - 1);
-        } while (_downrow == _uprow && _downcol == _upcol);
+        } while ((_downrow == _uprow && _downcol == _upcol) || (this.map[d][_downrow][_downcol].passage == 'wall'));
 
       } else if (d == this.maxDepth - 1) { // only up
 
         do {
           _uprow = getRandomInteger(3, this.mapHeight - 1);
           _upcol = getRandomInteger(3, this.mapWidth - 1);
-        } while (_downrow == _uprow && _downcol == _upcol);
+        } while ((_downrow == _uprow && _downcol == _upcol) || (this.map[d][_uprow][_upcol].passage == 'wall'));
 
       } else { // both
 
         do {
           _downrow = getRandomInteger(3, this.mapHeight - 1);
           _downcol = getRandomInteger(3, this.mapWidth - 1);
-        } while (_downrow == _uprow && _downcol == _upcol);
+        } while ((_downrow == _uprow && _downcol == _upcol) || (this.map[d][_downrow][_downcol].passage == 'wall'));
 
         do {
           _uprow = getRandomInteger(3, this.mapHeight - 1);
           _upcol = getRandomInteger(3, this.mapWidth - 1);
-        } while (_downrow == _uprow && _downcol == _upcol);
+        } while ((_downrow == _uprow && _downcol == _upcol) || (this.map[d][_uprow][_upcol].passage == 'wall'));
 
       }
 
@@ -416,6 +508,13 @@ class GameManager {
         return false;
     }
     return false;
+  }
+
+  placeCharacter(p) {
+    do {
+      p.row = getRandomInteger(0, this.mapHeight);
+      p.col = getRandomInteger(0, this.mapWidth);
+    } while (this.map[p.depth][p.row][p.col].passage == "wall");
   }
 
   carveCaverns() {
@@ -506,7 +605,7 @@ class GameManager {
           _row = getRandomInteger(1, this.mapHeight);
           _col = getRandomInteger(1, this.mapWidth);
           _key = `${d}:${_row}:${_col}`;
-        } while (_key in _chars);
+        } while (_key in _chars || this.map[d][_row][_col].passage == "wall");
         _chars[_key] = {
           'type': 'monster',
           'monster': _monsters[getRandomInteger(0, _monsters.length)],
@@ -879,9 +978,9 @@ class GameManager {
         _passages[i]['depth'] = player.depth;
 
       // check for validity (i.e., collisions)
-      if (_passages[i].valid)
-        if (this.map[_passages[i].depth][_passages[i].row][_passages[i].col].passage == "wall")
-          _passages[i].valid = false;
+      // if (_passages[i].valid)
+      //   if (this.map[_passages[i].depth][_passages[i].row][_passages[i].col].passage == "wall")
+      //     _passages[i].valid = false;
     }
 
 
