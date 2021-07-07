@@ -978,9 +978,9 @@ class GameManager {
         _passages[i]['depth'] = player.depth;
 
       // check for validity (i.e., collisions)
-      // if (_passages[i].valid)
-      //   if (this.map[_passages[i].depth][_passages[i].row][_passages[i].col].passage == "wall")
-      //     _passages[i].valid = false;
+      if (_passages[i].valid)
+        if (this.map[_passages[i].depth][_passages[i].row][_passages[i].col].passage == "wall")
+          _passages[i].valid = false;
     }
 
 

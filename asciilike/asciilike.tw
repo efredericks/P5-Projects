@@ -135,8 +135,26 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
             <div style="text-align:center;">
               <<set _monsterImgPath to "assets/tyler-rpg-9th-50-more-shades/" + _char.monster.img>>
               [img[_monsterImgPath]]
-              <p>A terrible <<=_char.monster.name>> blocks your path!</p>
+              <p>A terrible <<=_char.monster.name>> blocks your path!  It looks hungry...</p>
             </div>
+
+            <<set _txt to "Ask the " + _char.monster.name + " how it feels">>
+
+            <ol>
+            <li><<link [[Rub your temples|Begin]]>><</link>></li>
+            <li><<link [[_txt|Begin]]>><</link>> </li>
+            <li>
+            <<link [[Use Item]]>>
+               <<script>>
+                 Dialog.setup("Inventory");
+                 Dialog.wiki("Flashlight: " + variables().game.flashlight.status);
+                 Dialog.open();
+                <</script>>
+              <</link>> 
+            </li>
+            <li><<link [[Attack!|Begin]]>><</link>> </li>
+            </ol>
+
         <<else>>
           <<=_char.type>>
         <</if>>
@@ -277,7 +295,12 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
   
             /* can travel this way */
             <<if _nextPassages[_i].valid>>
-              <<button [img[_imgPath][Begin]]>>
+              <<if _nextPassages[_i].header == "wait" && !_nextPassages[_i].stairsdown && !_nextPassages[_i].stairsup>>
+                <<set _newPassage = "Inventory">>
+              <<else>>
+                <<set _newPassage = "Begin">>
+              <</if>>
+                <<button [img[_imgPath][_newPassage]]>>
                 <<if _nextPassages[_i].stairsdown == true or _nextPassages[_i].stairsup == true>>
                   <<set $game.player.depth to _nextPassages[_i].depth>>
                   <<set $game.player.row to _nextPassages[_i].startRow>>
@@ -287,13 +310,13 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
                   <<set $game.player.col to _nextPassages[_i].col>>
                 <</if>>
 
-                <<if _nextPassages[_i].header == "wait">>
+                /* <<if _nextPassages[_i].header == "wait">>
                   <<script>>
                     Dialog.setup("Inventory");
                     Dialog.wiki(Story.get("Inventory").processText());
                     Dialog.open();
                   <</script>>
-                <<else>>
+                <<else>> */
 
                   <<set _nextPassage to $game.getPassage($game.player.row, $game.player.col, $game.player.depth)>>
       
@@ -311,7 +334,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
                   <<if $game.totalFriends == $game.friendsRescued && $game.player.row == 0 && $game.player.col == 0 && $game.player.depth == 0>>
                     <<set $gameState to setup.STATES.WIN>>
                   <</if>>
-                <</if>>
+                /* <</if>> */
               <</button>>
             <<else>>
               /* can't travel in this direction */
@@ -352,10 +375,19 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
 <</nobr>>
 
 :: Inventory
+<<=$game.flashlight.status>>
+<<button [["Switch flashlight state"|Begin]]>>
+<<script>>
+  console.log("Passage start flashlight status: " + variables().game.flashlight.status);
+  if (variables().game.flashlight.status == "off")
+    variables().game.flashlight.status = "on";
+  else
+    variables().game.flashlight.status = "off";
+  Dialog.close();
+  console.log("Passage end flashlight status: " + variables().game.flashlight.status);
+<</script>>
+<</button>>
 
-Hey I'm the inventory!
-
-<<button [[$game.friendsRescued|Begin]]>><</button>>
 
 :: Begin2 [noinventory] 
 You find yourself in the Sugar Caves, standing in an empty cavern at the beginning of your journey.  You search the room and find multiple paths that you can follow.  Go forth and find your <<=$game.friends.length>> missing friends!

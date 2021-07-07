@@ -2115,9 +2115,9 @@ class GameManager {
         _passages[i]['depth'] = player.depth;
 
       // check for validity (i.e., collisions)
-      // if (_passages[i].valid)
-      //   if (this.map[_passages[i].depth][_passages[i].row][_passages[i].col].passage == "wall")
-      //     _passages[i].valid = false;
+      if (_passages[i].valid)
+        if (this.map[_passages[i].depth][_passages[i].row][_passages[i].col].passage == "wall")
+          _passages[i].valid = false;
     }
 
 
@@ -2719,8 +2719,26 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
             &lt;div style=&quot;text-align:center;&quot;&gt;
               &lt;&lt;set _monsterImgPath to &quot;assets/tyler-rpg-9th-50-more-shades/&quot; + _char.monster.img&gt;&gt;
               [img[_monsterImgPath]]
-              &lt;p&gt;A terrible &lt;&lt;=_char.monster.name&gt;&gt; blocks your path!&lt;/p&gt;
+              &lt;p&gt;A terrible &lt;&lt;=_char.monster.name&gt;&gt; blocks your path!  It looks hungry...&lt;/p&gt;
             &lt;/div&gt;
+
+            &lt;&lt;set _txt to &quot;Ask the &quot; + _char.monster.name + &quot; how it feels&quot;&gt;&gt;
+
+            &lt;ol&gt;
+            &lt;li&gt;&lt;&lt;link [[Rub your temples|Begin]]&gt;&gt;&lt;&lt;/link&gt;&gt;&lt;/li&gt;
+            &lt;li&gt;&lt;&lt;link [[_txt|Begin]]&gt;&gt;&lt;&lt;/link&gt;&gt; &lt;/li&gt;
+            &lt;li&gt;
+            &lt;&lt;link [[Use Item]]&gt;&gt;
+               &lt;&lt;script&gt;&gt;
+                 Dialog.setup(&quot;Inventory&quot;);
+                 Dialog.wiki(&quot;Flashlight: &quot; + variables().game.flashlight.status);
+                 Dialog.open();
+                &lt;&lt;/script&gt;&gt;
+              &lt;&lt;/link&gt;&gt; 
+            &lt;/li&gt;
+            &lt;li&gt;&lt;&lt;link [[Attack!|Begin]]&gt;&gt;&lt;&lt;/link&gt;&gt; &lt;/li&gt;
+            &lt;/ol&gt;
+
         &lt;&lt;else&gt;&gt;
           &lt;&lt;=_char.type&gt;&gt;
         &lt;&lt;/if&gt;&gt;
@@ -2861,7 +2879,12 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
   
             /* can travel this way */
             &lt;&lt;if _nextPassages[_i].valid&gt;&gt;
-              &lt;&lt;button [img[_imgPath][Begin]]&gt;&gt;
+              &lt;&lt;if _nextPassages[_i].header == &quot;wait&quot; &amp;&amp; !_nextPassages[_i].stairsdown &amp;&amp; !_nextPassages[_i].stairsup&gt;&gt;
+                &lt;&lt;set _newPassage = &quot;Inventory&quot;&gt;&gt;
+              &lt;&lt;else&gt;&gt;
+                &lt;&lt;set _newPassage = &quot;Begin&quot;&gt;&gt;
+              &lt;&lt;/if&gt;&gt;
+                &lt;&lt;button [img[_imgPath][_newPassage]]&gt;&gt;
                 &lt;&lt;if _nextPassages[_i].stairsdown == true or _nextPassages[_i].stairsup == true&gt;&gt;
                   &lt;&lt;set $game.player.depth to _nextPassages[_i].depth&gt;&gt;
                   &lt;&lt;set $game.player.row to _nextPassages[_i].startRow&gt;&gt;
@@ -2871,13 +2894,13 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
                   &lt;&lt;set $game.player.col to _nextPassages[_i].col&gt;&gt;
                 &lt;&lt;/if&gt;&gt;
 
-                &lt;&lt;if _nextPassages[_i].header == &quot;wait&quot;&gt;&gt;
+                /* &lt;&lt;if _nextPassages[_i].header == &quot;wait&quot;&gt;&gt;
                   &lt;&lt;script&gt;&gt;
                     Dialog.setup(&quot;Inventory&quot;);
                     Dialog.wiki(Story.get(&quot;Inventory&quot;).processText());
                     Dialog.open();
                   &lt;&lt;/script&gt;&gt;
-                &lt;&lt;else&gt;&gt;
+                &lt;&lt;else&gt;&gt; */
 
                   &lt;&lt;set _nextPassage to $game.getPassage($game.player.row, $game.player.col, $game.player.depth)&gt;&gt;
       
@@ -2895,7 +2918,7 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
                   &lt;&lt;if $game.totalFriends == $game.friendsRescued &amp;&amp; $game.player.row == 0 &amp;&amp; $game.player.col == 0 &amp;&amp; $game.player.depth == 0&gt;&gt;
                     &lt;&lt;set $gameState to setup.STATES.WIN&gt;&gt;
                   &lt;&lt;/if&gt;&gt;
-                &lt;&lt;/if&gt;&gt;
+                /* &lt;&lt;/if&gt;&gt; */
               &lt;&lt;/button&gt;&gt;
             &lt;&lt;else&gt;&gt;
               /* can&#39;t travel in this direction */
@@ -2933,9 +2956,18 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
 &lt;&lt;elseif $gameState == setup.STATES.LOST_SANITY&gt;&gt;
   &lt;h1&gt;YOU DED FROM MADNESS&lt;/h1&gt;
 &lt;&lt;/if&gt;&gt;
-&lt;&lt;/nobr&gt;&gt;</tw-passagedata><tw-passagedata pid="13" name="Inventory" tags="" position="350,225" size="100,100">Hey I&#39;m the inventory!
-
-&lt;&lt;button [[$game.friendsRescued|Begin]]&gt;&gt;&lt;&lt;/button&gt;&gt;</tw-passagedata><tw-passagedata pid="14" name="Begin2" tags="noinventory" position="475,225" size="100,100">You find yourself in the Sugar Caves, standing in an empty cavern at the beginning of your journey.  You search the room and find multiple paths that you can follow.  Go forth and find your &lt;&lt;=$game.friends.length&gt;&gt; missing friends!
+&lt;&lt;/nobr&gt;&gt;</tw-passagedata><tw-passagedata pid="13" name="Inventory" tags="" position="350,225" size="100,100">&lt;&lt;=$game.flashlight.status&gt;&gt;
+&lt;&lt;button [[&quot;Switch flashlight state&quot;|Begin]]&gt;&gt;
+&lt;&lt;script&gt;&gt;
+  console.log(&quot;Passage start flashlight status: &quot; + variables().game.flashlight.status);
+  if (variables().game.flashlight.status == &quot;off&quot;)
+    variables().game.flashlight.status = &quot;on&quot;;
+  else
+    variables().game.flashlight.status = &quot;off&quot;;
+  Dialog.close();
+  console.log(&quot;Passage end flashlight status: &quot; + variables().game.flashlight.status);
+&lt;&lt;/script&gt;&gt;
+&lt;&lt;/button&gt;&gt;</tw-passagedata><tw-passagedata pid="14" name="Begin2" tags="noinventory" position="475,225" size="100,100">You find yourself in the Sugar Caves, standing in an empty cavern at the beginning of your journey.  You search the room and find multiple paths that you can follow.  Go forth and find your &lt;&lt;=$game.friends.length&gt;&gt; missing friends!
 /* Welcome to the SugarCaves &lt;&lt;=$game.player.name&gt;&gt;!  You begin your story in the cave.  You have &lt;&lt;=$game.friends.length&gt;&gt; missing friends! */
 
 /* :: PassageHeader
