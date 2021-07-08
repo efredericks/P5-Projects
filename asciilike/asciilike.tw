@@ -593,5 +593,8 @@ Small gaps and outcroppings resemble natural handholds.  You can climb up here.
 :: fire [prefab fire]
 Four, I mean five!  I mean fire!
 
+:: fire2 [prefab fire]
+The floor is legitimately lava.  Avoid stepping on it if you value your feet.
+
 :: wall [prefab wall]
 A wall, you shouldn't be seeing this.
