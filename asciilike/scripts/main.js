@@ -235,15 +235,24 @@ setup.prefabs = [
   'fire',
 ];
 
+// get the list of prefabs in the constructor
+// set locally
+// grab random?
+
 class GameManager {
   constructor(rooms) {
+
+    // -- THIS IS HOW WE GRAB ROOM PREFABS!!!!!!!!
+    console.log(rooms);
+    console.log(rooms.filter(r => r.tags.includes("cavern")));
+
+
     this.map = [];
     this.npcs = [];
     this.mapWidth = 10;
     this.mapHeight = 10;
     this.maxDepth = 5;
     this.noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 8 });
-    // this.noiseGen = new FastSimplexNoise({ frequency: 0.01, octaves: 4 });
     this.init();
 
     this.fightActive = false;
@@ -268,6 +277,7 @@ class GameManager {
     this.eventCharacters = this.generateCharacters();
     console.log(this.eventCharacters);
 
+    // place PC on a valid location
     this.placeCharacter(this.player);
 
     // carve out if necessary (post monsters/characters generation)
