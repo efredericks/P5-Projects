@@ -2,6 +2,10 @@
 
 Aggregation of various playthings in P5JS
 
+### Web Worker - GA
+
+[String Search](WebWorkerGA)
+
 ### Starfield
 
 [Calvin and Hobbes - Starfield](ch-starfield)

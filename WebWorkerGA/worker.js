@@ -89,10 +89,10 @@ onmessage = e => {
     gaConfig.num_to_xover = Math.floor((gaConfig.crossover_rate * gaConfig.population_size)/2);
     gaConfig.iterations = e.data.iterations;
     gaConfig.target = e.data.target;
-    gaConfig.genes = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890, .-;:_!"#%&/()=?@${[]}';
+    gaConfig.genes = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ 1234567890, .-;:_!"#%&/()=?@${[]}\'';
     gaConfig.population = createPopulation(gaConfig.population_size);
 
-    const reply = setTimeout(() => postMessage("init successful"), 50);//1000);
+    const reply = setTimeout(() => postMessage({"msg": "init"}), 50);//1000);
   } else {
     gaConfig.iterations = e.data.iterations;
 
@@ -103,7 +103,8 @@ onmessage = e => {
 
     // check if done
     if (gaConfig.population[0].fitness <= 0) {
-      const reply = setTimeout(() => postMessage(`DONE: Generation [${gaConfig.iterations}] Individual [${gaConfig.population[0].individual}]`), 50);//1000);
+      const reply = setTimeout(() => postMessage({"msg": "done", "generation": gaConfig.iterations, "elite": gaConfig.population[0].individual}), 50);
+        //`DONE: Generation [${gaConfig.iterations}] Individual [${gaConfig.population[0].individual}]`), 50);//1000);
     } else {
       nextPopulation = [];
 
@@ -145,7 +146,8 @@ onmessage = e => {
       gaConfig.population.sort(function (a, b) {
         return a.fitness - b.fitness;
       });
-      const reply = setTimeout(() => postMessage(`Generation [${gaConfig.iterations}] Elite [${gaConfig.population[0].individual}]`), 50);//1000);
+      const reply = setTimeout(() => postMessage({"msg": "active", "generation": gaConfig.iterations, "elite": gaConfig.population[0].individual}), 50);
+      //"`Generation [${gaConfig.iterations}] Elite [${gaConfig.population[0].individual}]`), 50);//1000);
 
       // POST BACK AND DRAW!
     }
