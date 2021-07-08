@@ -111,6 +111,7 @@ onmessage = e => {
       // elite preservation (just 1?)
       for (let i = 0; i < Math.floor(gaConfig.population_size*0.1); i++) {
         nextPopulation.push(gaConfig.population[i]);
+        // nextPopulation.push(JSON.parse(JSON.stringify(gaConfig.population[i])));
       }
 
       // crossover

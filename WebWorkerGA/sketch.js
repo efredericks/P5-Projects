@@ -17,9 +17,9 @@ function setup() {
   target = "I am a dwarf and I'm digging a hole"
 
   num_generations = 1000;
-  population_size = 1000;
+  population_size = 10000;
   crossover_rate = 0.7;
-  mutation_rate = 0.2;
+  mutation_rate = 0.4;
 
 
   worker = new Worker("worker.js");
