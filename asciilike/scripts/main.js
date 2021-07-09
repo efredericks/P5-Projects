@@ -1004,7 +1004,7 @@ let _monsters = [
 
 // outside of class as we were exceeding the call stack
 let generateInteractions = function (char_type) {
-  let _attrs = { 'dialogue': [], 'attribute': null, 'mood': _moods[getRandomInteger(0, _moods.length)] };
+  let _attrs = { 'dialogue': ["hey there", "how's it goin", "good n u?"], 'attribute': null, 'mood': _moods[getRandomInteger(0, _moods.length)] };
   _attrs.attribute = _attributes[getRandomInteger(0, _attributes.length)];
   return _attrs;
 }
@@ -1399,7 +1399,7 @@ class GameManager {
       'boss': true,
       'dialogue': _attr.dialogue,
       'mood': _attr.mood,
-      'dialogueIndex': 0,
+      'dialogueIndex': -1,
       'attribute': _attr.attribute,
     };
 
@@ -1420,7 +1420,7 @@ class GameManager {
           'monster': _m,
           'mood': _attr.mood,
           'dialogue': _attr.dialogue,
-          'dialogueIndex': 0,
+          'dialogueIndex': -1,
           'attribute': _attr.attribute
         };
       }
@@ -1438,6 +1438,25 @@ class GameManager {
   }
   getCharacter(row, col, depth) {
     return this.eventCharacters[`${depth}:${row}:${col}`];
+  }
+
+  getDialogue(row, col, depth) {
+    let _key = `${depth}:${row}:${col}`;
+    if (this.eventCharacters[_key])
+      return this.eventCharacters[_key].dialogue[this.eventCharacters[_key].dialogueIndex];
+    else
+      return "<error>";
+  }
+
+  updateDialogueIndex(row, col, depth) {
+    let _key = `${depth}:${row}:${col}`;
+    console.log(this.eventCharacters[_key])
+    if (this.eventCharacters[_key]) {
+      this.eventCharacters[_key].dialogueIndex++;
+
+      if (this.eventCharacters[_key].dialogueIndex > this.eventCharacters[_key].dialogue.length-1)
+        this.eventCharacters[_key].dialogueIndex = -1;
+    }
   }
   // createCharacter(row, col, depth, type) {
   //   if (type == "monster") {

@@ -135,14 +135,27 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
             <div style="text-align:center;">
               <<set _monsterImgPath to "assets/tyler-rpg-9th-50-more-shades/" + _char.monster.img>>
               [img[_monsterImgPath]]
-              <p>A <<=_char.mood>> <<=_char.monster.name>> blocks your path!  It looks <<=_char.attribute.type>>...</p>
+
+              <<set _flavors = ["blocks the way", "blocks your path", "is in the way", "is in front of you", "doesn't move"]>>
+
+
+              <p>A <<=_char.mood>> <<=_char.monster.name>> <<=either(_flavors)>>!  It looks <<=_char.attribute.type>>...</p>
             </div>
 
-            <<set _txt to "Ask the " + _char.monster.name + " how it feels">>
+            /* dialogue option */
+            <<if _char.dialogueIndex == -1>>
+              <<set _txt to "Ask the " + _char.monster.name + " how it feels">>
+            <<else>>
+              <<set _txt to $game.getDialogue($game.player.row, $game.player.col, $game.player.depth)>>
+            <</if>>
 
             <ol>
-            <li><<link [[Rub your temples|Begin]]>><</link>></li>
-            <li><<link [[_txt|Begin]]>><</link>> </li>
+            /* <li><<link [[Rub your temples|Begin]]>><</link>></li> */
+            <li>
+              <<link [[_txt|Begin]]>>
+                <<run $game.updateDialogueIndex($game.player.row, $game.player.col, $game.player.depth)>>
+              <</link>> 
+            </li>
             <li>
             <<link [[Use Item]]>>
                <<script>>
