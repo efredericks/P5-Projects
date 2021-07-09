@@ -2,7 +2,7 @@
 Assets: 
 * UI: kenny.nl - Cartography pack: https://www.kenney.nl/assets/cartography-pack
 * Enemies: Tyler Warren RPG Battlers: https://tylerjwarren.itch.io/tylerwarrenrpg-9th-50
-* Names: Darius Kazemi: https://github.com/dariusk/corpora
+* Names/Moods: Darius Kazemi: https://github.com/dariusk/corpora
 
 
 * Gameplay thoughts:
@@ -20,7 +20,7 @@ Assets:
 
 Test cases
 
-* Correct # of map cell types (rocks to empty ground)
+* Correct # of map cell types (rocks to empty ground) ( percentages? )
 * Enemies/players generated in correct places
 * Player can never exit map boundaries
 * Button clicks do what is expected
@@ -135,7 +135,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
             <div style="text-align:center;">
               <<set _monsterImgPath to "assets/tyler-rpg-9th-50-more-shades/" + _char.monster.img>>
               [img[_monsterImgPath]]
-              <p>A terrible <<=_char.monster.name>> blocks your path!  It looks hungry...</p>
+              <p>A <<=_char.mood>> <<=_char.monster.name>> blocks your path!  It looks <<=_char.attribute.type>>...</p>
             </div>
 
             <<set _txt to "Ask the " + _char.monster.name + " how it feels">>
