@@ -151,6 +151,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
 
             <ol>
             /* <li><<link [[Rub your temples|Begin]]>><</link>></li> */
+            <li>[[Ask test|conversation1]]</li>
             <li>
               <<link [[_txt|Begin]]>>
                 <<run $game.updateDialogueIndex($game.player.row, $game.player.col, $game.player.depth)>>
@@ -611,3 +612,26 @@ The floor is legitimately lava.  Avoid stepping on it if you value your feet.
 
 :: wall [prefab wall]
 A wall, you shouldn't be seeing this.
+
+:: conversation1 [conv-prefab low-level nofooter]
+<<nobr>>
+<<set _dialogueChoices = [
+    "I've been stuck in these caves for so long",
+    "First time down here?",
+    "Fancy a rock muffin?  I think it's got a bit of lichen left on it.",
+    "There's a big old meanie that lives a few layers down.",
+]>>
+<<set _char to $game.getCharacter($game.player.row, $game.player.col, $game.player.depth)>>
+<<set _monsterImgPath to "assets/tyler-rpg-9th-50-more-shades/" + _char.monster.img>>
+[img[_monsterImgPath]]
+<<=either(_dialogueChoices)>>
+<</nobr>>
+
+:: death
+
+You are dead!
+
+:: santityloss
+
+You have lost your mind.
+

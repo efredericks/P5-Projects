@@ -15,6 +15,16 @@ setup.STATES = {
   LOST_SANITY: 4,
 }
 
+let _dialogues = [
+  [
+    "I've been stuck in these caves for so long",
+    "First time down here?",
+    "Fancy a rock muffin?  I think it's got a bit of lichen left on it.",
+    "There's a big old meanie that lives a few layers down.",
+  ],
+
+]
+
 // mood/desired item category
 let _attributes = [
   {
@@ -1004,7 +1014,7 @@ let _monsters = [
 
 // outside of class as we were exceeding the call stack
 let generateInteractions = function (char_type) {
-  let _attrs = { 'dialogue': ["hey there", "how's it goin", "good n u?"], 'attribute': null, 'mood': _moods[getRandomInteger(0, _moods.length)] };
+  let _attrs = { 'dialogue': _dialogues[0], 'attribute': null, 'mood': _moods[getRandomInteger(0, _moods.length)] };
   _attrs.attribute = _attributes[getRandomInteger(0, _attributes.length)];
   return _attrs;
 }
@@ -1454,7 +1464,7 @@ class GameManager {
     if (this.eventCharacters[_key]) {
       this.eventCharacters[_key].dialogueIndex++;
 
-      if (this.eventCharacters[_key].dialogueIndex > this.eventCharacters[_key].dialogue.length-1)
+      if (this.eventCharacters[_key].dialogueIndex > this.eventCharacters[_key].dialogue.length - 1)
         this.eventCharacters[_key].dialogueIndex = -1;
     }
   }
