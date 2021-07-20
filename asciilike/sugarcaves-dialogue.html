@@ -100,7 +100,25 @@ var saveAs=saveAs||navigator.msSaveBlob&&navigator.msSaveBlob.bind(navigator)||f
 		<div id="init-lacking">Your browser lacks required capabilities. Please upgrade it or switch to another to continue.</div>
 		<div id="init-loading"><div>Loading&hellip;</div></div>
 	</div>
-	<tw-storydata name="sugarcaves-dialogue" startnode="1" creator="Twine" creator-version="2.3.9" ifid="7D34782C-A071-421C-AB32-94009EFD273D" zoom="0.6" format="SugarCube" format-version="2.31.1" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">
+	<tw-storydata name="sugarcaves-dialogue" startnode="1" creator="Twine" creator-version="2.3.9" ifid="7D34782C-A071-421C-AB32-94009EFD273D" zoom="0.6" format="SugarCube" format-version="2.31.1" options="" hidden><style role="stylesheet" id="twine-user-stylesheet" type="text/twine-css">.speech-bubble {
+	position: relative;
+	background: #4c696b;
+	border-radius: .4em;
+}
+
+.speech-bubble:after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border: 0.875em solid transparent;
+	border-top-color: #26b8c5;
+	border-bottom: 0;
+	margin-left: -0.875em;
+	margin-bottom: -0.875em;
+}
 p.bubble {
 	position: relative;
 	width: 300px;
@@ -166,7 +184,55 @@ p.thought:after {
 	-webkit-border-radius: 18px;
 	-moz-border-radius: 18px;
 	border-radius: 18px;
-}</style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name="Untitled Passage" tags="" position="425,175" size="100,100">!Dialogue Test
+}
+
+/* https://projects.verou.me/bubbly/ */
+.speech-bubble {
+	position: relative;
+	background: #4c696b;
+	border-radius: .4em;
+    padding: 20px;
+    font-size: 18px;
+  
+}
+
+.speech-bubble:after {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border: 1.281em solid transparent;
+	border-top-color: #4c696b;
+	border-bottom: 0;
+	margin-left: -1.281em;
+	margin-bottom: -1.281em;
+}
+
+/* grid */
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 0.4fr 1.6fr;
+  gap: 25px 25px;
+  padding: 20px;
+  grid-auto-flow: row;
+  grid-template-areas:
+    "desc choices"
+    "monster choices";
+}
+
+.desc { grid-area: desc; }
+
+.monster { grid-area: monster; }
+
+.choices { grid-area: choices; }
+
+
+
+
+</style><script role="script" id="twine-user-script" type="text/twine-javascript"></script><tw-passagedata pid="1" name="Untitled Passage" tags="" position="425,175" size="100,100">!Dialogue Test
 
 !!D0
 * [[char1]]
@@ -206,37 +272,38 @@ p.thought:after {
 [[boss2]]
 [[boss3]]
 [[boss4]]
-[[boss5]]</tw-passagedata><tw-passagedata pid="2" name="char1" tags="" position="75,475" size="100,100">You see a CharacterType standing in the middle of the cavern. Looking around, you also see a skinny odd mushroom in the corner.  It seems to be about knee-height and radiates a bizarre aura, purplish in nature.  It&#39;s cap is a deep crimson with sickly purple blotches throughout.  It&#39;s stalk is a sallow yellow and appears hairy.
+[[boss5]]</tw-passagedata><tw-passagedata pid="2" name="char1" tags="" position="75,475" size="100,100">&lt;div class=&quot;container&quot;&gt;\
+  &lt;div class=&quot;desc&quot;&gt;You see a CharacterType standing in the middle of the cavern. Looking around, you also see a skinny odd mushroom in the corner.  It seems to be about knee-height and radiates a bizarre aura, purplish in nature.  It&#39;s cap is a deep crimson with sickly purple blotches throughout.  It&#39;s stalk is a sallow yellow and appears hairy.&lt;/div&gt;
+  
+  &lt;div class=&quot;monster&quot;&gt;&lt;p class=&quot;speech-bubble&quot;&gt;Hey, great to see you again!  Do you think you can help me find my way back out?  I&#39;ve got nothing but time it seems.&lt;/p&gt;
 
-&lt;p class=&quot;bubble speech&quot;&gt;It says, &quot;Hey, great to see you again!  Do you think you can help me find my way back out?  I&#39;ve got nothing but time it seems.&quot;&lt;/p&gt;
-
-&lt;img src=&quot;https://github.com/efredericks/P5-Projects/blob/main/asciilike/assets/tyler-rpg-9th-50-more-shades/Black%20Ancient.png?raw=true&quot; /&gt;
-
-[[Ask about the caves|more]]
-
-[[Ask about the mushroom|mushroom]]
-
-[[Leer past the CharacterName]]
-
-</tw-passagedata><tw-passagedata pid="3" name="char2" tags="" position="125,1025" size="100,100">A dour CharacterType stands in front of you.  It looks at you sullenly, plainly.  Pleadingly, even.
+&lt;img src=&quot;https://github.com/efredericks/P5-Projects/blob/main/asciilike/assets/tyler-rpg-9th-50-more-shades/Black%20Ancient.png?raw=true&quot; /&gt;&lt;/div&gt;\
+\
+&lt;div class=&quot;choices&quot;&gt; \
+&lt;&lt;button [[Ask about the caves|more]]&gt;&gt;&lt;&lt;/button&gt;&gt;
+&lt;&lt;button [[Ask about the mushroom|mushroom]]&gt;&gt;&lt;&lt;/button&gt;&gt;
+&lt;&lt;button [[Leer past the CharacterName]]&gt;&gt;&lt;&lt;/button&gt;&gt;
+&lt;/div&gt;\
+</tw-passagedata><tw-passagedata pid="3" name="char2" tags="" position="125,1025" size="100,100">A dour CharacterType stands in front of you.  It looks at you sullenly, plainly.  Pleadingly, even.  A crudely-drawn pair of stick figures can be seen scratched into the wall, one tall, one short.
 
 [[Ask about the bulging tumor on its back]]
 
 [[Ask after its father, it clearly has something its mind]]
 
-[[Ask about a way out of the caves]]</tw-passagedata><tw-passagedata pid="4" name="char3" tags="" position="125,1530" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="5" name="more" tags="" position="225,525" size="100,100">&lt;p class=&quot;bubble speech&quot;&gt;I&#39;ve been here as long as I can remember.  These are the Sugar Caves, though not sure that I&#39;ve ever seen so much as a sack of sugar laying about.  I don&#39;t think they go too deep, but when I&#39;ve taken a fancy to I&#39;ve gone down for what felt like forever.&lt;/p&gt;  
+[[Ask about a way out of the caves]]</tw-passagedata><tw-passagedata pid="4" name="char3" tags="" position="126.66666666666667,1530" size="100,100">You notice another denizen of the caves hiding behind a boulder in the corner.  
+&lt;p class=&quot;speech-bubble&quot;&gt;</tw-passagedata><tw-passagedata pid="5" name="more" tags="" position="225,525" size="100,100">&lt;p class=&quot;speech-bubble&quot;&gt;I&#39;ve been here as long as I can remember.  These are the Sugar Caves, though not sure that I&#39;ve ever seen so much as a sack of sugar laying about.  I don&#39;t think they go too deep, but when I&#39;ve taken a fancy to I&#39;ve gone down for what felt like forever.&lt;/p&gt;  
 
-[[Anything I can help you with?|char1-help]]</tw-passagedata><tw-passagedata pid="6" name="mushroom" tags="" position="225,400" size="100,100">&lt;p class=&quot;bubble speech&quot;&gt;It isn&#39;t poisonous.  At least, I don&#39;t think it is.&lt;/p&gt;
+[[Anything I can help you with?|char1-help]]</tw-passagedata><tw-passagedata pid="6" name="mushroom" tags="" position="225,400" size="100,100">&lt;p class=&quot;speech-bubble&quot;&gt;It isn&#39;t poisonous.  At least, I don&#39;t think it is.&lt;/p&gt;
 
 [[Anything I can help you with?|char1-help]]</tw-passagedata><tw-passagedata pid="7" name="Attack" tags="" position="1000,25" size="100,100">(attack sequence)</tw-passagedata><tw-passagedata pid="8" name="Run away" tags="" position="1125,25" size="100,100">(roll to run away)
 
-1d20 + characterInt &gt;= 10 - characterLuck</tw-passagedata><tw-passagedata pid="9" name="Ask about the bulging tumor on its back" tags="" position="350,925" size="100,100">&lt;p class=&quot;bubble speech&quot;&gt;Oh that old thing?  I call it [[Lefty]], on account of it being on my right shoulder.&lt;/p&gt;
+1d20 + characterInt &gt;= 10 - characterLuck</tw-passagedata><tw-passagedata pid="9" name="Ask about the bulging tumor on its back" tags="" position="350,925" size="100,100">&lt;p class=&quot;speech-bubble&quot;&gt;Oh that old thing?  I call it [[Lefty]], on account of it being on my right shoulder.&lt;/p&gt;
 
 It shrugs in a what-can-you-do manner.
 
-[[Anything I can help you with?|char2-help]]</tw-passagedata><tw-passagedata pid="10" name="Ask after its father, it clearly has something its mind" tags="" position="350,1050" size="100,100">&lt;p class=&quot;bubble speech&quot;&gt;I miss him dearly.  We used to explore these caves you know.  We&#39;d come in at daybreak when the lichen was tender and scrape it off.  We had these little dull knives that were perfect for scrapin&#39; and it&#39;d just pop right off.  We&#39;d dry them in the mid-day sun and add a touch of salt to bring out the cavey funk.  He went deeper into the caves one day and had me wait here for him.&lt;/p&gt;
+[[Anything I can help you with?|char2-help]]</tw-passagedata><tw-passagedata pid="10" name="Ask after its father, it clearly has something its mind" tags="" position="350,1050" size="100,100">&lt;p class=&quot;speech-bubble&quot;&gt;I miss him dearly.  We used to explore these caves you know.  We&#39;d come in at daybreak when the lichen was tender and scrape it off.  We had these little dull knives that were perfect for scrapin&#39; and it&#39;d just pop right off.  We&#39;d dry them in the mid-day sun and add a touch of salt to bring out the cavey funk.  He went deeper into the caves one day and had me wait here for him.&lt;/p&gt;
 
-[[Anything I can help you with?|char2-help]]</tw-passagedata><tw-passagedata pid="11" name="Ask about a way out of the caves" tags="" position="350,1175" size="100,100">&lt;p class=&quot;bubble speech&quot;&gt;The way that you came from, duh.  It was back, um, hmm.&lt;/p&gt;
+[[Anything I can help you with?|char2-help]]</tw-passagedata><tw-passagedata pid="11" name="Ask about a way out of the caves" tags="" position="350,1175" size="100,100">&lt;p class=&quot;speech-bubble&quot;&gt;The way that you came from, duh.  It was back, um, hmm.&lt;/p&gt;
 
 It glowers at the ground in silent confusion.
 
@@ -246,7 +313,7 @@ It glowers at the ground in silent confusion.
 [[Run away]]
 </tw-passagedata><tw-passagedata pid="13" name="char4" tags="" position="141.66666666666666,2058.6666870117188" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="14" name="char5" tags="" position="775,575" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="15" name="char6" tags="" position="775,700" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="16" name="char7" tags="" position="775,825" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="17" name="char8" tags="" position="775,950" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="18" name="char9" tags="" position="775,1150" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="19" name="char10" tags="" position="1025,475" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="20" name="char11" tags="" position="1025,625" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="21" name="char12" tags="" position="1025,775" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="22" name="char13" tags="" position="1025,900" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="23" name="char14" tags="" position="1025,1025" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="24" name="char15" tags="" position="1025,1150" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="25" name="char16" tags="" position="1525,650" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="26" name="char17" tags="" position="1525,775" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="27" name="char18" tags="" position="1525,900" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="28" name="char19" tags="" position="1525,1025" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="29" name="char20" tags="" position="1525,1150" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="30" name="boss1" tags="" position="1800,275" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="31" name="boss2" tags="" position="1950,275" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="32" name="boss3" tags="" position="2100,275" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="33" name="boss4" tags="" position="2250,275" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="34" name="boss5" tags="" position="2400,275" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="35" name="Leer past the CharacterName" tags="" position="225,675" size="100,100">You see a dark passageway leading on.  The CharacterName is blocking most of the view, but it seems to be more caveish than normal.
 
-[[Anything I can help you with?|char1-help]]</tw-passagedata><tw-passagedata pid="36" name="char1-help" tags="" position="425,525" size="100,100">&lt;p class=&quot;bubble speech&quot;&gt;Now that you mention it, I&#39;d love something to eat.  All this talk of depths plumbing and sugar sacks has stirred up a fierce appetite.&lt;/p&gt;
+[[Anything I can help you with?|char1-help]]</tw-passagedata><tw-passagedata pid="36" name="char1-help" tags="" position="425,525" size="100,100">&lt;p class=&quot;speech-bubble&quot;&gt;Now that you mention it, I&#39;d love something to eat.  All this talk of depths plumbing and sugar sacks has stirred up a fierce appetite.&lt;/p&gt;
 
 Unless, of course, I can [[eat you|Attack]] instead if you&#39;d rather.</tw-passagedata><tw-passagedata pid="37" name="Lefty" tags="" position="438.33333333333337,779.9999999999999" size="100,100">The tumour glares at you silently.</tw-passagedata><tw-passagedata pid="38" name="char2-help" tags="" position="533.3333333333334,1008.3333333333334" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="39" name="char21" tags="" position="1306.6666666666667,128.33333333333331" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="40" name="char22" tags="" position="1475,241.66666666666666" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="41" name="char23" tags="" position="1491.6666666666667,361.66666666666663" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="42" name="char24" tags="" position="1246.6666666666667,248.33333333333331" size="100,100">Double-click this passage to edit it.</tw-passagedata><tw-passagedata pid="43" name="char25" tags="" position="1355,246.66666666666666" size="100,100">Double-click this passage to edit it.</tw-passagedata></tw-storydata>
 	<script id="script-sugarcube" type="text/javascript">
