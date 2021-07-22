@@ -116,10 +116,56 @@ You click the [[flashlight]] on and are relieved to see the beam at full strengt
 :: empty cavern [nofooter]
 Your friends are gone. You stand in an empty cavern studded with ancient stalagtites and stalagmites. A drip-drip-drip of water hitting a puddle can be heard off in the distance. No indication of violence can be seen. All you can do is search to [[find your friends | Begin]].
 
+:: MainProcGen
+<<nobr>>
+<div class="parent">
+  <div class="column main">
+    <p>You see a CharacterType standing in the middle of the cavern. Looking around, you also see a skinny odd mushroom in the corner.  It seems to be about knee-height and radiates a bizarre aura, purplish in nature.  Its cap is a deep crimson with sickly purple blotches throughout.  Its stalk is a sallow yellow and appears hairy.</p>
+    <p class="speech-bubble">Hey, great to see you again!  Do you think you can help me find my way back out?  I've got nothing but time it seems.</p>
+    <div style="text-align: center">
+      <img src="https://github.com/efredericks/P5-Projects/blob/main/asciilike/assets/tyler-rpg-9th-50-more-shades/Black%20Bot.png?raw=true" />
+    </div>
+  </div>
+  /*<img src="https://github.com/efredericks/P5-Projects/blob/main/asciilike/assets/tyler-rpg-9th-50-more-shades/Black%20Ancient.png?raw=true" />*/
+   <div class="column sidebar"><<button [[Ask about the caves|more]]>><</button>>
+<<button [[Ask about the mushroom|mushroom]]>><</button>>
+<<button [[Leer past the CharacterName]]>><</button>></div>
+</div>
+<</nobr>>
+
 /* BEGIN PROCGEN */
 :: Begin
 <<nobr>>
 <<if $gameState == setup.STATES.GAME>>
+
+  <<if $game.hasCharacter($game.player.row, $game.player.col, $game.player.depth)>>
+    <<set _roomState to "fight">>
+    <<set _char to $game.getCharacter($game.player.row, $game.player.col, $game.player.depth)>>
+    <<if _char.type == "monster">>
+      <<if _char.boss == true>>
+        <h1>ALERT: THE BOSS</h1>
+      <</if>>
+      <<nobr>>
+      <div class="parent">
+        <div class="column main">
+          <p>You see a <<=_char.mood>> <<=_char.monster.name>> standing in the middle of the cavern. Looking around, you also see a skinny odd mushroom in the corner.  It seems to be about knee-height and radiates a bizarre aura, purplish in nature.  Its cap is a deep crimson with sickly purple blotches throughout.  Its stalk is a sallow yellow and appears hairy.</p>
+          <p class="speech-bubble">Hey, great to see you again!  Do you think you can help me find my way back out?  I've got nothing but time it seems.</p>
+          <div style="text-align: center">
+            <<set _monsterImgPath to "assets/tyler-rpg-9th-50-more-shades/" + _char.monster.img>>
+            [img[_monsterImgPath]]
+          </div>
+        </div>
+        /*<img src="https://github.com/efredericks/P5-Projects/blob/main/asciilike/assets/tyler-rpg-9th-50-more-shades/Black%20Ancient.png?raw=true" />*/
+        <div class="column sidebar">
+          <<button [[Ask about the caves|more]]>><</button>>
+          <<button [[Ask about the mushroom|mushroom]]>><</button>>
+          <<button [[Leer past the _char.monster.name]]>><</button>>
+        </div>
+      </div>
+      <</nobr>>
+    <</if>>
+
+  <<else>>
 
 <div class="container">
   <div class="game-area">
@@ -380,6 +426,7 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
 <<timed 40ms>>
 <<run $game.vizMapCanvas($game.player.depth)>>
 <</timed>>
+<</if>>
 
 <<elseif $gameState == setup.STATES.WIN>>
   <h1>YOU WON</h1>
@@ -445,7 +492,7 @@ Debug:<br />
 <</for>>
 <<else>>
 <hr size="1" />
-[[Skip | Begin]]
+[[Skip | Begin]] | [[New Skip | MainProcGen]]
 <</if>>
 <div id="back"></div>
 <div id="front"></div>
