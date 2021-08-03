@@ -157,9 +157,10 @@ Your friends are gone. You stand in an empty cavern studded with ancient stalagt
         </div>
         /*<img src="https://github.com/efredericks/P5-Projects/blob/main/asciilike/assets/tyler-rpg-9th-50-more-shades/Black%20Ancient.png?raw=true" />*/
         <div class="column sidebar">
+          <<set _charname to "Leer past the " + _char.monster.name>>
           <<button [[Ask about the caves|more]]>><</button>>
           <<button [[Ask about the mushroom|mushroom]]>><</button>>
-          <<button [[Leer past the _char.monster.name]]>><</button>>
+          <<button [[_charname]]>><</button>>
         </div>
       </div>
       <</nobr>>
