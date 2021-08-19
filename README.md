@@ -34,6 +34,8 @@ Aggregation of various playthings in P5JS
 
 ### [Branching (exceedingly laggy - need to fix)](branching)
 
+### [Feesh](feesh)
+
 ---
 
 # Phaser demos
