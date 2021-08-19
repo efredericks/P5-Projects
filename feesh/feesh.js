@@ -17,10 +17,16 @@ class Entity {
 
     if (random() > 0.5) {
       this.velocity = createVector(random(-1.0, 0.2), 0);
-      this.position = createVector(random(width + this.radius, width + this.radius + 500), random(height));
+      this.position = createVector(
+        random(width + this.radius, width + this.radius + 500),
+        random(height)
+      );
     } else {
       this.velocity = createVector(random(0.2, 1.0), 0);
-      this.position = createVector(random(-this.radius, -this.radius - 500), random(height));
+      this.position = createVector(
+        random(-this.radius, -this.radius - 500),
+        random(height)
+      );
     }
     this.color = eg;
   }
@@ -86,8 +92,14 @@ class Entity {
     beginShape();
     fill(this.color);
     let xoff = 0;
-    for (let a = 0; a < TWO_PI - PI / 30; a += 2 * PI / 30) {
-      let offset = map(noise(xoff + this.offRand.x, this.yoff + this.offRand.y), 0, 1, -this.radius / 4, this.radius / 4);
+    for (let a = 0; a < TWO_PI - PI / 30; a += (2 * PI) / 30) {
+      let offset = map(
+        noise(xoff + this.offRand.x, this.yoff + this.offRand.y),
+        0,
+        1,
+        -this.radius / 4,
+        this.radius / 4
+      );
       let r = this.radius / 2 + offset;
       let x = r * cos(a);
       let y = r * sin(a);
@@ -107,10 +119,8 @@ class Entity {
 function circleCircle(e1, e2) {
   let d = dist(e1.position.x, e1.position.y, e2.position.x, e2.position.y);
 
-  if (d < e1.radius / 2 + e2.radius / 2)
-    return true;
-  else
-    return false;
+  if (d < e1.radius / 2 + e2.radius / 2) return true;
+  else return false;
 }
 
 // globals
@@ -162,69 +172,22 @@ function setup() {
   createCanvas(640, 480);
   frameRate(60);
   setupGame();
+
+  STATE = STATES.start;
+
+  // add some extra entities for the splash
+  for (let i = 0; i < numEntities; i++) entities.push(new Entity());
 }
 
 function draw() {
   background(bg);
 
-  if (STATE === STATES.running) {
-    // update floaters
-    entities.forEach((e) => e.update());
+  if (STATE === STATES.start) {
+    entities.forEach((e) => {
+      e.update();
+      e.draw()
+    });
 
-    // handle continuous keypresses
-    if (keyIsDown(LEFT_ARROW)) {
-      player.velocity.x += -0.25;
-      player.veloTimer.x = 10;
-    }
-    if (keyIsDown(RIGHT_ARROW)) {
-      player.velocity.x += 0.25;
-      player.veloTimer.x = 10;
-    }
-    if (keyIsDown(UP_ARROW)) {
-      player.velocity.y += -0.25;
-      player.veloTimer.y = 10;
-    }
-    if (keyIsDown(DOWN_ARROW)) {
-      player.velocity.y += 0.25;
-      player.veloTimer.y = 10;
-    }
-
-    // cap velocity
-    player.velocity.x = constrain(player.velocity.x, -3.5, 3.5);
-    player.velocity.y = constrain(player.velocity.y, -3.5, 3.5);
-
-    // update player
-    player.update();
-
-    // collisions
-    for (let i = entities.length - 1; i >= 0; i--) {
-      if (circleCircle(player, entities[i])) {
-        // player bigger than entity
-        if (player.radius >= entities[i].radius) {
-          player.growTimer = 10;
-          player.growTarget = entities[i].radius / 2;
-
-          entities.splice(i, 1);
-          entities.push(new Entity()); // add a new one back
-
-          if (player.radius > width)
-            STATE = STATES.win;
-
-          // player smaller than entity
-        } else {
-          player.color = color(255, 0, 0);
-          STATE = STATES.gameOver;
-        }
-      }
-    }
-  }
-
-  // draw entities
-  entities.forEach((e) => e.draw());
-  player.draw();
-
-  // you lost
-  if (STATE === STATES.gameOver || STATE === STATES.win) {
     fill(color(0, 0, 0, 180));
     rect(0, 0, width, height);
 
@@ -232,21 +195,92 @@ function draw() {
     fill(255);
     textAlign(CENTER, CENTER);
 
-    let txt = "YOU DIED";
-    if (STATE === STATES.win)
-      txt = "YOU WON";
-    text(txt, width / 2, height / 2);
+    text("feesh", width / 2, height / 2);
 
     textSize(16);
-    text(`Final size: ${int(player.radius)}`, width / 2, height / 2 + 24);
-    text("Press any key to restart", width / 2, height / 2 + 44);
+    text("Movement: Arrow keys // Pause: Space", width / 2, height / 2 + 24);
+    text("Press any key to start", width / 2, height / 2 + 44);
+
+  } else {
+    if (STATE === STATES.running) {
+      // update floaters
+      entities.forEach((e) => e.update());
+
+      // handle continuous keypresses
+      if (keyIsDown(LEFT_ARROW)) {
+        player.velocity.x += -0.25;
+        player.veloTimer.x = 10;
+      }
+      if (keyIsDown(RIGHT_ARROW)) {
+        player.velocity.x += 0.25;
+        player.veloTimer.x = 10;
+      }
+      if (keyIsDown(UP_ARROW)) {
+        player.velocity.y += -0.25;
+        player.veloTimer.y = 10;
+      }
+      if (keyIsDown(DOWN_ARROW)) {
+        player.velocity.y += 0.25;
+        player.veloTimer.y = 10;
+      }
+
+      // cap velocity
+      player.velocity.x = constrain(player.velocity.x, -3.5, 3.5);
+      player.velocity.y = constrain(player.velocity.y, -3.5, 3.5);
+
+      // update player
+      player.update();
+
+      // collisions
+      for (let i = entities.length - 1; i >= 0; i--) {
+        if (circleCircle(player, entities[i])) {
+          // player bigger than entity
+          if (player.radius >= entities[i].radius) {
+            player.growTimer = 10;
+            player.growTarget = entities[i].radius / 2;
+
+            entities.splice(i, 1);
+            entities.push(new Entity()); // add a new one back
+
+            if (player.radius > width) STATE = STATES.win;
+
+            // player smaller than entity
+          } else {
+            player.color = color(255, 0, 0);
+            STATE = STATES.gameOver;
+          }
+        }
+      }
+    }
+
+    // draw entities
+    entities.forEach((e) => e.draw());
+    player.draw();
+
+    // you lost
+    if (STATE === STATES.gameOver || STATE === STATES.win) {
+      fill(color(0, 0, 0, 180));
+      rect(0, 0, width, height);
+
+      textSize(32);
+      fill(255);
+      textAlign(CENTER, CENTER);
+
+      let txt = "YOU DIED";
+      if (STATE === STATES.win) txt = "YOU WON";
+      text(txt, width / 2, height / 2);
+
+      textSize(16);
+      text(`Final size: ${int(player.radius)}`, width / 2, height / 2 + 24);
+      text("Press any key to restart", width / 2, height / 2 + 44);
+    }
   }
 }
 
 // handle async keypresses
 function keyPressed() {
   // restart game if done
-  if (STATE === STATES.gameOver || STATE === STATES.win) {
+  if (STATE === STATES.gameOver || STATE === STATES.win || STATE === STATES.start) {
     setupGame();
   } else {
     if (key === " ") {
