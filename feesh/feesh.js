@@ -169,7 +169,8 @@ function setupGame() {
 }
 
 function setup() {
-  createCanvas(640, 480);
+  let c = createCanvas(640, 480);
+  c.parent('canvas-container');
   frameRate(60);
   setupGame();
 
