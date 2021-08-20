@@ -3,16 +3,22 @@
 // Color palette: https://www.color-hex.com/color-palette/103536
 // Blobby: https://thecodingtrain.com/CodingChallenges/036-blobby.html
 
+// TBD:
+// * comment cleanup
+// * offscreen culling optimization
+// * difficulty selection
+
 // Generic entity
 class Entity {
   constructor() {
     this.cooldown = 0; // bounce cooldown
-    this.yoff = 0.0;
+
+    this.yoff = 0.0; // blob parameter
     // ensure all don't blob the same
     this.offRand = createVector(random(50000), random(50000));
     this.diameter = int(random(3, 100));
-    // this.position = createVector(int(random(width)), int(random(height)));
 
+    // randomly start its position/direction
     if (random() > 0.5) {
       this.velocity = createVector(random(-1.0, 0.2), 0);
       this.position = createVector(
@@ -146,6 +152,15 @@ class Entity {
   }
 }
 
+// enable/disable entity bouncing
+function bouncyBoxChanged() {
+  if (this.checked()) {
+    bouncy = true;
+  } else {
+    bouncy = false;
+  }
+}
+
 // Circle-Circle collision
 function circleCircle(e1, e2) {
   let d = dist(e1.position.x, e1.position.y, e2.position.x, e2.position.y);
@@ -163,12 +178,8 @@ let bg;
 let pg;
 let eg;
 
-let DIFFICULTIES = {
-  easy: 0,
-  medium: 1,
-  hard: 2
-};
-let DIFFICULTY;
+let bouncyBox;
+let bouncy;
 
 let STATE;
 let STATES = {
@@ -211,6 +222,11 @@ function setup() {
   c.parent('canvas-container');
   frameRate(60);
   setupGame();
+
+  bouncyBox = createCheckbox('bouncy blobs?', true);
+  bouncyBox.parent('controls');
+  bouncyBox.changed(bouncyBoxChanged);
+  bouncy = true;
 
   STATE = STATES.start;
 
@@ -291,14 +307,16 @@ function draw() {
         }
 
         // let them BOUNCE
-        for (let j = entities.length - 1; j >= 0; j--) {
-          if (i == j) continue;
+        if (bouncy) {
+          for (let j = entities.length - 1; j >= 0; j--) {
+            if (i == j) continue;
 
-          if (circleCircle(entities[i], entities[j]) && entities[i].inBounds() && entities[j].inBounds()) {
-            if (entities[i].cooldown == 0)
-              entities[i].bounce(entities[j]);
-            if (entities[j].cooldown == 0)
-              entities[j].bounce(entities[i]);
+            if (circleCircle(entities[i], entities[j]) && entities[i].inBounds() && entities[j].inBounds()) {
+              if (entities[i].cooldown == 0)
+                entities[i].bounce(entities[j]);
+              if (entities[j].cooldown == 0)
+                entities[j].bounce(entities[i]);
+            }
           }
         }
       }
