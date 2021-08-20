@@ -3,32 +3,59 @@
 // Color palette: https://www.color-hex.com/color-palette/103536
 // Blobby: https://thecodingtrain.com/CodingChallenges/036-blobby.html
 
-//TBD:
-// * radius is actually diameter -- precalculate and update
-
 // Generic entity
 class Entity {
   constructor() {
+    this.cooldown = 0; // bounce cooldown
     this.yoff = 0.0;
     // ensure all don't blob the same
     this.offRand = createVector(random(50000), random(50000));
-    this.radius = int(random(3, 100));
+    this.diameter = int(random(3, 100));
     // this.position = createVector(int(random(width)), int(random(height)));
 
     if (random() > 0.5) {
       this.velocity = createVector(random(-1.0, 0.2), 0);
       this.position = createVector(
-        random(width + this.radius, width + this.radius + 500),
+        random(width + this.diameter, width + this.diameter + 500),
         random(height)
       );
     } else {
       this.velocity = createVector(random(0.2, 1.0), 0);
       this.position = createVector(
-        random(-this.radius, -this.radius - 500),
+        random(-this.diameter, -this.diameter - 500),
         random(height)
       );
     }
     this.color = eg;
+  }
+
+  // only bounce if in bounds
+  inBounds() {
+    return ((this.position.x > 0) &&
+      (this.position.x < width) &&
+      (this.position.y > 0) &&
+      (this.position.y < height))
+  }
+
+  // collision between entities occurred, bounce
+  // https://p5js.org/examples/motion-bouncy-bubbles.html
+  bounce(other) {
+    this.cooldown = 5;
+
+    let dx = other.position.x - this.position.x;
+    let dy = other.position.y - this.position.y;
+
+    let spring = 0.05;
+
+    let distance = sqrt(dx * dx + dy * dy);
+    let minDist = other.diameter / 2 + this.diameter / 2;
+    let angle = atan2(dy, dx);
+    let targetX = this.position.x + cos(angle) * minDist;
+    let targetY = this.position.y + sin(angle) * minDist;
+    let ax = (targetX - other.position.x) * spring;
+    let ay = (targetY - other.position.y) * spring;
+    this.velocity.x -= ax;
+    this.velocity.y -= ay;
   }
 
   // update position, boundaries, sizing, etc.
@@ -38,26 +65,30 @@ class Entity {
 
     // update all entities that are not the player
     if (!this.isPlayer) {
+      // cooldown
+      if (this.cooldown > 0)
+        this.cooldown--;
+
       // bounds wrapping
       if (this.velocity.x < 0) {
         // left bound
-        if (this.position.x + this.radius < 0) {
-          this.position.x = width + this.radius + random(150);
-          this.radius = random(3, 100);
-          this.position.y = random(this.radius, height - this.radius);
+        if (this.position.x + this.diameter < 0) {
+          this.position.x = width + this.diameter + random(150);
+          this.diameter = random(3, 100);
+          this.position.y = random(this.diameter, height - this.diameter);
         }
       } else {
         // right bound
-        if (this.position.x - this.radius > width) {
-          this.position.x = -this.radius + random(-150);
-          this.radius = random(3, 100);
-          this.position.y = random(this.radius, height - this.radius);
+        if (this.position.x - this.diameter > width) {
+          this.position.x = -this.diameter + random(-150);
+          this.diameter = random(3, 100);
+          this.position.y = random(this.diameter, height - this.diameter);
         }
       }
     } else {
       // easy way to stay in-bounds
-      // this.position.x = constrain(this.position.x, this.radius/2, width-this.radius/2);
-      // this.position.y = constrain(this.position.y, this.radius/2, height-this.radius/2);
+      // this.position.x = constrain(this.position.x, this.diameter/2, width-this.diameter/2);
+      // this.position.y = constrain(this.position.y, this.diameter/2, height-this.diameter/2);
       // easing
       if (this.veloTimer.x > 0) {
         this.veloTimer.x--;
@@ -74,7 +105,7 @@ class Entity {
       }
 
       if (this.growTimer > 0) {
-        this.radius += this.growTarget / 10;
+        this.diameter += this.growTarget / 10;
         this.growTimer--;
       } else {
         this.growTimer = 0;
@@ -97,10 +128,10 @@ class Entity {
         noise(xoff + this.offRand.x, this.yoff + this.offRand.y),
         0,
         1,
-        -this.radius / 4,
-        this.radius / 4
+        -this.diameter / 4,
+        this.diameter / 4
       );
-      let r = this.radius / 2 + offset;
+      let r = this.diameter / 2 + offset;
       let x = r * cos(a);
       let y = r * sin(a);
       vertex(x, y);
@@ -110,7 +141,7 @@ class Entity {
     this.yoff += 0.01;
     // noStroke();
     // fill(this.color);
-    // circle(this.position.x, this.position.y, this.radius);
+    // circle(this.position.x, this.position.y, this.diameter);
     pop();
   }
 }
@@ -119,18 +150,25 @@ class Entity {
 function circleCircle(e1, e2) {
   let d = dist(e1.position.x, e1.position.y, e2.position.x, e2.position.y);
 
-  if (d < e1.radius / 2 + e2.radius / 2) return true;
+  if (d < e1.diameter / 2 + e2.diameter / 2) return true;
   else return false;
 }
 
 // globals
 let entities = [];
-let numEntities = 10;
+let numEntities = 20;
 let player;
 
 let bg;
 let pg;
 let eg;
+
+let DIFFICULTIES = {
+  easy: 0,
+  medium: 1,
+  hard: 2
+};
+let DIFFICULTY;
 
 let STATE;
 let STATES = {
@@ -152,7 +190,7 @@ function setupGame() {
   for (let i = 0; i < numEntities; i++) entities.push(new Entity());
 
   player = new Entity();
-  player.radius = 0;
+  player.diameter = 0;
   player.color = pg; //color(255, 0, 255);
   player.isPlayer = true;
   player.position.x = width / 2;
@@ -236,19 +274,31 @@ function draw() {
       for (let i = entities.length - 1; i >= 0; i--) {
         if (circleCircle(player, entities[i])) {
           // player bigger than entity
-          if (player.radius >= entities[i].radius) {
+          if (player.diameter >= entities[i].diameter) {
             player.growTimer = 10;
-            player.growTarget = entities[i].radius / 2;
+            player.growTarget = entities[i].diameter / 2;
 
             entities.splice(i, 1);
             entities.push(new Entity()); // add a new one back
 
-            if (player.radius > width) STATE = STATES.win;
+            if (player.diameter > width) STATE = STATES.win;
 
             // player smaller than entity
           } else {
             player.color = color(255, 0, 0);
             STATE = STATES.gameOver;
+          }
+        }
+
+        // let them BOUNCE
+        for (let j = entities.length - 1; j >= 0; j--) {
+          if (i == j) continue;
+
+          if (circleCircle(entities[i], entities[j]) && entities[i].inBounds() && entities[j].inBounds()) {
+            if (entities[i].cooldown == 0)
+              entities[i].bounce(entities[j]);
+            if (entities[j].cooldown == 0)
+              entities[j].bounce(entities[i]);
           }
         }
       }
@@ -272,7 +322,7 @@ function draw() {
       text(txt, width / 2, height / 2);
 
       textSize(16);
-      text(`Final size: ${int(player.radius)}`, width / 2, height / 2 + 24);
+      text(`Final size: ${int(player.diameter)}`, width / 2, height / 2 + 24);
       text("Press any key to restart", width / 2, height / 2 + 44);
     }
   }
