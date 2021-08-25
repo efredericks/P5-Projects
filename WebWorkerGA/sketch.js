@@ -58,11 +58,13 @@ function draw() {
       text(`Generation [${active_msg.data.generation}]`, 20, 20);
       text(`Individual [${active_msg.data.elite}]`, 20, 60);
       text(`Target [${target}]`, 20, 100);
+      text(`Framerate [${frameRate()}]`, 20, 140);
     } else if (active_msg.data.msg == "done") {
       background(color(60, 176, 137));
       text(`Generation [${active_msg.data.generation}]`, 20, 20);
       text(`Individual [${active_msg.data.elite}]`, 20, 60);
       text(`Target [${target}]`, 20, 100);
+      text(`Framerate [${frameRate()}]`, 20, 140);
     } else {
       background(color(255, 0, 255));
       text("ERROR", 20, 20);
