@@ -10,23 +10,23 @@
 
 // Generic entity
 class Entity {
-  constructor() {
+  constructor(vel, diam) {
     this.cooldown = 0; // bounce cooldown
 
     this.yoff = 0.0; // blob parameter
     // ensure all don't blob the same
     this.offRand = createVector(random(50000), random(50000));
-    this.diameter = int(random(3, 100));
+    this.diameter = int(random(diam.small, diam.large));
 
     // randomly start its position/direction
     if (random() > 0.5) {
-      this.velocity = createVector(random(-1.0, 0.2), 0);
+      this.velocity = createVector(random(-vel.large, vel.small), 0);
       this.position = createVector(
         random(width + this.diameter, width + this.diameter + 500),
         random(height)
       );
     } else {
-      this.velocity = createVector(random(0.2, 1.0), 0);
+      this.velocity = createVector(random(vel.small, vel.large), 0);
       this.position = createVector(
         random(-this.diameter, -this.diameter - 500),
         random(height)
@@ -152,6 +152,45 @@ class Entity {
   }
 }
 
+// monitor-analyze-plan-execute
+/* 
+  * Monitor: 
+    - check score (player size)
+    - check number of blobs
+    - check existing blob sizes
+    - check blob velocities
+  * Analyze:
+    - difficulty scale
+  * Plan:
+    - ensure blob changes are on screen to ensure player knows
+  * Execute:
+    - scale blob sizes/velocities
+    - write changes to debug log
+*/
+function MAPEcycle() {
+  let knob_threshold = 20;
+  let score = int(player.diameter);
+
+  let scoreCheck = int(score/knob_threshold);
+  if (scoreCheck > lastThreshold) {
+    lastThreshold = scoreCheck;
+    debugLog.push(`New threshold: ${lastThreshold}`);
+
+    while (entities.length < ((lastThreshold+1) * numEntities)) { // scale # of blobs based on threshold?
+      entities.push(new Entity(startingVelocity, startingDiamater));
+    }
+    debugLog.push(`Enemies increased -> ${entities.length}`);
+  }
+
+  // draw debuglog
+  let yoff = 10;
+  textSize(12);
+  fill(color(255))
+  for (let i = 0; i < debugLog.length; i++) {
+    text(debugLog[i], 40, yoff * i + 20);
+  }
+}
+
 // enable/disable entity bouncing
 function bouncyBoxChanged() {
   if (this.checked()) {
@@ -181,6 +220,9 @@ function circleCircle(e1, e2) {
 // globals
 let entities = [];
 let numEntities = 20;
+
+let startingVelocity = {'small': 0.1, 'large': 0.5};
+let startingDiamater = {'small': 3, 'large': 100};
 let player;
 
 let bg;
@@ -192,6 +234,9 @@ let bouncy;
 
 let testsBox;
 let tests;
+
+let debugLog = [];
+let lastThreshold;
 
 let STATE;
 let STATES = {
@@ -210,9 +255,9 @@ function setupGame() {
   pg = color(187, 28, 203);
   eg = color(212, 148, 147);
 
-  for (let i = 0; i < numEntities; i++) entities.push(new Entity());
+  for (let i = 0; i < numEntities; i++) entities.push(new Entity(startingVelocity, startingDiamater));
 
-  player = new Entity();
+  player = new Entity({'small':0, 'large':0},{'small':0,'large':0});
   player.diameter = 0;
   player.color = pg; //color(255, 0, 255);
   player.isPlayer = true;
@@ -227,6 +272,8 @@ function setupGame() {
   player.growTarget = 5;
 
   STATE = STATES.running;
+
+  lastThreshold = 0;
 }
 
 function setup() {
@@ -248,7 +295,7 @@ function setup() {
   STATE = STATES.start;
 
   // add some extra entities for the splash
-  for (let i = 0; i < numEntities; i++) entities.push(new Entity());
+  for (let i = 0; i < numEntities; i++) entities.push(new Entity(startingVelocity, startingDiamater));
 }
 
 function handleRunTimeTesting() {
@@ -319,7 +366,7 @@ function draw() {
             player.growTarget = entities[i].diameter / 2;
 
             entities.splice(i, 1);
-            entities.push(new Entity()); // add a new one back
+            entities.push(new Entity(startingVelocity, startingDiamater)); // add a new one back
 
             if (player.diameter > width) STATE = STATES.win;
 
@@ -349,6 +396,9 @@ function draw() {
     // draw entities
     entities.forEach((e) => e.draw());
     player.draw();
+
+    // MAPE
+    MAPEcycle();
 
     // you lost
     if (STATE === STATES.gameOver || STATE === STATES.win) {
