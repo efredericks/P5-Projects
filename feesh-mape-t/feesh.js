@@ -159,6 +159,8 @@ class Entity {
     - check number of blobs
     - check existing blob sizes
     - check blob velocities
+    - fps
+    - time in between increase?
   * Analyze:
     - difficulty scale
   * Plan:
@@ -169,25 +171,48 @@ class Entity {
 */
 function MAPEcycle() {
   let knob_threshold = 20;
+  let fps_threshold = 30;
+
+  // randomly add an enemy
+  if (random() > 0.98) {
+    debugLog.push("Random enemy added");
+    entities.push(new Entity(startingVelocity, startingDiamater));
+  }
+
+
   let score = int(player.diameter);
 
-  let scoreCheck = int(score/knob_threshold);
+  let scoreCheck = int(score / knob_threshold);
   if (scoreCheck > lastThreshold) {
     lastThreshold = scoreCheck;
     debugLog.push(`New threshold: ${lastThreshold}`);
 
-    while (entities.length < ((lastThreshold+1) * numEntities)) { // scale # of blobs based on threshold?
+    while (entities.length < ((lastThreshold + 1) * numEntities)) { // scale # of blobs based on threshold?
       entities.push(new Entity(startingVelocity, startingDiamater));
     }
     debugLog.push(`Enemies increased -> ${entities.length}`);
+  }
+
+  if (frameRate() < fps_threshold) {
+    // remove up to 5 at a time
+    if (entities.length > 1) {
+      debugLog.push(`FPS exceeded, removing entity -> ${entities.length-1}`);
+      entities.splice(entities.length - 1, 1);
+    }
   }
 
   // draw debuglog
   let yoff = 10;
   textSize(12);
   fill(color(255))
-  for (let i = 0; i < debugLog.length; i++) {
-    text(debugLog[i], 40, yoff * i + 20);
+  textAlign(LEFT);
+
+  let start = 0;
+  let end = debugLog.length;
+  if (end > 20)
+    start = end - 20;
+  for (let i = start; i < end; i++) {
+    text(debugLog[i], 40, yoff * (i - start) + 20);
   }
 }
 
@@ -221,8 +246,8 @@ function circleCircle(e1, e2) {
 let entities = [];
 let numEntities = 20;
 
-let startingVelocity = {'small': 0.1, 'large': 0.5};
-let startingDiamater = {'small': 3, 'large': 100};
+let startingVelocity = { 'small': 0.1, 'large': 1.5 };
+let startingDiamater = { 'small': 3, 'large': 100 };
 let player;
 
 let bg;
@@ -250,6 +275,7 @@ let STATES = {
 // re-initialize everything as needed
 function setupGame() {
   entities = [];
+  debugLog = [];
   player = null;
   bg = color(60, 35, 92);
   pg = color(187, 28, 203);
@@ -257,7 +283,7 @@ function setupGame() {
 
   for (let i = 0; i < numEntities; i++) entities.push(new Entity(startingVelocity, startingDiamater));
 
-  player = new Entity({'small':0, 'large':0},{'small':0,'large':0});
+  player = new Entity({ 'small': 0, 'large': 0 }, { 'small': 0, 'large': 0 });
   player.diameter = 0;
   player.color = pg; //color(255, 0, 255);
   player.isPlayer = true;
@@ -301,7 +327,7 @@ function setup() {
 function handleRunTimeTesting() {
   for (i = 0; i < 1000; i++) {
     fill(255);
-    rect(random(width-20), random(height-20), 20, 20);
+    rect(random(width - 20), random(height - 20), 20, 20);
   }
 }
 
@@ -324,7 +350,7 @@ function draw() {
     text("feesh [research edition]", width / 2, height / 2);
 
     textSize(16);
-    text("Movement: Arrow keys // Pause: Space", width / 2, height / 2 + 24);
+    text("Movement: Arrow keys // Pause: Space // Restart: R", width / 2, height / 2 + 24);
     text("Press any key to start", width / 2, height / 2 + 44);
 
   } else {
@@ -391,14 +417,14 @@ function draw() {
           }
         }
       }
+
+      // MAPE
+      MAPEcycle();
     }
 
     // draw entities
     entities.forEach((e) => e.draw());
     player.draw();
-
-    // MAPE
-    MAPEcycle();
 
     // you lost
     if (STATE === STATES.gameOver || STATE === STATES.win) {
@@ -441,6 +467,8 @@ function keyPressed() {
     if (key === " ") {
       if (STATE === STATES.running) STATE = STATES.paused;
       else STATE = STATES.running;
+    } else if (key === "r" || key === "R") {
+      setupGame();
     }
   }
 }
