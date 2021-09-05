@@ -160,6 +160,7 @@ class Entity {
     - check existing blob sizes
     - check blob velocities
     - fps
+    - remove collision detection?
     - time in between increase?
   * Analyze:
     - difficulty scale
@@ -194,12 +195,24 @@ function MAPEcycle() {
   }
 
   if (frameRate() < fps_threshold) {
+    if (bouncy) {
+      bouncy = false;
+      debugLog.push("Debounced")
+    }
+
     // remove up to 5 at a time
     if (entities.length > 1) {
       debugLog.push(`FPS exceeded, removing entity -> ${entities.length-1}`);
       entities.splice(entities.length - 1, 1);
     }
+  } else {
+    // if (!bouncy) {
+    //   debugLog.push("Rebounced")
+    //   bouncy = true;
+    // }
   }
+
+
 
   // draw debuglog
   let yoff = 10;
