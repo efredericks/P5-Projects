@@ -8,6 +8,8 @@
 // * offscreen culling optimization
 // * difficulty selection
 
+// powerups?
+
 // Generic entity
 class Entity {
   constructor(vel, diam) {
@@ -91,7 +93,7 @@ class Entity {
           this.position.y = random(this.diameter, height - this.diameter);
         }
       }
-    } else {
+    } else { // the player
       // easy way to stay in-bounds
       // this.position.x = constrain(this.position.x, this.diameter/2, width-this.diameter/2);
       // this.position.y = constrain(this.position.y, this.diameter/2, height-this.diameter/2);
@@ -117,6 +119,12 @@ class Entity {
         this.growTimer = 0;
         this.growTarget = 0;
       }
+
+      if (this.shieldActive > 0) {
+        this.shieldActive-=0.2;
+      } else {
+        this.shieldActive = 0;
+      }
     }
   }
 
@@ -126,6 +134,13 @@ class Entity {
     // blobby-ize this
     noStroke();
     translate(this.position.x, this.position.y);
+
+    // player fx
+    if (this.isPlayer && this.shieldActive > 0) {
+      fill(color(255, 0, 0, 100));
+      circle(0, 0, this.diameter + (this.shieldActive*3));
+    }
+
     beginShape();
     fill(this.color);
     let xoff = 0;
@@ -160,10 +175,11 @@ class Entity {
     - check existing blob sizes
     - check blob velocities
     - fps
-    - remove collision detection?
     - time in between increase?
   * Analyze:
     - difficulty scale
+    - remove collision detection?
+    - deblobbyize?
   * Plan:
     - ensure blob changes are on screen to ensure player knows
   * Execute:
@@ -202,7 +218,7 @@ function MAPEcycle() {
 
     // remove up to 5 at a time
     if (entities.length > 1) {
-      debugLog.push(`FPS exceeded, removing entity -> ${entities.length-1}`);
+      debugLog.push(`FPS exceeded, removing entity -> ${entities.length - 1}`);
       entities.splice(entities.length - 1, 1);
     }
   } else {
@@ -306,6 +322,14 @@ function setupGame() {
   player.velocity.y = 0;
   player.veloTimer = createVector(0, 0);
 
+  // setup simple inventory
+  player.items = {
+    'shield': 5,
+    'noncorporeal': 5,
+    'flame': 5,
+    'laser': 5,
+  };
+
   // chunk into X steps for eased growing
   player.growTimer = 30;
   player.growTarget = 5;
@@ -341,6 +365,14 @@ function handleRunTimeTesting() {
   for (i = 0; i < 1000; i++) {
     fill(255);
     rect(random(width - 20), random(height - 20), 20, 20);
+  }
+}
+
+function keyReleased() {
+  if (key == "1") {
+    if (player.items.shield > 0) {
+      player.shieldActive = 20;
+    }
   }
 }
 
