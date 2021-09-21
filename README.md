@@ -36,6 +36,8 @@ Aggregation of various playthings in P5JS
 
 ### [Feesh](feesh)
 
+### [Flow Fields](flow)
+
 ---
 
 # Phaser demos
