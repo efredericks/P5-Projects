@@ -126,7 +126,7 @@ function initVertices() {
       points: [
         createVector(
           width / 2 + random(-_x_bound, _x_bound),
-          height / 2 + random(-_y_bound, _y_bound)
+          height / 2 + random(-_y_bound*2, _y_bound*2)
         ),
       ],
 
